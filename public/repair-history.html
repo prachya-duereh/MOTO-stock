@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ประวัติการซ่อม</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#eef2f7;color:#222}.page{padding:16px}.topbar,.panel{background:#fff;border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,.08)}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;margin-bottom:16px;gap:12px;flex-wrap:wrap}.topbar button,.full,.small-btn,.del-btn,.print-btn{border:none;color:#fff;border-radius:12px;cursor:pointer}
+.topbar button{background:#2563eb;padding:12px 16px}.grid{display:grid;grid-template-columns:38% 62%;gap:16px}.panel{padding:16px}
+input,textarea,select{width:100%;box-sizing:border-box;padding:14px;margin:8px 0;border:1px solid #ccd5df;border-radius:12px;font-size:16px}textarea{min-height:110px;resize:vertical}
+.full{width:100%;background:#2563eb;padding:14px;font-size:16px;margin-top:8px}.record{border:1px solid #e1e7ee;border-radius:14px;padding:12px;margin-bottom:12px;background:#fbfcfe}.del-btn{width:100%;background:#dc2626;padding:12px;margin-top:10px}
+.print-btn{width:100%;background:#16a34a;padding:12px;margin-top:10px}.parts-box{border:1px solid #e5e7eb;border-radius:12px;padding:10px;background:#fafcff;margin-top:8px}.part-row{border-bottom:1px solid #eee;padding:8px 0}.two-col{display:grid;grid-template-columns:1fr 180px;gap:8px}
+.total-box{font-size:18px;font-weight:bold;margin-top:8px}.small-btn{background:#16a34a;padding:12px;width:100%}.remove-part-btn{margin-top:6px;border:none;background:#ef4444;color:#fff;padding:8px 10px;border-radius:10px;cursor:pointer}.empty-text{color:#666}
+.price-mode{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 4px 0}.price-mode button{border:none;padding:12px;border-radius:10px;background:#dbeafe;color:#1d4ed8;cursor:pointer;font-size:15px;font-weight:bold}.price-mode button.active{background:#2563eb;color:#fff}
+@media (max-width:1100px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <h2>ประวัติการซ่อมรถลูกค้า</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;"><button onclick="location.href='/pos.html'">หน้าร้าน</button><button onclick="location.href='/admin.html'">หลังบ้าน</button><button onclick="logout()" style="background:#dc2626;">ออกจากระบบ</button></div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <h3>บันทึกประวัติใหม่</h3>
+      <input id="customerName" placeholder="ชื่อลูกค้า"><input id="phone" placeholder="เบอร์โทร"><input id="bikeModel" placeholder="รุ่นรถ"><input id="plate" placeholder="ทะเบียนรถ"><input id="repairDate" type="date"><textarea id="symptom" placeholder="อาการ / งานซ่อม"></textarea>
+      <h3>เลือกประเภทราคาอะไหล่</h3>
+      <div class="price-mode"><button id="repair-price-retail" onclick="setRepairPriceType('retail')">ราคาปลีก</button><button id="repair-price-wholesale" onclick="setRepairPriceType('wholesale')">ราคาส่ง</button><button id="repair-price-mechanic" class="active" onclick="setRepairPriceType('mechanic')">ราคาช่าง</button></div>
+      <h3>เลือกอะไหล่จากสต๊อก</h3>
+      <input id="partSearch" placeholder="พิมพ์ค้นหาอะไหล่..." oninput="renderPartOptions()"><select id="partSelect"></select>
+      <div class="two-col"><input id="partQty" type="number" placeholder="จำนวน"><button class="small-btn" onclick="addPart()">เพิ่ม</button></div>
+      <div class="parts-box"><div><b>อะไหล่ที่ใช้</b></div><div id="partsList">ยังไม่มีอะไหล่</div></div>
+      <input id="laborCost" type="number" placeholder="ค่าแรง" oninput="updateTotals()"><div class="total-box" id="partsCostText">ค่าอะไหล่: 0 บาท</div><div class="total-box" id="totalCostText">รวมเงิน: 0 บาท</div>
+      <textarea id="note" placeholder="หมายเหตุเพิ่มเติม"></textarea>
+      <button class="full" onclick="saveRepair()">บันทึกประวัติ</button>
+      <button class="print-btn" onclick="printCurrentRepairForm()">พิมพ์ใบรับซ่อมจากฟอร์มนี้</button>
+      <button class="print-btn" style="background:#1d4ed8" onclick="printCurrentRepairReceipt()">พิมพ์ใบเสร็จจากฟอร์มนี้</button>
+    </div>
+    <div class="panel">
+      <h3>ค้นหาประวัติ</h3>
+      <input id="searchRepair" placeholder="ค้นหาชื่อลูกค้า เบอร์ รุ่นรถ ทะเบียน อาการ อะไหล่" oninput="loadRepairs()">
+      <div id="repairList"></div>
+    </div>
+  </div>
+</div>
+<script>
+let items=[]; let selectedParts=[]; let repairPriceType='mechanic'; let repairsCache=[];
+function $(id){return document.getElementById(id);}
+function money(n){return Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:2});}
+async function api(url, options){try{const res=await fetch(url,options);const text=await res.text();let data={};try{data=text?JSON.parse(text):{};}catch{throw new Error(text||'server ส่งข้อมูลไม่ถูกต้อง');}if(!res.ok||data.success===false) throw new Error(data.message||'เกิดข้อผิดพลาด');return data;}catch(err){if(err instanceof TypeError) throw new Error('เชื่อมต่อเซิร์ฟเวอร์หรือฐานข้อมูลไม่สำเร็จ'); throw err;}}
+function getRepairPriceLabel(){return repairPriceType==='retail'?'ราคาปลีก':repairPriceType==='wholesale'?'ราคาส่ง':'ราคาช่าง';}
+function getRepairUnitPrice(item){if(repairPriceType==='retail') return Number(item.retailPrice||0); if(repairPriceType==='wholesale') return Number(item.wholesalePrice||0); return Number(item.mechanicPrice||item.retailPrice||0);}
+function setRepairPriceType(type){repairPriceType=type; ['retail','wholesale','mechanic'].forEach(t=>$('repair-price-'+t).classList.remove('active')); $('repair-price-'+type).classList.add('active'); selectedParts=[]; renderSelectedParts(); renderPartOptions();}
+async function loadItems(){items = await api('/api/items'); renderPartOptions();}
+function renderPartOptions(){const select=$('partSelect'); const keyword=$('partSearch').value.trim().toLowerCase(); select.innerHTML=''; const filtered=items.filter(item=>[item.name,item.barcode,item.category,item.model,item.year,item.note].join(' ').toLowerCase().includes(keyword)); if(!filtered.length){select.innerHTML='<option value="">ไม่พบอะไหล่</option>'; return;} filtered.forEach(item=>{const option=document.createElement('option'); option.value=item.id; option.textContent=`${item.name} [${item.barcode||'-'}] | คงเหลือ ${item.quantity} | ${getRepairPriceLabel()} ${money(getRepairUnitPrice(item))}`; select.appendChild(option);});}
+function addPart(){const item=items.find(i=>i.id==$('partSelect').value); const qty=Number($('partQty').value)||0; if(!item) return alert('กรุณาเลือกอะไหล่'); if(qty<=0) return alert('กรุณาใส่จำนวน'); if(qty>Number(item.quantity)) return alert('จำนวนอะไหล่เกินสต๊อก'); const found=selectedParts.find(p=>p.id==item.id); if(found){if(found.qty+qty>Number(item.quantity)) return alert('จำนวนรวมเกินสต๊อก'); found.qty+=qty;} else {selectedParts.push({id:item.id,barcode:item.barcode||'',name:item.name,qty,unitPrice:getRepairUnitPrice(item),priceLabel:getRepairPriceLabel()});} $('partQty').value=''; renderSelectedParts();}
+function removePart(index){selectedParts.splice(index,1); renderSelectedParts();}
+function renderSelectedParts(){if(!selectedParts.length){$('partsList').innerHTML='ยังไม่มีอะไหล่'; updateTotals(); return;} $('partsList').innerHTML=selectedParts.map((p,index)=>`<div class="part-row"><div><b>${p.name}</b> [${p.barcode||'-'}]</div><div>${p.priceLabel} ${money(p.unitPrice)} x ${p.qty} = ${money(p.unitPrice*p.qty)} บาท</div><button class="remove-part-btn" onclick="removePart(${index})">ลบ</button></div>`).join(''); updateTotals();}
+function updateTotals(){const partsCost=selectedParts.reduce((sum,p)=>sum+(p.qty*p.unitPrice),0); const labor=Number($('laborCost').value)||0; $('partsCostText').innerText='ค่าอะไหล่: '+money(partsCost)+' บาท'; $('totalCostText').innerText='รวมเงิน: '+money(partsCost+labor)+' บาท';}
+function currentRepairPayload(){const partsCost=selectedParts.reduce((sum,p)=>sum+(p.qty*p.unitPrice),0); const labor=Number($('laborCost').value)||0; return {customerName:$('customerName').value.trim(),phone:$('phone').value.trim(),bikeModel:$('bikeModel').value.trim(),plate:$('plate').value.trim(),repairDate:$('repairDate').value,symptom:$('symptom').value.trim(),parts:selectedParts.map(p=>({id:p.id,barcode:p.barcode,name:p.name,qty:p.qty,unitPrice:p.unitPrice,total:p.qty*p.unitPrice,priceLabel:p.priceLabel})),partsCost,laborCost:labor,totalCost:partsCost+labor,note:$('note').value.trim(),repairPriceType,repairPriceLabel:getRepairPriceLabel()};}
+function openPrint(data){localStorage.setItem('printData', JSON.stringify(data)); window.open('/print.html?v='+Date.now(),'_blank');}
+function printCurrentRepairForm(){const record=currentRepairPayload(); if(!record.customerName) return alert('กรุณาใส่ชื่อลูกค้าก่อนพิมพ์'); openPrint({type:'repair_form', repair:record});}
+function printCurrentRepairReceipt(){const record=currentRepairPayload(); if(!record.customerName) return alert('กรุณาใส่ชื่อลูกค้าก่อนพิมพ์'); openPrint({type:'repair_receipt', repair:record, extraLabor:0});}
+async function saveRepair(){try{const payload={customerName:$('customerName').value.trim(),phone:$('phone').value.trim(),bikeModel:$('bikeModel').value.trim(),plate:$('plate').value.trim(),repairDate:$('repairDate').value,symptom:$('symptom').value.trim(),parts:selectedParts.map(p=>({id:p.id,qty:p.qty})),repairPriceType,laborCost:Number($('laborCost').value)||0,note:$('note').value.trim()}; if(!payload.customerName) return alert('กรุณาใส่ชื่อลูกค้า'); await api('/api/repairs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); ['customerName','phone','bikeModel','plate','repairDate','symptom','laborCost','note','partQty','partSearch'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';}); selectedParts=[]; renderSelectedParts(); await loadItems(); await loadRepairs();}catch(err){alert(err.message);}}
+async function loadRepairs(){try{const q=$('searchRepair').value.trim(); repairsCache=await api(q?('/api/repairs?q='+encodeURIComponent(q)):'/api/repairs'); const list=$('repairList'); list.innerHTML=''; if(!repairsCache.length){list.innerHTML='<div class="empty-text">ยังไม่มีประวัติการซ่อม</div>'; return;} repairsCache.forEach(r=>{const partsHtml=(Array.isArray(r.parts)&&r.parts.length)?r.parts.map(p=>`[${p.barcode||'-'}] ${p.name} x${p.qty}`).join(', '):(r.partsUsedText||'-'); list.innerHTML += `<div class="record"><h3>${r.customerName||'-'}</h3><div>เบอร์โทร: ${r.phone||'-'}</div><div>รุ่นรถ: ${r.bikeModel||'-'}</div><div>ทะเบียน: ${r.plate||'-'}</div><div>วันที่: ${r.repairDate||'-'}</div><div style="margin-top:8px;"><b>อาการ / งานซ่อม</b><br>${r.symptom||'-'}</div><div style="margin-top:8px;"><b>อะไหล่ที่ใช้</b><br>${partsHtml}</div><div style="margin-top:8px;">ประเภทราคาอะไหล่: ${r.repairPriceLabel||'-'}</div><div>ค่าอะไหล่: ${money(r.partsCost)} บาท</div><div>ค่าแรงเดิม: ${money(r.laborCost)} บาท</div><div><b>รวมเงินเดิม: ${money(r.totalCost)} บาท</b></div><div>หมายเหตุ: ${r.note||'-'}</div><input id="extra-labor-${r.id}" type="number" placeholder="ค่าแรงเพิ่มก่อนพิมพ์ใบเสร็จ (ถ้ามี)"><button class="print-btn" onclick="printRepairForm(${r.id})">พิมพ์ใบรับซ่อม</button><button class="print-btn" style="background:#1d4ed8" onclick="printRepairReceipt(${r.id})">พิมพ์ใบเสร็จ</button><button class="del-btn" onclick="deleteRepair(${r.id})">ลบประวัติ</button></div>`;});}catch(err){$('repairList').innerHTML=err.message;}}
+function findRepair(id){return repairsCache.find(r=>r.id===Number(id));}
+function printRepairForm(id){const record=findRepair(id); if(!record) return; openPrint({type:'repair_form', repair:record});}
+function printRepairReceipt(id){const record=findRepair(id); if(!record) return; const extraLabor=Number(document.getElementById('extra-labor-'+id).value)||0; openPrint({type:'repair_receipt', repair:record, extraLabor});}
+async function deleteRepair(id){if(!confirm('ต้องการลบประวัตินี้ใช่หรือไม่?')) return; try{await api('/api/repairs/'+id,{method:'DELETE'}); await loadRepairs();}catch(err){alert(err.message);}}
+(async function startup(){ try{ await loadItems(); }catch(err){ $('partSelect').innerHTML='<option value=>'+err.message+'</option>'; } try{ await loadRepairs(); }catch(err){ $('repairList').innerHTML=err.message; } renderSelectedParts(); })();
+
+async function logout(){
+  try{await fetch('/api/logout',{method:'POST'});}catch{}
+  location.href='/login.html';
+}
+(async function checkAuth(){
+  try {
+    const res = await fetch('/api/auth/me');
+    if(!res.ok) location.href='/login.html';
+  } catch {
+    location.href='/login.html';
+  }
+})();
+
+</script>
+</body>
+</html>

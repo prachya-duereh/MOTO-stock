@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>พิมพ์เอกสาร</title>
+    <style>
+      body {
+        font-family: "Courier New", monospace;
+        width: 80mm;
+        margin: 0 auto;
+        padding: 10px;
+        font-size: 13px;
+        color: #000;
+      }
+      .center {
+        text-align: center;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .bold {
+        font-weight: bold;
+      }
+      .small {
+        font-size: 12px;
+      }
+      hr {
+        border: none;
+        border-top: 1px dashed #000;
+        margin: 6px 0;
+      }
+      .logo {
+        max-width: 120px;
+        max-height: 70px;
+        object-fit: contain;
+        margin-bottom: 6px;
+      }
+      .spacer {
+        height: 12px;
+      }
+      .sign {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        margin-top: 22px;
+      }
+      .sign .box {
+        flex: 1;
+        text-align: center;
+      }
+      .line {
+        border-top: 1px solid #000;
+        margin-top: 32px;
+        padding-top: 6px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 4px 0;
+        border-bottom: 1px dashed #bbb;
+        vertical-align: top;
+        font-size: 12px;
+      }
+      th {
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="center">
+      <img src="/logo.jpg" class="logo" alt="logo" />
+      <div style="font-size: 22px; font-weight: bold">ดี อะไหล่ กรงปินัง</div>
+      <div class="small">จำหน่ายอะไหล่มอเตอร์ไซค์</div>
+      <div class="small">Tel: 081-766-7549</div>
+    </div>
+    <hr />
+    <div id="content"></div>
+    <hr />
+    <div class="center small">ขอบคุณที่ใช้บริการ</div>
+    <script>
+      const payload = JSON.parse(localStorage.getItem("printData") || "{}");
+      function money(n) {
+        return Number(n || 0).toLocaleString("th-TH", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+      function dateText(v) {
+        return v || new Date().toLocaleString("th-TH");
+      }
+
+      function renderSale(receipt) {
+        const items = Array.isArray(receipt.items) ? receipt.items : [];
+        let subtotal = 0;
+        const itemsHTML = items
+          .map((i, index) => {
+            const lineTotal = Number(
+              i.total ?? Number(i.price || 0) * Number(i.qty || 0),
+            );
+            subtotal += lineTotal;
+            return `<tr><td style="width:8%;">${index + 1}</td><td style="width:30%;">[${i.barcode || i.code || "-"}] ${i.name || "-"}</td><td style="width:14%;text-align:center;">${i.qty || 0}</td><td style="width:20%;text-align:right;">${money(i.price)}</td><td style="width:20%;text-align:right;">${money(lineTotal)}</td></tr>`;
+          })
+          .join("");
+        const laborCost = Number(receipt.laborCost || 0);
+        const total = Number(receipt.total || subtotal + laborCost);
+        const paid = Number(receipt.paid || 0);
+        const change = Number(receipt.change ?? paid - total);
+        return `
+    <div class="center bold">ใบเสร็จรับเงิน</div>
+    <div class="small">เลขที่: ${receipt.saleId || receipt.id || "-"}</div>
+    <div class="small">วันที่: ${dateText(receipt.date)}</div>
+    <div class="small">ลูกค้า: ${receipt.customerName || "-"}</div>
+    <div class="small">ประเภทราคา: ${receipt.priceLabel || "-"}</div>
+    <hr>
+    <table>
+      <thead><tr><th>#</th><th>รายการ</th><th style="text-align:center;">จำนวน</th><th style="text-align:right;">ราคา</th><th style="text-align:right;">รวม</th></tr></thead>
+      <tbody>${itemsHTML}</tbody>
+    </table>
+    <hr>
+    <div class="row">
+      <div class="row">
+      <span>รวม</span>
+      <span>${items.length}</span>
+      <span>รายการ</span>
+      </div>
+        <span>${money(subtotal)}</span>
+    </div>
+         
+    <div class="row"><span>ค่าบริการ</span><span>${money(laborCost)}</span></div>
+    <div class="row bold"><span>ยอดรวม</span><span>${money(total)}</span></div>
+    <hr>
+    <div class="row"><span>รับเงิน</span><span>${money(paid)}</span></div>
+    <div class="row"><span>เงินทอน</span><span>${money(change)}</span></div>`;
+      }
+
+      function renderRepairForm(repair) {
+        const parts = Array.isArray(repair.parts) ? repair.parts : [];
+        const rows = parts
+          .map(
+            (p, index) =>
+              `<tr><td style="width:8%;">${index + 1}</td><td>[${p.barcode || "-"}] ${p.name || "-"}</td><td style="text-align:center;">${p.qty || 0}</td><td style="text-align:right;">${money(p.unitPrice)}</td><td style="text-align:right;">${money(p.total)}</td></tr>`,
+          )
+          .join("");
+        return `
+    <div class="center bold">ใบรับซ่อม</div>
+    <div class="small">เลขที่: RP${repair.id || "-"}</div>
+    <div class="small">วันที่พิมพ์: ${dateText()}</div>
+    <hr>
+    <div class="small">ชื่อลูกค้า: ${repair.customerName || "-"}</div>
+    <div class="small">เบอร์โทร: ${repair.phone || "-"}</div>
+    <div class="small">รุ่นรถ: ${repair.bikeModel || "-"}</div>
+    <div class="small">ทะเบียน: ${repair.plate || "-"}</div>
+    <div class="small">วันที่รับซ่อม: ${repair.repairDate || "-"}</div>
+    <hr>
+    <div><b>อาการ / งานซ่อม</b></div>
+    <div class="small">${repair.symptom || "-"}</div>
+    <hr>
+    <table><thead><tr><th>#</th><th>รายการ</th><th style="text-align:center;">จำนวน</th><th style="text-align:right;">ราคา</th><th style="text-align:right;">รวม</th></tr></thead><tbody>${rows}</tbody></table>
+    <hr>
+    <div class="row"><span>ค่าอะไหล่</span><span>${money(repair.partsCost)}</span></div>
+    <div class="row"><span>ค่าแรง</span><span>${money(repair.laborCost)}</span></div>
+    <div class="row bold"><span>รวมเงิน</span><span>${money(repair.totalCost)}</span></div>
+    <hr>
+    <div><b>หมายเหตุ</b></div>
+    <div class="small">${repair.note || "-"}</div>
+    <div class="sign"><div class="box"><div class="line">ลายเซ็นร้าน</div></div><div class="box"><div class="line">ลายเซ็นลูกค้า</div></div></div>`;
+      }
+
+      function renderRepairReceipt(repair, extraLabor) {
+        const parts = Array.isArray(repair.parts) ? repair.parts : [];
+        const subtotal = Number(repair.partsCost || 0);
+        const baseLabor = Number(repair.laborCost || 0);
+        const addLabor = Number(extraLabor || 0);
+        const labor = baseLabor + addLabor;
+        const total = subtotal + labor;
+        const itemsHTML = parts
+          .map(
+            (p, index) =>
+              `<tr><td style="width:8%;">${index + 1}</td><td>[${p.barcode || "-"}] ${p.name || "-"}</td><td style="text-align:center;">${p.qty || 0}</td><td style="text-align:right;">${money(p.unitPrice)}</td><td style="text-align:right;">${money(p.total)}</td></tr>`,
+          )
+          .join("");
+        return `
+    <div class="center bold">ใบเสร็จรับเงินงานซ่อม</div>
+    <div class="small">เลขที่: RR${repair.id || "-"}</div>
+    <div class="small">วันที่: ${dateText()}</div>
+    <div class="small">ลูกค้า: ${repair.customerName || "-"}</div>
+    <div class="small">ทะเบียน: ${repair.plate || "-"}</div>
+    <hr>
+    <table><thead><tr><th>#</th><th>รายการ</th><th style="text-align:center;">จำนวน</th><th style="text-align:right;">ราคา</th><th style="text-align:right;">รวม</th></tr></thead><tbody>${itemsHTML}</tbody></table>
+    <hr>
+    <div class="row"><span>ค่าอะไหล่</span><span>${money(subtotal)}</span></div>
+    <div class="row"><span>ค่าแรงเดิม</span><span>${money(baseLabor)}</span></div>
+    <div class="row"><span>ค่าแรงเพิ่ม</span><span>${money(addLabor)}</span></div>
+    <div class="row bold"><span>ยอดรวม</span><span>${money(total)}</span></div>
+    <hr>
+    <div class="small">หมายเหตุ: ${repair.note || "-"}</div>`;
+      }
+
+      let html = '<div class="small">ไม่พบข้อมูลสำหรับพิมพ์</div>';
+      if (payload.type === "sale" && payload.receipt)
+        html = renderSale(payload.receipt);
+      if (payload.type === "repair_form" && payload.repair)
+        html = renderRepairForm(payload.repair);
+      if (payload.type === "repair_receipt" && payload.repair)
+        html = renderRepairReceipt(payload.repair, payload.extraLabor || 0);
+      document.getElementById("content").innerHTML = html;
+      window.onload = () => {
+        window.print();
+        setTimeout(() => window.close(), 500);
+      };
+    </script>
+  </body>
+</html>
