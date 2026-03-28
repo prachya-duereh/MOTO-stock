@@ -4,158 +4,58 @@
     <link rel="icon" type="image/jpg" href="D.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>หลังบ้าน</title>
     <style>
-      * {
-        font-family: "Kanit", sans-serif;
-        scrollbar-gutter: stable;
-      }
-      body {
-        margin: 0;
-        background: #eef2f7;
-        color: #222;
-      }
-      .page {
-        padding: 16px;
-      }
-      .topbar,
-      .panel {
-        background: #fff;
-        border-radius: 18px;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-      }
-      .topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 14px 18px;
-        margin-bottom: 16px;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-      .topbar button,
-      button.full,
-      .clear-btn,
-      .stock-btn,
-      .delete-btn {
-        border: none;
-        color: #fff;
-        border-radius: 12px;
-        cursor: pointer;
-      }
-      .topbar button {
-        background: #2563eb;
-        padding: 12px 16px;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: 38% 62%;
-        gap: 16px;
-      }
-      .panel {
-        padding: 16px;
-      }
-      input {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 14px;
-        margin: 8px 0;
-        border: 1px solid #ccd5df;
-        border-radius: 12px;
-        font-size: 16px;
-      }
-      button.full {
-        width: 100%;
-        background: #2563eb;
-        padding: 14px;
-        font-size: 16px;
-        margin-top: 8px;
-      }
-      .clear-btn {
-        width: 100%;
-        background: #f97316;
-        padding: 14px;
-        font-size: 16px;
-        margin-top: 12px;
-      }
-      .item-card {
-        border: 1px solid #e1e7ee;
-        border-radius: 14px;
-        padding: 12px;
-        margin-bottom: 12px;
-        background: #fbfcfe;
-      }
-      .stock-grid,
-      .quick-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        margin-top: 8px;
-      }
-      .stock-btn {
-        padding: 12px;
-      }
-      .add {
-        background: #16a34a;
-      }
-      .sub {
-        background: #f59e0b;
-      }
-      .quick1 {
-        background: #22c55e;
-      }
-      .quick2 {
-        background: #ef4444;
-      }
-      .delete-btn {
-        background: #dc2626;
-        width: 100%;
-        padding: 12px;
-        margin-top: 10px;
-      }
-      .report-line {
-        border-bottom: 1px solid #eee;
-        padding: 8px 0;
-      }
-      .muted {
-        color: #666;
-      }
-      .split {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-      @media (max-width: 1100px) {
-        .grid {
-          grid-template-columns: 1fr;
-        }
-      }
+      * { box-sizing:border-box; font-family:"Kanit",sans-serif; }
+      body { margin:0; background:#eef2f7; color:#1f2937; }
+      .page { padding:16px; }
+      .topbar,.panel { background:#fff; border-radius:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); }
+      .topbar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 18px; margin-bottom:16px; }
+      .nav { display:flex; gap:10px; flex-wrap:wrap; }
+      button { border:none; border-radius:12px; cursor:pointer; }
+      .nav button { background:#2563eb; color:#fff; padding:11px 14px; }
+      .grid { display:grid; grid-template-columns: 36% 64%; gap:16px; }
+      .panel { padding:16px; }
+      .split { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+      input, select { width:100%; padding:13px; border:1px solid #d5dbe4; border-radius:12px; font-size:15px; }
+      .title { font-size:20px; font-weight:700; margin-bottom:10px; }
+      .save, .action, .danger, .warn, .export { color:#fff; padding:12px; font-weight:700; }
+      .save { background:#2563eb; width:100%; margin-top:10px; }
+      .action { background:#16a34a; }
+      .warn { background:#f59e0b; }
+      .danger { background:#dc2626; }
+      .export { background:#0f766e; }
+      .report-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:12px; }
+      .stat { border:1px solid #e5e7eb; border-radius:14px; padding:12px; background:#fbfdff; }
+      .stat .label { color:#6b7280; font-size:13px; }
+      .stat .value { font-weight:700; font-size:24px; }
+      .item-card { border:1px solid #e5e7eb; border-radius:14px; padding:12px; background:#fbfdff; margin-bottom:10px; }
+      .muted { color:#6b7280; }
+      .danger-text { color:#dc2626; font-weight:700; }
+      .tool-grid, .export-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:10px; }
+      .item-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; }
+      .inline-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
+      @media (max-width:1100px){ .grid,.report-grid,.tool-grid,.export-grid,.item-actions,.inline-actions,.split{ grid-template-columns:1fr; } }
     </style>
   </head>
   <body>
     <div class="page">
       <div class="topbar">
-        <h2>⚙️ หลังบ้าน</h2>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap">
-          <button onclick="location.href = '/pos.html'">หน้าร้าน</button>
-          <button onclick="location.href = '/repair-history.html'">
-            ประวัติการซ่อม
-          </button>
-          <button onclick="logout()" style="background: #dc2626">
-            ออกจากระบบ
-          </button>
+        <div class="title">⚙️ หลังบ้าน</div>
+        <div class="nav">
+          <button onclick="location.href='/pos.html'">หน้าร้าน</button>
+          <button onclick="location.href='/report.html'">รายงาน</button>
+          <button onclick="location.href='/repair-history.html'">ประวัติการซ่อม</button>
+          <button onclick="logout()" style="background:#dc2626">ออกจากระบบ</button>
         </div>
       </div>
 
       <div class="grid">
         <div class="panel">
-          <h3>เพิ่มสินค้าใหม่</h3>
+          <div class="title">เพิ่มสินค้าใหม่</div>
           <input id="name" placeholder="ชื่อสินค้า" />
           <input id="barcode" placeholder="รหัสสินค้า / บาร์โค้ด" />
           <div class="split">
@@ -170,297 +70,154 @@
             <input id="retailPrice" type="number" placeholder="ราคาปลีก" />
             <input id="wholesalePrice" type="number" placeholder="ราคาส่ง" />
           </div>
-          <input id="mechanicPrice" type="number" placeholder="ราคาช่าง" />
-          <input id="note" placeholder="หมายเหตุ" />
-          <button class="full" onclick="addItem()">บันทึกสินค้า</button>
-          <div id="saveStatus" class="muted" style="margin-top: 8px"></div>
+          <div class="split">
+            <input id="mechanicPrice" type="number" placeholder="ราคาช่าง" />
+            <input id="costPrice" type="number" placeholder="ต้นทุน" />
+          </div>
+          <div class="split">
+            <input id="minStock" type="number" placeholder="จำนวนเตือนสต๊อกต่ำ" />
+            <input id="note" placeholder="หมายเหตุ" />
+          </div>
+          <button class="save" onclick="addItem()">บันทึกสินค้า</button>
+          <div id="saveStatus" class="muted" style="margin-top:8px"></div>
+
+          <div class="title" style="margin-top:18px">เติมสต๊อกด้วยบาร์โค้ด</div>
+          <div class="split">
+            <input id="restockBarcode" placeholder="ยิง/กรอกบาร์โค้ดสินค้าเดิมในระบบ" onkeydown="handleRestockBarcode(event)" />
+            <input id="restockQty" type="number" min="1" value="1" placeholder="จำนวนเพิ่ม" />
+          </div>
+          <button class="action" style="width:100%;margin-top:10px" onclick="restockByBarcode()">เพิ่มสต๊อกตามบาร์โค้ด</button>
+          <div id="restockStatus" class="muted" style="margin-top:8px"></div>
+
+          <div class="title" style="margin-top:18px">สำรองข้อมูล / CSV</div>
+          <div class="export-grid">
+            <button class="export" onclick="downloadExport('items')">items.csv</button>
+            <button class="export" onclick="downloadExport('sales')">sales.csv</button>
+            <button class="export" onclick="downloadExport('repairs')">repairs.csv</button>
+            <button class="warn" onclick="clearReport()">เคลียร์ยอดขาย</button>
+          </div>
         </div>
 
         <div class="panel">
-          <h3>สรุปรายได้วันนี้</h3>
-          <div id="reportList">กำลังโหลด...</div>
-          <h2 id="dailyTotal">รวมทั้งวัน: 0 บาท</h2>
-          <button class="clear-btn" onclick="clearReport()">
-            เคลียร์ยอดเพื่อเริ่มวันใหม่
-          </button>
+          <div class="title">สรุปยอดขาย</div>
+          <div class="report-grid">
+            <div class="stat"><div class="label">ยอดขายวันนี้</div><div class="value" id="todaySales">0</div></div>
+            <div class="stat"><div class="label">ยอดขายเดือนนี้</div><div class="value" id="monthSales">0</div></div>
+            <div class="stat"><div class="label">กำไรช่วงที่เลือก</div><div class="value" id="profitTotal">0</div></div>
+            <div class="stat"><div class="label">จำนวนบิลวันนี้</div><div class="value" id="billCount">0</div></div>
+          </div>
+          <div class="split">
+            <input id="reportStart" type="date" />
+            <input id="reportEnd" type="date" />
+          </div>
+          <div class="tool-grid">
+            <button class="action" onclick="loadReport()">โหลดรายงาน</button>
+            <button class="warn" onclick="location.href='/report.html'">เปิดหน้ารายงานเต็ม</button>
+          </div>
+          <div id="lowStockList" style="margin-top:14px"></div>
         </div>
       </div>
 
-      <div class="panel" style="margin-top: 16px">
-        <h3>เติมสต๊อกด้วยบาร์โค้ด</h3>
-        <div class="split">
-          <input
-            id="restockBarcode"
-            placeholder="ยิง/กรอกบาร์โค้ดสินค้าเดิมในระบบ"
-            onkeydown="handleRestockBarcode(event)"
-          />
-          <input id="restockQty" type="number" min="1" value="1" placeholder="จำนวนเพิ่ม" />
-        </div>
-        <button class="full" onclick="restockByBarcode()">เพิ่มสต๊อกตามบาร์โค้ด</button>
-        <div id="restockStatus" class="muted" style="margin-top: 8px"></div>
-      </div>
-
-      <div class="panel" style="margin-top: 16px">
-        <h3>รายการสินค้า / เติมสต๊อก</h3>
-        <input
-          id="searchItem"
-          placeholder="ค้นหาชื่อสินค้า รหัสสินค้า ประเภท รุ่น ปี หรือหมายเหตุ"
-          oninput="loadItems()"
-        />
-        <div id="list"></div>
+      <div class="panel" style="margin-top:16px">
+        <div class="title">รายการสินค้า / แจ้งเตือนของใกล้หมด</div>
+        <input id="searchItem" placeholder="ค้นหาสินค้า รหัส ประเภท รุ่น ปี หมายเหตุ" oninput="loadItems()" />
+        <div id="list" style="margin-top:10px"></div>
       </div>
     </div>
+
     <script>
-      function $(id) {
-        return document.getElementById(id);
-      }
-      function money(n) {
-        return Number(n || 0).toLocaleString("th-TH", {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2,
-        });
-      }
-      async function api(url, options) {
-        try {
-          const res = await fetch(url, options);
-          const text = await res.text();
-          let data = {};
-          try {
-            data = text ? JSON.parse(text) : {};
-          } catch {
-            throw new Error(text || "server ส่งข้อมูลไม่ถูกต้อง");
-          }
-          if (!res.ok || data.success === false)
-            throw new Error(data.message || "เกิดข้อผิดพลาด");
-          return data;
-        } catch (err) {
-          if (err instanceof TypeError)
-            throw new Error("เชื่อมต่อเซิร์ฟเวอร์หรือฐานข้อมูลไม่สำเร็จ");
-          throw err;
-        }
-      }
+      function $(id){ return document.getElementById(id); }
+      function money(n){ return Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:2}); }
+      async function api(url, options){ const res=await fetch(url,options); const text=await res.text(); let data={}; try{ data=text?JSON.parse(text):{}; }catch{ throw new Error(text||'server ส่งข้อมูลไม่ถูกต้อง'); } if(!res.ok||data.success===false) throw new Error(data.message||'เกิดข้อผิดพลาด'); return data; }
 
-      async function loadItems() {
-        const items = await api("/api/items");
-        const keyword = $("searchItem").value.trim().toLowerCase();
-        const filtered = items.filter((item) =>
-          [
-            item.name,
-            item.barcode,
-            item.category,
-            item.model,
-            item.year,
-            item.note,
-          ]
-            .join(" ")
-            .toLowerCase()
-            .includes(keyword),
-        );
-        const list = $("list");
-        list.innerHTML = "";
-        if (!filtered.length) {
-          list.innerHTML = '<div class="muted">ไม่พบสินค้า</div>';
-          return;
-        }
-        filtered.forEach((item) => {
+      async function loadItems(){
+        const items = await api('/api/items');
+        const keyword = $('searchItem').value.trim().toLowerCase();
+        const filtered = items.filter((item)=>[item.name,item.barcode,item.category,item.model,item.year,item.note].join(' ').toLowerCase().includes(keyword));
+        const list = $('list');
+        list.innerHTML='';
+        if(!filtered.length){ list.innerHTML='<div class="muted">ไม่พบสินค้า</div>'; return; }
+        filtered.forEach((item)=>{
+          const isLow = Number(item.minStock||0) > 0 && Number(item.quantity||0) <= Number(item.minStock||0);
           list.innerHTML += `
-      <div class="item-card">
-        <h3>${item.name || "-"}</h3>
-        <div>รหัสสินค้า: <b>${item.barcode || "-"}</b></div>
-        <div>ประเภท: ${item.category || "-"}</div>
-        <div>รุ่น: ${item.model || "-"} | ปี: ${item.year || "-"}</div>
-        <div>คงเหลือ: <b>${item.quantity || 0}</b> ชิ้น</div>
-        <div>ราคาปลีก: ${money(item.retailPrice)} บาท | ราคาส่ง: ${money(item.wholesalePrice)} บาท | ราคาช่าง: ${money(item.mechanicPrice)} บาท</div>
-        <div>หมายเหตุ: ${item.note || "-"}</div>
-        <input id="stock-${item.id}" type="number" placeholder="ใส่จำนวนที่จะเพิ่มหรือลด">
-        <div class="stock-grid">
-          <button class="stock-btn add" onclick="adjustStock(${item.id}, 'add')">เติมเข้า</button>
-          <button class="stock-btn sub" onclick="adjustStock(${item.id}, 'remove')">ตัดออก</button>
-        </div>
-        <div class="quick-grid">
-          <button class="stock-btn quick1" onclick="quickAdjust(${item.id}, 1)">+1</button>
-          <button class="stock-btn quick2" onclick="quickAdjust(${item.id}, -1)">-1</button>
-        </div>
-        <button class="delete-btn" onclick="deleteItem(${item.id})">ลบสินค้า</button>
-      </div>`;
+            <div class="item-card">
+              <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                <div>
+                  <div style="font-size:18px;font-weight:700">${item.name || '-'}</div>
+                  <div>รหัสสินค้า: <b>${item.barcode || '-'}</b></div>
+                  <div>ประเภท: ${item.category || '-'} | รุ่น: ${item.model || '-'} | ปี: ${item.year || '-'}</div>
+                  <div class="${isLow ? 'danger-text' : ''}">คงเหลือ: ${money(item.quantity)} | เตือนต่ำกว่า: ${money(item.minStock || 0)}</div>
+                  <div>ปลีก ${money(item.retailPrice)} | ส่ง ${money(item.wholesalePrice)} | ช่าง ${money(item.mechanicPrice)} | ต้นทุน ${money(item.costPrice)}</div>
+                  <div>หมายเหตุ: ${item.note || '-'}</div>
+                </div>
+                <div style="min-width:240px;width:240px">
+                  <input id="stock-${item.id}" type="number" placeholder="จำนวนเพิ่ม / ลด" />
+                  <div class="inline-actions">
+                    <button class="action" onclick="adjustStock(${item.id}, 1)">เติมเข้า</button>
+                    <button class="warn" onclick="adjustStock(${item.id}, -1)">ตัดออก</button>
+                  </div>
+                  <div class="item-actions">
+                    <button class="action" onclick="quickAdjust(${item.id}, 1)">+1</button>
+                    <button class="warn" onclick="quickAdjust(${item.id}, -1)">-1</button>
+                    <button class="danger" onclick="deleteItem(${item.id})">ลบ</button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
         });
       }
 
-      async function addItem() {
-        try {
+      async function addItem(){
+        try{
           const payload = {
-            name: $("name").value.trim(),
-            barcode: $("barcode").value.trim(),
-            category: $("category").value.trim(),
-            model: $("model").value.trim(),
-            year: $("year").value.trim(),
-            quantity: Number($("quantity").value) || 0,
-            retailPrice: Number($("retailPrice").value) || 0,
-            wholesalePrice: Number($("wholesalePrice").value) || 0,
-            mechanicPrice: Number($("mechanicPrice").value) || 0,
-            note: $("note").value.trim(),
+            name:$('name').value.trim(), barcode:$('barcode').value.trim(), category:$('category').value.trim(), model:$('model').value.trim(), year:$('year').value.trim(), quantity:Number($('quantity').value)||0,
+            retailPrice:Number($('retailPrice').value)||0, wholesalePrice:Number($('wholesalePrice').value)||0, mechanicPrice:Number($('mechanicPrice').value)||0,
+            costPrice:Number($('costPrice').value)||0, minStock:Number($('minStock').value)||0, note:$('note').value.trim()
           };
-          await api("/api/items", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-          [
-            "name",
-            "barcode",
-            "category",
-            "model",
-            "year",
-            "quantity",
-            "retailPrice",
-            "wholesalePrice",
-            "mechanicPrice",
-            "note",
-          ].forEach((id) => (document.getElementById(id).value = ""));
-          $("saveStatus").innerText = "บันทึกสินค้าเรียบร้อย";
+          await api('/api/items',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+          ['name','barcode','category','model','year','quantity','retailPrice','wholesalePrice','mechanicPrice','costPrice','minStock','note'].forEach((id)=>$(id).value='');
+          $('saveStatus').innerText='บันทึกสินค้าเรียบร้อย';
           await loadItems();
-        } catch (err) {
-          alert(err.message);
-        }
+        }catch(err){ alert(err.message); }
       }
 
-      async function adjustStock(id, mode) {
-        try {
-          const input = document.getElementById("stock-" + id);
-          const value = Number(input.value);
-          if (!value || value <= 0) return alert("กรุณาใส่จำนวน");
-
-          await api("/api/items/" + id + "/stock", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ change: mode === "add" ? value : -value }),
-          });
-
-          input.value = "";
+      async function adjustStock(id, direction){
+        try{
+          const amount = Number($('stock-'+id).value)||0;
+          if(amount<=0) return alert('กรุณาใส่จำนวน');
+          await api('/api/items/'+id+'/stock',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({change:direction*amount})});
+          $('stock-'+id).value='';
           await loadItems();
-        } catch (err) {
-          alert(err.message);
-        }
-      }
-
-      async function handleRestockBarcode(event) {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          await restockByBarcode();
-        }
-      }
-
-      async function restockByBarcode() {
-        const barcode = $("restockBarcode").value.trim();
-        const qty = Number($("restockQty").value) || 0;
-        const status = $("restockStatus");
-
-        if (!barcode) {
-          status.innerText = "กรุณายิงหรือกรอกบาร์โค้ด";
-          return;
-        }
-
-        if (qty <= 0) {
-          status.innerText = "จำนวนเพิ่มต้องมากกว่า 0";
-          return;
-        }
-
-        try {
-          const result = await api("/api/items/restock-by-barcode", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ barcode, qty }),
-          });
-
-          const item = result.item || {};
-          status.innerText = `เพิ่มสต๊อกสำเร็จ: ${item.name || "-"} | คงเหลือ ${item.quantity || 0} ชิ้น`;
-          $("restockBarcode").value = "";
-          $("restockQty").value = 1;
-          $("restockBarcode").focus();
-          await loadItems();
-        } catch (err) {
-          status.innerText = err.message;
-        }
-      }
-      async function quickAdjust(id, change) {
-        try {
-          await api("/api/items/" + id + "/stock", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ change }),
-          });
-          await loadItems();
-        } catch (err) {
-          alert(err.message);
-        }
-      }
-      async function deleteItem(id) {
-        if (!confirm("ต้องการลบสินค้านี้ใช่หรือไม่?")) return;
-        try {
-          await api("/api/items/" + id, { method: "DELETE" });
-          await loadItems();
-        } catch (err) {
-          alert(err.message);
-        }
-      }
-
-      async function loadReport() {
-        try {
-          const sales = await api("/api/report");
-          const reportList = document.getElementById("reportList");
-          const dailyTotal = document.getElementById("dailyTotal");
-          reportList.innerHTML = "";
-          if (!sales.length) {
-            reportList.innerHTML = "วันนี้ยังไม่มียอดขาย";
-            dailyTotal.innerText = "รวมทั้งวัน: 0 บาท";
-            return;
-          }
-          let total = 0;
-          sales.forEach((s) => {
-            total += Number(s.total) || 0;
-            reportList.innerHTML += `<div class="report-line"><b>${s.name}</b> [${s.barcode || "-"}]<br>ราคา: ${s.priceLabel || "-"} | จำนวน: ${s.qty} | หน่วยละ ${money(s.price)} | รวม ${money(s.total)} บาท</div>`;
-          });
-          dailyTotal.innerText = "รวมทั้งวัน: " + money(total) + " บาท";
-        } catch (err) {
-          document.getElementById("reportList").innerText = err.message;
-        }
-      }
-      async function clearReport() {
-        if (!confirm("ต้องการเคลียร์ยอดเพื่อเริ่มวันใหม่ใช่หรือไม่?")) return;
-        try {
-          await api("/api/report/clear", { method: "DELETE" });
           await loadReport();
-        } catch (err) {
-          alert(err.message);
-        }
+        }catch(err){ alert(err.message); }
       }
-      (async function startup() {
-        try {
-          await loadItems();
-        } catch (err) {
-          $("list").innerHTML = '<div class="muted">' + err.message + "</div>";
-        }
-        try {
-          await loadReport();
-        } catch (err) {
-          $("reportList").innerText = err.message;
-        }
-      })();
-
-      async function logout() {
-        try {
-          await fetch("/api/logout", { method: "POST" });
-        } catch {}
-        location.href = "/login.html";
+      async function quickAdjust(id, change){ try{ await api('/api/items/'+id+'/stock',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({change})}); await loadItems(); }catch(err){ alert(err.message); } }
+      async function deleteItem(id){ if(!confirm('ต้องการลบสินค้านี้ใช่หรือไม่?')) return; try{ await api('/api/items/'+id,{method:'DELETE'}); await loadItems(); }catch(err){ alert(err.message); } }
+      async function handleRestockBarcode(event){ if(event.key==='Enter'){ event.preventDefault(); await restockByBarcode(); } }
+      async function restockByBarcode(){
+        const barcode = $('restockBarcode').value.trim(); const qty = Number($('restockQty').value)||0;
+        if(!barcode) return $('restockStatus').innerText='กรุณายิงหรือกรอกบาร์โค้ด';
+        if(qty<=0) return $('restockStatus').innerText='จำนวนเพิ่มต้องมากกว่า 0';
+        try{ const result = await api('/api/items/restock-by-barcode',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({barcode,qty})}); $('restockStatus').innerText=`เพิ่มสต๊อกสำเร็จ: ${result.item.name || '-'} | คงเหลือ ${money(result.item.quantity)}`; $('restockBarcode').value=''; $('restockQty').value=1; $('restockBarcode').focus(); await loadItems(); }catch(err){ $('restockStatus').innerText=err.message; }
       }
-      (async function checkAuth() {
-        try {
-          const res = await fetch("/api/auth/me");
-          if (!res.ok) location.href = "/login.html";
-        } catch {
-          location.href = "/login.html";
-        }
-      })();
+      async function loadReport(){
+        try{
+          const today = new Date().toISOString().slice(0,10);
+          if(!$('reportStart').value) $('reportStart').value = today;
+          if(!$('reportEnd').value) $('reportEnd').value = today;
+          const result = await api('/api/report?startDate='+encodeURIComponent($('reportStart').value)+'&endDate='+encodeURIComponent($('reportEnd').value));
+          $('todaySales').innerText = money(result.summary.todaySales);
+          $('monthSales').innerText = money(result.summary.monthSales);
+          $('profitTotal').innerText = money(result.summary.profitTotal);
+          $('billCount').innerText = money(result.summary.billCount);
+          $('lowStockList').innerHTML = `<div class="title" style="font-size:18px">แจ้งเตือนของใกล้หมด</div>` + (result.lowStock.length ? result.lowStock.map((item)=>`<div class="item-card"><b class="danger-text">${item.name}</b><div>รหัส: ${item.barcode || '-'} | คงเหลือ ${money(item.quantity)} | จุดเตือน ${money(item.minStock)}</div></div>`).join('') : '<div class="muted">ยังไม่มีสินค้าที่ต่ำกว่าจุดเตือน</div>');
+        }catch(err){ $('lowStockList').innerHTML='<div class="danger-text">'+err.message+'</div>'; }
+      }
+      async function clearReport(){ if(!confirm('ต้องการเคลียร์ยอดขายทั้งหมดใช่หรือไม่?')) return; try{ await api('/api/report/clear',{method:'DELETE'}); await loadReport(); }catch(err){ alert(err.message); } }
+      function downloadExport(type){ window.open('/api/export/'+type,'_blank'); }
+      async function logout(){ try{ await fetch('/api/logout',{method:'POST'});}catch{} location.href='/login.html'; }
+      (async function checkAuth(){ try{ const res=await fetch('/api/auth/me'); if(!res.ok) location.href='/login.html'; }catch{ location.href='/login.html'; }})();
+      (async function startup(){ try{ await loadItems(); await loadReport(); }catch(err){ $('list').innerHTML='<div class="danger-text">'+err.message+'</div>'; } })();
     </script>
   </body>
 </html>

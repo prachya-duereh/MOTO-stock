@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <link rel="icon" type="image/jpg" href="D.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>รายงานยอดขาย</title>
+    <style>
+      *{box-sizing:border-box;font-family:"Kanit",sans-serif} body{margin:0;background:#eef2f7;color:#1f2937}.page{padding:16px}.topbar,.panel{background:#fff;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+      .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;margin-bottom:16px}.nav{display:flex;gap:10px;flex-wrap:wrap}.nav button,button{border:none;border-radius:12px;cursor:pointer}.nav button{background:#2563eb;color:#fff;padding:11px 14px}
+      .panel{padding:16px;margin-bottom:16px}.title{font-size:22px;font-weight:700;margin-bottom:12px}.split{display:grid;grid-template-columns:1fr 1fr 180px;gap:10px} input{width:100%;padding:13px;border:1px solid #d5dbe4;border-radius:12px;font-size:15px}
+      .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.stat{border:1px solid #e5e7eb;border-radius:14px;background:#fbfdff;padding:12px}.label{color:#6b7280;font-size:13px}.value{font-size:24px;font-weight:700}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{border:1px solid #e5e7eb;border-radius:14px;background:#fbfdff;padding:12px;margin-bottom:10px}.muted{color:#6b7280}.danger{color:#dc2626;font-weight:700}
+      @media (max-width:1100px){.split,.stats,.grid{grid-template-columns:1fr}}
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="topbar">
+        <div class="title" style="margin:0">รายงานยอดขาย / กำไร / สต๊อก</div>
+        <div class="nav">
+          <button onclick="location.href='/pos.html'">หน้าร้าน</button>
+          <button onclick="location.href='/admin.html'">หลังบ้าน</button>
+          <button onclick="location.href='/repair-history.html'">ประวัติการซ่อม</button>
+          <button onclick="logout()" style="background:#dc2626">ออกจากระบบ</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="split">
+          <input id="startDate" type="date" />
+          <input id="endDate" type="date" />
+          <button style="background:#16a34a;color:#fff;font-weight:700" onclick="loadReport()">โหลดรายงาน</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="stats">
+          <div class="stat"><div class="label">ยอดขายวันนี้</div><div class="value" id="todaySales">0</div></div>
+          <div class="stat"><div class="label">ยอดขายเดือนนี้</div><div class="value" id="monthSales">0</div></div>
+          <div class="stat"><div class="label">ยอดขายช่วงที่เลือก</div><div class="value" id="rangeSales">0</div></div>
+          <div class="stat"><div class="label">ค่าแรงรวม</div><div class="value" id="laborTotal">0</div></div>
+          <div class="stat"><div class="label">จำนวนบิล</div><div class="value" id="billCount">0</div></div>
+          <div class="stat"><div class="label">กำไรรวม</div><div class="value" id="profitTotal">0</div></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="panel">
+          <div class="title" style="font-size:20px">กำไรต่อสินค้า</div>
+          <div id="itemProfitList"></div>
+        </div>
+        <div class="panel">
+          <div class="title" style="font-size:20px">สต๊อกใกล้หมด</div>
+          <div id="lowStockList"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="title" style="font-size:20px">บิลในช่วงที่เลือก</div>
+        <div id="billList"></div>
+      </div>
+    </div>
+
+    <script>
+      function $(id){ return document.getElementById(id); }
+      function money(n){ return Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:2}); }
+      async function api(url, options){ const res=await fetch(url,options); const text=await res.text(); let data={}; try{ data=text?JSON.parse(text):{}; }catch{ throw new Error(text||'server ส่งข้อมูลไม่ถูกต้อง'); } if(!res.ok||data.success===false) throw new Error(data.message||'เกิดข้อผิดพลาด'); return data; }
+      async function loadReport(){ try{ const result = await api('/api/report?startDate='+encodeURIComponent($('startDate').value)+'&endDate='+encodeURIComponent($('endDate').value)); $('todaySales').innerText=money(result.summary.todaySales); $('monthSales').innerText=money(result.summary.monthSales); $('rangeSales').innerText=money(result.summary.rangeSales); $('laborTotal').innerText=money(result.summary.laborTotal); $('billCount').innerText=money(result.summary.billCount); $('profitTotal').innerText=money(result.summary.profitTotal); $('itemProfitList').innerHTML = result.itemProfits.length ? result.itemProfits.map((row)=>`<div class="card"><b>${row.name}</b> [${row.barcode||'-'}]<div>จำนวนขาย ${money(row.qty)} | ยอดขาย ${money(row.sales)} | ต้นทุนรวม ${money(row.cost)} | <b>กำไร ${money(row.profit)}</b></div></div>`).join('') : '<div class="muted">ยังไม่มีข้อมูลกำไร</div>'; $('lowStockList').innerHTML = result.lowStock.length ? result.lowStock.map((row)=>`<div class="card"><b class="danger">${row.name}</b><div>รหัส: ${row.barcode||'-'} | คงเหลือ ${money(row.quantity)} | จุดเตือน ${money(row.minStock||0)}</div></div>`).join('') : '<div class="muted">ยังไม่มีสินค้าที่ต่ำกว่าจุดเตือน</div>'; $('billList').innerHTML = result.bills.length ? result.bills.map((row)=>`<div class="card"><b>${row.saleId}</b><div>วันที่: ${row.createdAt || '-'} | ลูกค้า: ${row.customerName || '-'}</div><div>ค่าสินค้า ${money(row.itemsTotal)} | ค่าแรง ${money(row.laborCost)} | <b>รวม ${money(row.grandTotal)}</b></div></div>`).join('') : '<div class="muted">ยังไม่มีบิลในช่วงนี้</div>'; }catch(err){ $('billList').innerHTML='<div class="danger">'+err.message+'</div>'; } }
+      async function logout(){ try{ await fetch('/api/logout',{method:'POST'});}catch{} location.href='/login.html'; }
+      (async function checkAuth(){ try{ const res=await fetch('/api/auth/me'); if(!res.ok) location.href='/login.html'; }catch{ location.href='/login.html'; }})();
+      (function startup(){ const today=new Date().toISOString().slice(0,10); $('startDate').value=today; $('endDate').value=today; loadReport(); })();
+    </script>
+  </body>
+</html>
