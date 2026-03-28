@@ -6,97 +6,487 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>พิมพ์เอกสาร</title>
     <style>
-      :root { --paper-width: 58mm; }
-      body { font-family: "Courier New", monospace; width: var(--paper-width); max-width: var(--paper-width); margin: 0 auto; padding: 3mm; color: #000; font-size: 11px; }
-      body.paper-80 { --paper-width: 80mm; }
-      @page { size: auto; margin: 0; }
-      .center { text-align: center; } .row { display:flex; justify-content:space-between; gap:8px; } .bold{font-weight:bold} .small{font-size:10px}
-      hr { border:none; border-top:1px dashed #000; margin:4px 0; }
-      .logo { max-width: 90px; max-height: 50px; object-fit: contain; margin-bottom: 4px; }
-      table { width:100%; border-collapse:collapse; } th,td { padding:2px 0; border-bottom:1px dashed #ccc; font-size:10px; vertical-align:top; }
-      th:nth-child(1),td:nth-child(1){width:8%} th:nth-child(2),td:nth-child(2){width:42%;word-break:break-word} th:nth-child(3),td:nth-child(3){width:12%;text-align:center} th:nth-child(4),td:nth-child(4){width:18%;text-align:right} th:nth-child(5),td:nth-child(5){width:20%;text-align:right}
-      .line { border-top:1px solid #000; margin-top:20px; padding-top:4px; text-align:center; font-size:10px; }
-      .sign { display:flex; gap:10px; margin-top:14px; } .sign > div { flex:1; }
+      :root {
+        --paper-width: 80mm;
+        --font-main: 11px;
+        --font-small: 10px;
+      }
+
+      body.paper-58 {
+        --paper-width: 58mm;
+        --font-main: 10px;
+        --font-small: 9px;
+      }
+
+      body.paper-80 {
+        --paper-width: 80mm;
+        --font-main: 11px;
+        --font-small: 10px;
+      }
+
+      @page {
+        size: auto;
+        margin: 0;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        color: #000;
+        font-family: "Courier New", monospace;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        width: var(--paper-width);
+        margin: 0 auto;
+        padding: 4px;
+        font-size: var(--font-main);
+        box-sizing: border-box;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .bold {
+        font-weight: bold;
+      }
+
+      .small {
+        font-size: var(--font-small);
+      }
+
+      hr {
+        border: none;
+        border-top: 1px dashed #000;
+        margin: 6px 0;
+      }
+
+      .logo {
+        max-width: 100px;
+        max-height: 56px;
+        object-fit: contain;
+        margin-bottom: 4px;
+      }
+
+      .sign {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .sign .box {
+        flex: 1;
+        text-align: center;
+      }
+
+      .line {
+        border-top: 1px solid #000;
+        margin-top: 26px;
+        padding-top: 4px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+
+      th,
+      td {
+        padding: 3px 0;
+        border-bottom: 1px dashed #bbb;
+        vertical-align: top;
+        font-size: var(--font-main);
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+      }
+
+      th {
+        text-align: left;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      .col-no {
+        width: 8%;
+      }
+
+      .col-name {
+        width: 40%;
+      }
+
+      .col-qty {
+        width: 14%;
+      }
+
+      .col-price {
+        width: 18%;
+      }
+
+      .col-total {
+        width: 20%;
+      }
+
+      body.paper-58 .col-name {
+        width: 36%;
+      }
+
+      body.paper-58 .col-qty {
+        width: 14%;
+      }
+
+      body.paper-58 .col-price {
+        width: 22%;
+      }
+
+      body.paper-58 .col-total {
+        width: 20%;
+      }
+
+      .shop-name {
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 1.2;
+      }
+
+      .doc-title {
+        font-size: 15px;
+        font-weight: bold;
+        margin-top: 4px;
+      }
+
+      .mt-4 {
+        margin-top: 4px;
+      }
+
+      .mb-4 {
+        margin-bottom: 4px;
+      }
+
+      .nowrap {
+        white-space: nowrap;
+      }
+
+      @media print {
+        html,
+        body {
+          width: var(--paper-width);
+        }
+
+        body {
+          margin: 0 auto;
+          padding: 3px;
+        }
+      }
     </style>
   </head>
-  <body>
+  <body class="paper-80">
     <div class="center">
-      <img src="/logo.jpg" class="logo" alt="logo" />
-      <div style="font-size:20px;font-weight:bold">ดี อะไหล่ กรงปินัง</div>
+      <img src="/logo.jpg" class="logo" alt="logo" onerror="this.style.display='none'" />
+      <div class="shop-name">ดี อะไหล่ กรงปินัง</div>
       <div class="small">จำหน่ายอะไหล่มอเตอร์ไซค์</div>
       <div class="small">Tel: 081-766-7549</div>
     </div>
+
     <hr />
     <div id="content"></div>
     <hr />
-    <div class="center small">ขอบคุณที่ใช้บริการ</div>
+    <div class="center small bold">ขอบคุณที่ใช้บริการ</div>
+
     <script>
-      const payload = JSON.parse(localStorage.getItem('printData') || '{}');
-      const urlPaper = new URLSearchParams(location.search).get('paper');
-      const paperSize = String(payload.paperSize || localStorage.getItem('paperSize') || urlPaper || '58');
-      if (paperSize === '80') document.body.classList.add('paper-80');
-      function money(n){ const num=Number(n||0); return Number.isInteger(num) ? num.toLocaleString('th-TH') : num.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-      function qtyText(n){ const num=Number(n||0); return Number.isInteger(num) ? num.toLocaleString('th-TH') : num.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-      function dateText(v){ return v || new Date().toLocaleString('th-TH'); }
-      function renderRows(items){ return (items||[]).map((i,index)=>`<tr><td>${index+1}</td><td>[${i.barcode || i.code || '-'}] ${i.name || '-'}${i.priceLabel ? `<div class="small">${i.priceLabel}</div>` : ''}</td><td>${qtyText(i.qty || 0)}</td><td>${money(i.unitPrice ?? i.price ?? 0)}</td><td>${money(i.total ?? (Number(i.price || 0) * Number(i.qty || 0)))}</td></tr>`).join(''); }
-      function renderSale(receipt){ const items=Array.isArray(receipt.items)?receipt.items:[]; const subtotal = items.reduce((sum,i)=>sum + Number(i.total ?? (Number(i.price||0)*Number(i.qty||0))),0); const labor=Number(receipt.laborCost||0); const total=Number(receipt.total || subtotal + labor); const paid=Number(receipt.paid||0); const change=Number(receipt.change ?? paid-total); return `
-        <div class="center bold">ใบเสร็จรับเงิน</div>
-        <div class="small">เลขที่: ${receipt.saleId || receipt.id || '-'}</div>
-        <div class="small">วันที่: ${dateText(receipt.date)}</div>
-        <div class="small">ลูกค้า: ${receipt.customerName || '-'}</div>
-        <hr>
-        <table><thead><tr><th>#</th><th>รายการ</th><th>จำนวน</th><th>ราคา</th><th>รวม</th></tr></thead><tbody>${renderRows(items)}</tbody></table>
-        <hr>
-        <div class="row"><span>รวม ${items.length} รายการ</span><span>${money(subtotal)}</span></div>
-        <div class="row"><span>ค่าบริการ</span><span>${money(labor)}</span></div>
-        <div class="row bold"><span>ยอดรวม</span><span>${money(total)}</span></div>
-        <hr>
-        <div class="row"><span>รับเงิน</span><span>${money(paid)}</span></div>
-        <div class="row"><span>เงินทอน</span><span>${money(change)}</span></div>`; }
-      function renderRepairForm(repair){ return `
-        <div class="center bold">ใบรับซ่อม</div>
-        <div class="small">เลขที่: RP${repair.id || '-'}</div>
-        <div class="small">วันที่พิมพ์: ${dateText()}</div>
-        <hr>
-        <div class="small">ชื่อลูกค้า: ${repair.customerName || '-'}</div>
-        <div class="small">เบอร์โทร: ${repair.phone || '-'}</div>
-        <div class="small">รุ่นรถ: ${repair.bikeModel || '-'}</div>
-        <div class="small">ทะเบียน: ${repair.plate || '-'}</div>
-        <div class="small">วันที่รับซ่อม: ${repair.repairDate || '-'}</div>
-        <hr>
-        <div><b>อาการ / งานซ่อม</b></div>
-        <div class="small">${repair.symptom || '-'}</div>
-        <hr>
-        <table><thead><tr><th>#</th><th>รายการ</th><th>จำนวน</th><th>ราคา</th><th>รวม</th></tr></thead><tbody>${renderRows(repair.parts || [])}</tbody></table>
-        <hr>
-        <div class="row"><span>ค่าอะไหล่</span><span>${money(repair.partsCost)}</span></div>
-        <div class="row"><span>ค่าแรง</span><span>${money(repair.laborCost)}</span></div>
-        <div class="row bold"><span>รวมเงิน</span><span>${money(repair.totalCost)}</span></div>
-        <hr>
-        <div><b>หมายเหตุ</b></div>
-        <div class="small">${repair.note || '-'}</div>
-        <div class="sign"><div><div class="line">ลายเซ็นร้าน</div></div><div><div class="line">ลายเซ็นลูกค้า</div></div></div>`; }
-      function renderRepairReceipt(repair, extraLabor){ const subtotal=Number(repair.partsCost||0); const baseLabor=Number(repair.laborCost||0); const addLabor=Number(extraLabor||0); const total=subtotal+baseLabor+addLabor; return `
-        <div class="center bold">ใบเสร็จรับเงินงานซ่อม</div>
-        <div class="small">เลขที่: RR${repair.id || '-'}</div>
-        <div class="small">วันที่: ${dateText()}</div>
-        <div class="small">ลูกค้า: ${repair.customerName || '-'}</div>
-        <div class="small">ทะเบียน: ${repair.plate || '-'}</div>
-        <hr>
-        <table><thead><tr><th>#</th><th>รายการ</th><th>จำนวน</th><th>ราคา</th><th>รวม</th></tr></thead><tbody>${renderRows(repair.parts || [])}</tbody></table>
-        <hr>
-        <div class="row"><span>ค่าอะไหล่</span><span>${money(subtotal)}</span></div>
-        <div class="row"><span>ค่าแรงเดิม</span><span>${money(baseLabor)}</span></div>
-        <div class="row"><span>ค่าแรงเพิ่ม</span><span>${money(addLabor)}</span></div>
-        <div class="row bold"><span>ยอดรวม</span><span>${money(total)}</span></div>
-        <hr>
-        <div class="small">หมายเหตุ: ${repair.note || '-'}</div>`; }
+      const payload = JSON.parse(localStorage.getItem("printData") || "{}");
+
+      function getPaperSize() {
+        const params = new URLSearchParams(window.location.search);
+        const queryPaper = (params.get("paper") || "").trim();
+        const savedPaper = (localStorage.getItem("paperSize") || "").trim();
+        const paper = queryPaper || savedPaper || "80";
+        return paper === "58" ? "58" : "80";
+      }
+
+      function applyPaperSize() {
+        const paper = getPaperSize();
+        document.body.classList.remove("paper-58", "paper-80");
+        document.body.classList.add(`paper-${paper}`);
+      }
+
+      function money(n) {
+        const num = Number(n || 0);
+        if (Number.isInteger(num)) {
+          return num.toLocaleString("th-TH");
+        }
+        return num.toLocaleString("th-TH", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+
+      function qtyText(n) {
+        const num = Number(n || 0);
+        if (Number.isInteger(num)) {
+          return num.toLocaleString("th-TH");
+        }
+        return num.toLocaleString("th-TH", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2,
+        });
+      }
+
+      function dateText(v) {
+        if (!v) return new Date().toLocaleString("th-TH");
+        const d = new Date(v);
+        if (isNaN(d.getTime())) return v;
+        return d.toLocaleString("th-TH");
+      }
+
+      function renderSale(receipt) {
+        const items = Array.isArray(receipt.items) ? receipt.items : [];
+
+        const subtotal = items.reduce(
+          (sum, i) =>
+            sum + Number(i.total ?? Number(i.price || 0) * Number(i.qty || 0)),
+          0
+        );
+
+        const labor = Number(receipt.laborCost || 0);
+        const total = Number(receipt.total || subtotal + labor);
+        const paid = Number(receipt.paid || 0);
+        const change = Number(receipt.change ?? paid - total);
+
+        const itemsHTML = items
+          .map((i, index) => {
+            const lineTotal = Number(
+              i.total ?? Number(i.price || 0) * Number(i.qty || 0)
+            );
+
+            return `
+              <tr>
+                <td class="col-no">${index + 1}</td>
+                <td class="col-name">[${i.barcode || i.code || "-"}] ${i.name || "-"}</td>
+                <td class="col-qty text-center">${qtyText(i.qty || 0)}</td>
+                <td class="col-price text-right">${money(i.price)}</td>
+                <td class="col-total text-right">${money(lineTotal)}</td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        return `
+          <div class="center doc-title">ใบเสร็จรับเงิน</div>
+          <div class="small">เลขที่: ${receipt.saleId || receipt.id || "-"}</div>
+          <div class="small">วันที่: ${dateText(receipt.date)}</div>
+          <div class="small">ลูกค้า: ${receipt.customerName || "-"}</div>
+          <hr>
+          <table>
+            <thead>
+              <tr>
+                <th class="col-no">#</th>
+                <th class="col-name">รายการ</th>
+                <th class="col-qty text-center">จำนวน</th>
+                <th class="col-price text-right">ราคา</th>
+                <th class="col-total text-right">รวม</th>
+              </tr>
+            </thead>
+            <tbody>${itemsHTML}</tbody>
+          </table>
+          <hr>
+          <div class="row bold">
+            <span>รวม ${items.length} รายการ</span>
+            <span>${money(subtotal)}</span>
+          </div>
+          <div class="row">
+            <span>ค่าบริการ</span>
+            <span>${money(labor)}</span>
+          </div>
+          <div class="row bold">
+            <span>ยอดรวม</span>
+            <span>${money(total)}</span>
+          </div>
+          <hr>
+          <div class="row">
+            <span>รับเงิน</span>
+            <span>${money(paid)}</span>
+          </div>
+          <div class="row">
+            <span>เงินทอน</span>
+            <span>${money(change)}</span>
+          </div>
+        `;
+      }
+
+      function renderRepairForm(repair) {
+        const parts = Array.isArray(repair.parts) ? repair.parts : [];
+        const rows = parts
+          .map(
+            (p, index) => `
+              <tr>
+                <td class="col-no">${index + 1}</td>
+                <td class="col-name">[${p.barcode || "-"}] ${p.name || "-"}</td>
+                <td class="col-qty text-center">${qtyText(p.qty || 0)}</td>
+                <td class="col-price text-right">${money(p.unitPrice)}</td>
+                <td class="col-total text-right">${money(p.total)}</td>
+              </tr>
+            `
+          )
+          .join("");
+
+        return `
+          <div class="center doc-title">ใบรับซ่อม</div>
+          <div class="small">เลขที่: RP${repair.id || "-"}</div>
+          <div class="small">วันที่พิมพ์: ${dateText()}</div>
+          <hr>
+          <div class="small">ชื่อลูกค้า: ${repair.customerName || "-"}</div>
+          <div class="small">เบอร์โทร: ${repair.phone || "-"}</div>
+          <div class="small">รุ่นรถ: ${repair.bikeModel || "-"}</div>
+          <div class="small">ทะเบียน: ${repair.plate || "-"}</div>
+          <div class="small">วันที่รับซ่อม: ${repair.repairDate || "-"}</div>
+          <hr>
+          <div><b>อาการ / งานซ่อม</b></div>
+          <div class="small">${repair.symptom || "-"}</div>
+          <hr>
+          <table>
+            <thead>
+              <tr>
+                <th class="col-no">#</th>
+                <th class="col-name">รายการ</th>
+                <th class="col-qty text-center">จำนวน</th>
+                <th class="col-price text-right">ราคา</th>
+                <th class="col-total text-right">รวม</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <hr>
+          <div class="row">
+            <span>ค่าอะไหล่</span>
+            <span>${money(repair.partsCost)}</span>
+          </div>
+          <div class="row">
+            <span>ค่าแรง</span>
+            <span>${money(repair.laborCost)}</span>
+          </div>
+          <div class="row bold">
+            <span>รวมเงิน</span>
+            <span>${money(repair.totalCost)}</span>
+          </div>
+          <hr>
+          <div><b>หมายเหตุ</b></div>
+          <div class="small">${repair.note || "-"}</div>
+          <div class="sign">
+            <div class="box">
+              <div class="line">ลายเซ็นร้าน</div>
+            </div>
+            <div class="box">
+              <div class="line">ลายเซ็นลูกค้า</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderRepairReceipt(repair, extraLabor) {
+        const parts = Array.isArray(repair.parts) ? repair.parts : [];
+        const subtotal = Number(repair.partsCost || 0);
+        const baseLabor = Number(repair.laborCost || 0);
+        const addLabor = Number(extraLabor || 0);
+        const labor = baseLabor + addLabor;
+        const total = subtotal + labor;
+
+        const itemsHTML = parts
+          .map(
+            (p, index) => `
+              <tr>
+                <td class="col-no">${index + 1}</td>
+                <td class="col-name">[${p.barcode || "-"}] ${p.name || "-"}</td>
+                <td class="col-qty text-center">${qtyText(p.qty || 0)}</td>
+                <td class="col-price text-right">${money(p.unitPrice)}</td>
+                <td class="col-total text-right">${money(p.total)}</td>
+              </tr>
+            `
+          )
+          .join("");
+
+        return `
+          <div class="center doc-title">ใบเสร็จรับเงินงานซ่อม</div>
+          <div class="small">เลขที่: RR${repair.id || "-"}</div>
+          <div class="small">วันที่: ${dateText()}</div>
+          <div class="small">ลูกค้า: ${repair.customerName || "-"}</div>
+          <div class="small">ทะเบียน: ${repair.plate || "-"}</div>
+          <hr>
+          <table>
+            <thead>
+              <tr>
+                <th class="col-no">#</th>
+                <th class="col-name">รายการ</th>
+                <th class="col-qty text-center">จำนวน</th>
+                <th class="col-price text-right">ราคา</th>
+                <th class="col-total text-right">รวม</th>
+              </tr>
+            </thead>
+            <tbody>${itemsHTML}</tbody>
+          </table>
+          <hr>
+          <div class="row">
+            <span>ค่าอะไหล่</span>
+            <span>${money(subtotal)}</span>
+          </div>
+          <div class="row">
+            <span>ค่าแรงเดิม</span>
+            <span>${money(baseLabor)}</span>
+          </div>
+          <div class="row">
+            <span>ค่าแรงเพิ่ม</span>
+            <span>${money(addLabor)}</span>
+          </div>
+          <div class="row bold">
+            <span>ยอดรวม</span>
+            <span>${money(total)}</span>
+          </div>
+          <hr>
+          <div class="small">หมายเหตุ: ${repair.note || "-"}</div>
+        `;
+      }
+
+      applyPaperSize();
+
       let html = '<div class="small">ไม่พบข้อมูลสำหรับพิมพ์</div>';
-      if (payload.type === 'sale' && payload.receipt) html = renderSale(payload.receipt);
-      if (payload.type === 'repair_form' && payload.repair) html = renderRepairForm(payload.repair);
-      if (payload.type === 'repair_receipt' && payload.repair) html = renderRepairReceipt(payload.repair, payload.extraLabor || 0);
-      document.getElementById('content').innerHTML = html;
-      window.onload = () => { window.print(); setTimeout(() => window.close(), 500); };
+
+      if (payload.type === "sale" && payload.receipt) {
+        html = renderSale(payload.receipt);
+      }
+
+      if (payload.type === "repair_form" && payload.repair) {
+        html = renderRepairForm(payload.repair);
+      }
+
+      if (payload.type === "repair_receipt" && payload.repair) {
+        html = renderRepairReceipt(payload.repair, payload.extraLabor || 0);
+      }
+
+      document.getElementById("content").innerHTML = html;
+
+      window.onload = () => {
+        window.print();
+        setTimeout(() => window.close(), 500);
+      };
     </script>
   </body>
 </html>
