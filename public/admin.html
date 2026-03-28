@@ -187,6 +187,20 @@
       </div>
 
       <div class="panel" style="margin-top: 16px">
+        <h3>เติมสต๊อกด้วยบาร์โค้ด</h3>
+        <div class="split">
+          <input
+            id="restockBarcode"
+            placeholder="ยิง/กรอกบาร์โค้ดสินค้าเดิมในระบบ"
+            onkeydown="handleRestockBarcode(event)"
+          />
+          <input id="restockQty" type="number" min="1" value="1" placeholder="จำนวนเพิ่ม" />
+        </div>
+        <button class="full" onclick="restockByBarcode()">เพิ่มสต๊อกตามบาร์โค้ด</button>
+        <div id="restockStatus" class="muted" style="margin-top: 8px"></div>
+      </div>
+
+      <div class="panel" style="margin-top: 16px">
         <h3>รายการสินค้า / เติมสต๊อก</h3>
         <input
           id="searchItem"
@@ -316,27 +330,65 @@
           const value = Number(input.value);
           if (!value || value <= 0) return alert("กรุณาใส่จำนวน");
 
-          const result = await api("/api/items/" + id + "/stock", {
+          await api("/api/items/" + id + "/stock", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ change: mode === "add" ? value : -value }),
           });
 
-          console.log("PATCH result:", result);
           input.value = "";
           await loadItems();
         } catch (err) {
           alert(err.message);
         }
       }
+
+      async function handleRestockBarcode(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          await restockByBarcode();
+        }
+      }
+
+      async function restockByBarcode() {
+        const barcode = $("restockBarcode").value.trim();
+        const qty = Number($("restockQty").value) || 0;
+        const status = $("restockStatus");
+
+        if (!barcode) {
+          status.innerText = "กรุณายิงหรือกรอกบาร์โค้ด";
+          return;
+        }
+
+        if (qty <= 0) {
+          status.innerText = "จำนวนเพิ่มต้องมากกว่า 0";
+          return;
+        }
+
+        try {
+          const result = await api("/api/items/restock-by-barcode", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ barcode, qty }),
+          });
+
+          const item = result.item || {};
+          status.innerText = `เพิ่มสต๊อกสำเร็จ: ${item.name || "-"} | คงเหลือ ${item.quantity || 0} ชิ้น`;
+          $("restockBarcode").value = "";
+          $("restockQty").value = 1;
+          $("restockBarcode").focus();
+          await loadItems();
+        } catch (err) {
+          status.innerText = err.message;
+        }
+      }
       async function quickAdjust(id, change) {
         try {
-          const result = await api("/api/items/" + id + "/stock", {
+          await api("/api/items/" + id + "/stock", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ change }),
           });
-          console.log("PATCH result:", result);
           await loadItems();
         } catch (err) {
           alert(err.message);

@@ -294,7 +294,6 @@ async function updateItemStock(id, change) {
     const numChange = Number(change);
     if (!Number.isFinite(numChange) || numChange === 0) throw new Error('จำนวนไม่ถูกต้อง');
 
-
     const items = await getItems();
     const found = items.find(i => i.id === numId);
     if (!found) throw new Error('ไม่พบสินค้า');
@@ -318,14 +317,28 @@ async function updateItemStock(id, change) {
             .from('items')
             .update({ quantity: newQty })
             .eq('id', numId)
-            .select("")
-    .maybeSingle();
+            .select('*')
+            .maybeSingle();
         if (error) throw error;
-        return mapItemOut(data);
+        return mapItemOut(data || { ...found, quantity: newQty });
     } catch (error) {
         console.error('SUPABASE updateItemStock fallback:', error.message || error);
         return saveLocal();
     }
+}
+
+async function restockItemByBarcode(barcode, qty) {
+    const code = String(barcode || '').trim();
+    const increaseQty = Number(qty);
+
+    if (!code) throw new Error('กรุณาระบุบาร์โค้ด');
+    if (!Number.isFinite(increaseQty) || increaseQty <= 0) throw new Error('จำนวนเพิ่มไม่ถูกต้อง');
+
+    const items = await getItems();
+    const found = items.find(i => String(i.barcode || '').trim() === code);
+    if (!found) throw new Error('ไม่พบสินค้านี้ในระบบ');
+
+    return await updateItemStock(found.id, increaseQty);
 }
 
 async function deleteItemById(id) {
@@ -710,75 +723,24 @@ app.post('/api/items', async (req, res) => {
 });
 
 app.patch('/api/items/:id/stock', async (req, res) => {
-  try {
-    console.log('PATCH /api/items/:id/stock');
-    console.log('params.id =', req.params.id, typeof req.params.id);
-    console.log('body =', req.body);
-
-    const id = Number(req.params.id);
-    const change = Number(req.body.change);
-
-    if (!Number.isFinite(id)) {
-      return res.status(400).json({ success: false, message: 'รหัสสินค้าไม่ถูกต้อง' });
+    try {
+        const item = await updateItemStock(req.params.id, req.body.change);
+        res.json({ success: true, item });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message || 'อัปเดตสต๊อกไม่สำเร็จ' });
     }
+});
 
-    if (!Number.isFinite(change) || change === 0) {
-      return res.status(400).json({ success: false, message: 'จำนวนไม่ถูกต้อง' });
+app.patch('/api/items/restock-by-barcode', async (req, res) => {
+    try {
+        const item = await restockItemByBarcode(req.body.barcode, req.body.qty);
+        res.json({ success: true, item });
+    } catch (error) {
+        console.error(error);
+        const status = String(error.message || '').includes('ไม่พบสินค้า') ? 404 : 500;
+        res.status(status).json({ success: false, message: error.message || 'เติมสต๊อกด้วยบาร์โค้ดไม่สำเร็จ' });
     }
-
-    const { data: current, error: findError } = await supabase
-      .from('items')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
-
-    console.log('current =', current);
-    console.log('findError =', findError);
-
-    if (findError) throw findError;
-
-    if (!current) {
-      return res.status(404).json({ success: false, message: 'ไม่พบสินค้า' });
-    }
-
-    const oldQty = Number(current.quantity || 0);
-    const newQty = oldQty + change;
-
-    console.log('oldQty =', oldQty, 'change =', change, 'newQty =', newQty);
-
-    if (newQty < 0) {
-      return res.status(400).json({ success: false, message: 'สต๊อกติดลบไม่ได้' });
-    }
-
-    const { data: updatedRows, error: updateError } = await supabase
-      .from('items')
-      .update({ quantity: newQty })
-      .eq('id', id)
-      .select('*');
-
-    console.log('updatedRows =', updatedRows);
-    console.log('updateError =', updateError);
-
-    if (updateError) throw updateError;
-
-    if (!updatedRows || updatedRows.length === 0) {
-      return res.status(500).json({
-        success: false,
-        message: 'อัปเดตสต๊อกไม่สำเร็จ ไม่พบข้อมูลหลังอัปเดต'
-      });
-    }
-
-    return res.json({
-      success: true,
-      item: updatedRows[0]
-    });
-  } catch (err) {
-    console.error('PATCH stock error:', err);
-    return res.status(500).json({
-      success: false,
-      message: err.message || 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์'
-    });
-  }
 });
 
 app.delete('/api/items/:id', async (req, res) => {
