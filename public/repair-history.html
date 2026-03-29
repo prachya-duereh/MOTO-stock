@@ -111,23 +111,33 @@
       function currentRepairPayload(){ const parts = selectedParts.map((p)=>({ id:p.id, barcode:p.barcode, name:p.name, qty:Number(p.qty||0), unitPrice:Number(p.unitPrice||0), total:Number(p.total||0), priceType:p.priceType, priceLabel:p.priceLabel })); const partsCost = parts.reduce((sum,p)=>sum+Number(p.total||0),0); const labor = Number($('laborCost').value)||0; const distinctTypes = [...new Set(parts.map((p)=>p.priceType))]; const effectiveType = distinctTypes.length===1 ? distinctTypes[0] : 'mixed'; return { customerName:$('customerName').value.trim(), phone:$('phone').value.trim(), bikeModel:$('bikeModel').value.trim(), plate:$('plate').value.trim(), repairDate:$('repairDate').value, symptom:$('symptom').value.trim(), parts, partsCost, laborCost:labor, totalCost:partsCost+labor, note:$('note').value.trim(), repairPriceType:effectiveType, repairPriceLabel:getRepairPriceLabel(effectiveType) }; }
       function openPrint(data){ localStorage.setItem('printData', JSON.stringify(data)); window.open('/print.html?v='+Date.now()+'&paper='+encodeURIComponent(getPaperSize()), '_blank'); }
       function printCurrentRepairForm(){ const record=currentRepairPayload(); if(!record.customerName) return alert('กรุณาใส่ชื่อลูกค้า'); openPrint({ type:'repair_form', repair:record, paperSize:getPaperSize() }); }
-      function printRepairReceipt(repair) {
+    
+      function resetRepairForm(){ editingRepairId=null; $('formTitle').innerText='บันทึกประวัติใหม่'; ['customerName','phone','bikeModel','plate','repairDate','symptom','laborCost','note','partSearch'].forEach((id)=>$(id).value=''); $('partQty').value=1; selectedParts=[]; setRepairPriceType('mechanic'); renderSelectedParts(); }
+      async function saveRepair(){ try{ const payload = currentRepairPayload(); if(!payload.customerName) return alert('กรุณาใส่ชื่อลูกค้า'); if(!payload.parts.length) return alert('กรุณาเลือกอะไหล่'); const url = editingRepairId ? '/api/repairs/'+editingRepairId : '/api/repairs'; const method = editingRepairId ? 'PUT' : 'POST'; await api(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); resetRepairForm(); await loadItems(); await loadRepairs(); }catch(err){ alert(err.message); } }
+      async function loadRepairs(){ try{ const q = $('searchRepair').value.trim(); repairsCache = await api(q ? '/api/repairs?q='+encodeURIComponent(q) : '/api/repairs'); $('repairList').innerHTML = repairsCache.length ? repairsCache.map((r)=>{ const partsHtml = Array.isArray(r.parts)&&r.parts.length ? r.parts.map((p)=>`<div>[${p.barcode || '-'}] ${p.name} x${money(p.qty)} <span class="tag">${p.priceLabel || getRepairPriceLabel(p.priceType)}</span> หน่วยละ ${money(p.unitPrice)} รวม ${money(p.total)}</div>`).join('') : (r.partsUsedText || '-'); return `<div class="record" style="padding:12px;margin-bottom:10px"><div style="font-size:18px;font-weight:700">${r.customerName || '-'}</div><div>เบอร์โทร: ${r.phone || '-'} | ทะเบียน: ${r.plate || '-'}</div><div>รุ่นรถ: ${r.bikeModel || '-'} | วันที่: ${r.repairDate || '-'}</div><div style="margin-top:6px"><b>อาการ / งานซ่อม</b><br>${r.symptom || '-'}</div><div style="margin-top:6px"><b>อะไหล่ที่ใช้</b><br>${partsHtml}</div><div style="margin-top:6px">ค่าอะไหล่ ${money(r.partsCost)} | ค่าแรง ${money(r.laborCost)} | <b>รวม ${money(r.totalCost)}</b></div><div>หมายเหตุ: ${r.note || '-'}</div><input id="extra-labor-${r.id}" type="number" placeholder="ค่าแรงเพิ่มก่อนพิมพ์ใบเสร็จ (ถ้ามี)" style="margin-top:8px" /><div class="record-actions"><button class="print" onclick="printRepairForm(${r.id})">พิมพ์ใบรับซ่อม</button><button class="print2" onclick="printRepairReceipt(${r.id})">พิมพ์ใบเสร็จ</button><button class="edit" onclick="editRepair(${r.id})">แก้ไข</button><button class="danger" onclick="deleteRepair(${r.id})">ลบ</button></div></div>`; }).join('') : '<div class="muted">ยังไม่มีประวัติการซ่อม</div>'; }catch(err){ $('repairList').innerHTML='<div class="muted">'+err.message+'</div>'; } }
+      function findRepair(id){ return repairsCache.find((r)=>r.id===Number(id)); }
+      function printRepairForm(id){ const record=findRepair(id); if(!record) return; localStorage.setItem('lastRepairPrint', JSON.stringify({ type:'repair_form', repair:record, paperSize:getPaperSize() })); openPrint({ type:'repair_form', repair:record, paperSize:getPaperSize() }); }
+      function printRepairReceipt(id){
+  const record = findRepair(id);
+  if(!record) return;
+
+  const extraLabor = Number($('extra-labor-'+id).value) || 0;
+
   const receipt = {
-    saleId: repair.id || '-',
-    date: repair.repairDate || repair.created_at || '-',
-    customerName: repair.customerName || '-',
-    items: Array.isArray(repair.parts) ? repair.parts.map(part => ({
-      barcode: part.barcode || part.id || '-',
-      name: part.name || '-',
-      qty: Number(part.qty || 0),
-      price: Number(part.unitPrice || 0),
-      total: Number(part.total || 0),
-      priceLabel: part.priceLabel || repair.repairPriceLabel || '-'
+    saleId: record.id || '-',
+    date: record.repairDate || record.created_at || '-',
+    customerName: record.customerName || '-',
+    items: Array.isArray(record.parts) ? record.parts.map(p => ({
+      barcode: p.barcode || p.id || '-',
+      name: p.name || '-',
+      qty: Number(p.qty || 0),
+      price: Number(p.unitPrice || 0),
+      total: Number(p.total || 0)
     })) : [],
-    itemsTotal: Number(repair.partsCost || 0),
-    laborCost: Number(repair.laborCost || 0),
-    total: Number(repair.totalCost || 0),
-    paid: Number(repair.totalCost || 0),
+    itemsTotal: Number(record.partsCost || 0),
+    laborCost: Number(record.laborCost || 0) + extraLabor,
+    total: Number(record.partsCost || 0) + Number(record.laborCost || 0) + extraLabor,
+    paid: Number(record.partsCost || 0) + Number(record.laborCost || 0) + extraLabor,
     change: 0
   };
 
@@ -140,12 +150,6 @@
 
   window.open('/print.html', '_blank');
 }
-      function resetRepairForm(){ editingRepairId=null; $('formTitle').innerText='บันทึกประวัติใหม่'; ['customerName','phone','bikeModel','plate','repairDate','symptom','laborCost','note','partSearch'].forEach((id)=>$(id).value=''); $('partQty').value=1; selectedParts=[]; setRepairPriceType('mechanic'); renderSelectedParts(); }
-      async function saveRepair(){ try{ const payload = currentRepairPayload(); if(!payload.customerName) return alert('กรุณาใส่ชื่อลูกค้า'); if(!payload.parts.length) return alert('กรุณาเลือกอะไหล่'); const url = editingRepairId ? '/api/repairs/'+editingRepairId : '/api/repairs'; const method = editingRepairId ? 'PUT' : 'POST'; await api(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); resetRepairForm(); await loadItems(); await loadRepairs(); }catch(err){ alert(err.message); } }
-      async function loadRepairs(){ try{ const q = $('searchRepair').value.trim(); repairsCache = await api(q ? '/api/repairs?q='+encodeURIComponent(q) : '/api/repairs'); $('repairList').innerHTML = repairsCache.length ? repairsCache.map((r)=>{ const partsHtml = Array.isArray(r.parts)&&r.parts.length ? r.parts.map((p)=>`<div>[${p.barcode || '-'}] ${p.name} x${money(p.qty)} <span class="tag">${p.priceLabel || getRepairPriceLabel(p.priceType)}</span> หน่วยละ ${money(p.unitPrice)} รวม ${money(p.total)}</div>`).join('') : (r.partsUsedText || '-'); return `<div class="record" style="padding:12px;margin-bottom:10px"><div style="font-size:18px;font-weight:700">${r.customerName || '-'}</div><div>เบอร์โทร: ${r.phone || '-'} | ทะเบียน: ${r.plate || '-'}</div><div>รุ่นรถ: ${r.bikeModel || '-'} | วันที่: ${r.repairDate || '-'}</div><div style="margin-top:6px"><b>อาการ / งานซ่อม</b><br>${r.symptom || '-'}</div><div style="margin-top:6px"><b>อะไหล่ที่ใช้</b><br>${partsHtml}</div><div style="margin-top:6px">ค่าอะไหล่ ${money(r.partsCost)} | ค่าแรง ${money(r.laborCost)} | <b>รวม ${money(r.totalCost)}</b></div><div>หมายเหตุ: ${r.note || '-'}</div><input id="extra-labor-${r.id}" type="number" placeholder="ค่าแรงเพิ่มก่อนพิมพ์ใบเสร็จ (ถ้ามี)" style="margin-top:8px" /><div class="record-actions"><button class="print" onclick="printRepairForm(${r.id})">พิมพ์ใบรับซ่อม</button><button class="print2" onclick="printRepairReceipt(${r.id})">พิมพ์ใบเสร็จ</button><button class="edit" onclick="editRepair(${r.id})">แก้ไข</button><button class="danger" onclick="deleteRepair(${r.id})">ลบ</button></div></div>`; }).join('') : '<div class="muted">ยังไม่มีประวัติการซ่อม</div>'; }catch(err){ $('repairList').innerHTML='<div class="muted">'+err.message+'</div>'; } }
-      function findRepair(id){ return repairsCache.find((r)=>r.id===Number(id)); }
-      function printRepairForm(id){ const record=findRepair(id); if(!record) return; localStorage.setItem('lastRepairPrint', JSON.stringify({ type:'repair_form', repair:record, paperSize:getPaperSize() })); openPrint({ type:'repair_form', repair:record, paperSize:getPaperSize() }); }
-      function printRepairReceipt(id){ const record=findRepair(id); if(!record) return; const extraLabor = Number($('extra-labor-'+id).value)||0; const payload = { type:'repair_receipt', repair:record, extraLabor, paperSize:getPaperSize() }; localStorage.setItem('lastRepairPrint', JSON.stringify(payload)); openPrint(payload); }
       function editRepair(id){ const record=findRepair(id); if(!record) return alert('ไม่พบประวัติ'); editingRepairId=Number(id); $('formTitle').innerText='แก้ไขประวัติ #' + id; $('customerName').value=record.customerName||''; $('phone').value=record.phone||''; $('bikeModel').value=record.bikeModel||''; $('plate').value=record.plate||''; $('repairDate').value=record.repairDate||''; $('symptom').value=record.symptom||''; $('laborCost').value=Number(record.laborCost||0)||''; $('note').value=record.note||''; selectedParts = (record.parts || []).map((p)=>({ id:Number(p.id), barcode:p.barcode||'', name:p.name||'', qty:Number(p.qty||0), priceType:p.priceType || record.repairPriceType || 'mechanic', priceLabel:p.priceLabel || getRepairPriceLabel(p.priceType || record.repairPriceType || 'mechanic'), unitPrice:Number(p.unitPrice||0), total:Number(p.total || Number(p.unitPrice||0)*Number(p.qty||0)) })); renderSelectedParts(); window.scrollTo({ top:0, behavior:'smooth' }); }
       async function deleteRepair(id){ if(!confirm('ต้องการลบประวัตินี้ใช่หรือไม่? การลบจะคืนสต๊อกอะไหล่กลับด้วย')) return; try{ await api('/api/repairs/'+id,{method:'DELETE'}); await loadItems(); await loadRepairs(); }catch(err){ alert(err.message); } }
       async function logout(){ try{ await fetch('/api/logout',{method:'POST'});}catch{} location.href='/login.html'; }

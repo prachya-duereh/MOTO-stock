@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>พิมพ์ใบเสร็จ</title>
+  <title>ใบเสร็จรับเงิน</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -12,9 +12,9 @@
 
     body {
       margin: 0;
+      background: #f0f0f0;
       font-family: "Kanit", sans-serif;
-      background: #ececec;
-      color: #111827;
+      color: #111;
     }
 
     .page {
@@ -22,134 +22,150 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 20px 12px;
+      padding: 18px 10px;
     }
 
-    .receipt {
-      width: 100%;
-      max-width: 390px;
+    .paper {
+      width: 80mm;
+      min-height: 100vh;
       background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-      border: 1px solid #e5e7eb;
-      padding: 16px;
+      padding: 10px 8px 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
     }
 
-    .header {
+    .logo-wrap {
       text-align: center;
-      border-bottom: 1px dashed #cbd5e1;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 2px;
     }
 
-    .title {
-      margin: 0;
-      font-size: 28px;
+    .logo {
+      max-width: 54px;
+      max-height: 54px;
+      object-fit: contain;
+      display: inline-block;
+    }
+
+    .shop-name {
+      text-align: center;
+      font-size: 24px;
       font-weight: 800;
-      color: #0f172a;
       line-height: 1.1;
+      margin-top: 2px;
     }
 
-    .subtitle {
-      margin-top: 4px;
+    .shop-sub {
+      text-align: center;
       font-size: 14px;
-      color: #64748b;
+      line-height: 1.25;
+      margin-top: 2px;
     }
 
-    .meta {
-      border-bottom: 1px dashed #cbd5e1;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
+    .shop-tel {
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.25;
+      margin-top: 2px;
     }
 
-    .meta-row,
-    .sum-row {
+    .dash {
+      border-top: 2px dashed #666;
+      margin: 8px 0 6px;
+    }
+
+    .receipt-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin: 2px 0 6px;
+    }
+
+    .meta-row {
       display: flex;
-      justify-content: space-between;
       align-items: flex-start;
-      gap: 10px;
-      margin: 4px 0;
-      font-size: 15px;
+      gap: 6px;
+      font-size: 14px;
+      line-height: 1.35;
+      margin: 1px 0;
     }
 
-    .meta-label,
-    .sum-label {
-      color: #334155;
-      font-weight: 500;
-      flex: 0 0 95px;
-    }
-
-    .meta-value,
-    .sum-value {
-      flex: 1;
-      text-align: right;
+    .meta-label {
+      width: 44px;
+      flex: 0 0 44px;
       font-weight: 700;
+    }
+
+    .meta-value {
+      flex: 1;
       word-break: break-word;
     }
 
-    .item {
-      padding: 10px 0;
-      border-bottom: 1px dashed #e5e7eb;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 13px;
+      line-height: 1.25;
     }
 
-    .item:last-child {
-      border-bottom: none;
+    thead th {
+      font-weight: 800;
+      text-align: center;
+      padding: 3px 2px;
     }
+
+    tbody td {
+      padding: 4px 2px;
+      vertical-align: top;
+    }
+
+    .col-no { width: 22px; text-align: center; }
+    .col-qty { width: 36px; text-align: center; }
+    .col-price { width: 52px; text-align: right; }
+    .col-total { width: 52px; text-align: right; }
 
     .item-name {
-      font-size: 18px;
-      font-weight: 800;
-      margin-bottom: 6px;
-      color: #0f172a;
-    }
-
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 2px 0;
-      font-size: 15px;
-    }
-
-    .item-label {
-      color: #334155;
-      font-weight: 500;
-    }
-
-    .item-value {
-      text-align: right;
       font-weight: 700;
-      word-break: break-word;
+      line-height: 1.2;
     }
 
-    .item-total {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 4px;
-      font-size: 16px;
-      font-weight: 800;
-      color: #0f172a;
+    .item-code {
+      color: #444;
+      line-height: 1.2;
     }
 
     .summary {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px dashed #cbd5e1;
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1.35;
     }
 
-    .grand-row .sum-value {
-      font-size: 24px;
+    .sum-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 1px 0;
+    }
+
+    .sum-label {
+      font-weight: 700;
+    }
+
+    .sum-value {
+      text-align: right;
+      min-width: 72px;
+    }
+
+    .sum-grand {
+      font-size: 16px;
       font-weight: 800;
-      color: #0f172a;
     }
 
     .footer {
       text-align: center;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px dashed #cbd5e1;
-      color: #64748b;
-      font-size: 13px;
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 700;
     }
 
     .actions {
@@ -162,8 +178,8 @@
       border: none;
       background: #16a34a;
       color: #fff;
-      border-radius: 12px;
-      padding: 12px 28px;
+      border-radius: 10px;
+      padding: 10px 24px;
       font-family: inherit;
       font-size: 18px;
       font-weight: 800;
@@ -172,9 +188,9 @@
 
     .message {
       text-align: center;
-      padding: 24px 8px;
       font-size: 18px;
       font-weight: 700;
+      padding: 24px 8px;
     }
 
     .error {
@@ -190,13 +206,11 @@
         padding: 0;
       }
 
-      .receipt {
+      .paper {
         width: 80mm;
-        max-width: 80mm;
-        border: none;
-        border-radius: 0;
+        min-height: auto;
         box-shadow: none;
-        padding: 6mm;
+        padding: 6px 6px 10px;
       }
 
       .actions {
@@ -207,8 +221,8 @@
 </head>
 <body>
   <div class="page">
-    <div class="receipt">
-      <div id="receiptBox" class="message">กำลังโหลดใบเสร็จ...</div>
+    <div class="paper">
+      <div id="printArea" class="message">กำลังโหลดใบเสร็จ...</div>
       <div class="actions">
         <button class="print-btn" onclick="window.print()">พิมพ์บิล</button>
       </div>
@@ -216,8 +230,11 @@
   </div>
 
   <script>
-    function formatNumber(value) {
-      return Number(value || 0).toLocaleString('th-TH');
+    function money(n) {
+      return Number(n || 0).toLocaleString('th-TH', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      });
     }
 
     function escapeHtml(text) {
@@ -230,7 +247,7 @@
     }
 
     function getStoredReceipt() {
-      const keys = ['lastReceipt', 'printReceipt'];
+      const keys = ['lastReceipt', 'printReceipt', 'printData', 'lastRepairPrint'];
       for (const key of keys) {
         try {
           const a = localStorage.getItem(key);
@@ -244,125 +261,199 @@
       return null;
     }
 
-    function normalizeReceipt(receipt) {
-      const items = Array.isArray(receipt.items) ? receipt.items : [];
-      const itemsTotal = receipt.itemsTotal != null
-        ? Number(receipt.itemsTotal || 0)
+    function normalizeData(data) {
+      if (!data) return null;
+
+      // กรณี repair form / repair receipt เดิม
+      if (data.type === 'repair_receipt' && data.repair) {
+        const repair = data.repair;
+        const extraLabor = Number(data.extraLabor || 0);
+        const laborCost = Number(repair.laborCost || 0) + extraLabor;
+        const items = Array.isArray(repair.parts) ? repair.parts.map(p => ({
+          barcode: p.barcode || p.id || '-',
+          name: p.name || '-',
+          qty: Number(p.qty || 0),
+          price: Number(p.unitPrice || 0),
+          total: Number(p.total || 0)
+        })) : [];
+
+        const itemsTotal = Number(repair.partsCost || 0);
+        return {
+          saleId: repair.id || '-',
+          date: repair.repairDate || repair.created_at || '-',
+          customerName: repair.customerName || '-',
+          items,
+          itemsTotal,
+          laborCost,
+          total: itemsTotal + laborCost,
+          paid: itemsTotal + laborCost,
+          change: 0
+        };
+      }
+
+      if (data.type === 'repair_form' && data.repair) {
+        const repair = data.repair;
+        const items = Array.isArray(repair.parts) ? repair.parts.map(p => ({
+          barcode: p.barcode || p.id || '-',
+          name: p.name || '-',
+          qty: Number(p.qty || 0),
+          price: Number(p.unitPrice || 0),
+          total: Number(p.total || 0)
+        })) : [];
+
+        const itemsTotal = Number(repair.partsCost || 0);
+        const laborCost = Number(repair.laborCost || 0);
+
+        return {
+          saleId: repair.id || '-',
+          date: repair.repairDate || repair.created_at || '-',
+          customerName: repair.customerName || '-',
+          items,
+          itemsTotal,
+          laborCost,
+          total: itemsTotal + laborCost,
+          paid: itemsTotal + laborCost,
+          change: 0
+        };
+      }
+
+      // กรณีใบเสร็จขายจาก POS / report
+      const items = Array.isArray(data.items) ? data.items.map(item => ({
+        barcode: item.barcode || item.id || '-',
+        name: item.name || '-',
+        qty: Number(item.qty || 0),
+        price: Number(item.price || item.unitPrice || 0),
+        total: Number(item.total || 0)
+      })) : [];
+
+      const itemsTotal = data.itemsTotal != null
+        ? Number(data.itemsTotal || 0)
         : items.reduce((sum, item) => sum + Number(item.total || 0), 0);
 
       return {
-        saleId: receipt.saleId || receipt.id || receipt.code || '-',
-        date: receipt.date || receipt.createdAt || receipt.repairDate || '-',
-        customerName: receipt.customerName || '-',
-        items: items.map(item => ({
-          barcode: item.barcode || item.id || '-',
-          name: item.name || '-',
-          qty: Number(item.qty || 0),
-          price: Number(item.price || item.unitPrice || 0),
-          total: Number(item.total || 0),
-          priceLabel: item.priceLabel || receipt.priceLabel || receipt.repairPriceLabel || '-'
-        })),
+        saleId: data.saleId || data.id || data.code || '-',
+        date: data.date || data.createdAt || data.repairDate || '-',
+        customerName: data.customerName || '-',
+        items,
         itemsTotal,
-        laborCost: Number(receipt.laborCost || 0),
-        total: Number(receipt.total || receipt.totalCost || receipt.grandTotal || 0),
-        paid: Number(receipt.paid || 0),
-        change: Number(receipt.change || 0)
+        laborCost: Number(data.laborCost || 0),
+        total: Number(data.total || data.totalCost || data.grandTotal || 0),
+        paid: Number(data.paid || 0),
+        change: Number(data.change || 0)
       };
     }
 
     function renderReceipt(receipt) {
-      const box = document.getElementById('receiptBox');
+      const el = document.getElementById('printArea');
       const items = Array.isArray(receipt.items) ? receipt.items : [];
+      const itemCount = items.reduce((sum, item) => sum + Number(item.qty || 0), 0);
 
-      box.className = '';
-      box.innerHTML = `
-        <div class="header">
-          <h1 class="title">ใบเสร็จรับเงิน</h1>
-          <div class="subtitle">ร้านอะไหล่มอเตอร์ไซค์</div>
+      el.className = '';
+      el.innerHTML = `
+        <div class="logo-wrap">
+          <img src="/D.jpg" alt="logo" class="logo" onerror="this.style.display='none'">
         </div>
 
-        <div class="meta">
-          <div class="meta-row">
-            <div class="meta-label">เลขที่บิล</div>
-            <div class="meta-value">${escapeHtml(receipt.saleId || '-')}</div>
-          </div>
-          <div class="meta-row">
-            <div class="meta-label">วันที่</div>
-            <div class="meta-value">${escapeHtml(receipt.date || '-')}</div>
-          </div>
-          <div class="meta-row">
-            <div class="meta-label">ลูกค้า</div>
-            <div class="meta-value">${escapeHtml(receipt.customerName || '-')}</div>
-          </div>
+        <div class="shop-name">ดี อะไหล่ กรุงปืนัง</div>
+        <div class="shop-sub">จำหน่ายอะไหล่มอเตอร์ไซค์</div>
+        <div class="shop-tel">Tel: 081-766-7549</div>
+
+        <div class="dash"></div>
+
+        <div class="receipt-title">ใบเสร็จรับเงิน</div>
+
+        <div class="meta-row">
+          <div class="meta-label">เลขที่:</div>
+          <div class="meta-value">${escapeHtml(receipt.saleId || '-')}</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label">วันที่:</div>
+          <div class="meta-value">${escapeHtml(receipt.date || '-')}</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label">ลูกค้า:</div>
+          <div class="meta-value">${escapeHtml(receipt.customerName || '-')}</div>
         </div>
 
-        <div class="items">
-          ${items.length ? items.map(item => `
-            <div class="item">
-              <div class="item-name">${escapeHtml(item.name || '-')}</div>
-              <div class="item-row">
-                <div class="item-label">รหัสสินค้า</div>
-                <div class="item-value">${escapeHtml(item.barcode || '-')}</div>
-              </div>
-              <div class="item-row">
-                <div class="item-label">จำนวน x ราคา</div>
-                <div class="item-value">${formatNumber(item.qty)} x ${formatNumber(item.price)}</div>
-              </div>
-              <div class="item-row">
-                <div class="item-label">ประเภทราคา</div>
-                <div class="item-value">${escapeHtml(item.priceLabel || '-')}</div>
-              </div>
-              <div class="item-total">
-                <div>รวม</div>
-                <div>${formatNumber(item.total)}</div>
-              </div>
-            </div>
-          `).join('') : `
-            <div class="message">ไม่มีรายการสินค้า</div>
-          `}
-        </div>
+        <div class="dash"></div>
+
+        <table>
+          <thead>
+            <tr>
+              <th class="col-no">#</th>
+              <th>รายการ</th>
+              <th class="col-qty">จำนวน</th>
+              <th class="col-price">ราคา</th>
+              <th class="col-total">รวม</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map((item, index) => `
+              <tr>
+                <td class="col-no">${index + 1}</td>
+                <td>
+                  <div class="item-code">[${escapeHtml(item.barcode || '-')} ]</div>
+                  <div class="item-name">${escapeHtml(item.name || '-')}</div>
+                </td>
+                <td class="col-qty">${money(item.qty)}</td>
+                <td class="col-price">${money(item.price)}</td>
+                <td class="col-total">${money(item.total)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="dash"></div>
 
         <div class="summary">
           <div class="sum-row">
-            <div class="sum-label">ค่าสินค้า</div>
-            <div class="sum-value">${formatNumber(receipt.itemsTotal)}</div>
+            <div class="sum-label">รวม ${money(itemCount)} รายการ</div>
+            <div class="sum-value">${money(receipt.itemsTotal)}</div>
           </div>
           <div class="sum-row">
-            <div class="sum-label">ค่าแรง</div>
-            <div class="sum-value">${formatNumber(receipt.laborCost)}</div>
+            <div class="sum-label">ค่าบริการ</div>
+            <div class="sum-value">${money(receipt.laborCost)}</div>
           </div>
-          <div class="sum-row grand-row">
-            <div class="sum-label">รวมสุทธิ</div>
-            <div class="sum-value">${formatNumber(receipt.total)}</div>
+          <div class="sum-row sum-grand">
+            <div class="sum-label">ยอดรวม</div>
+            <div class="sum-value">${money(receipt.total)}</div>
           </div>
+        </div>
+
+        <div class="dash"></div>
+
+        <div class="summary">
           <div class="sum-row">
             <div class="sum-label">รับเงิน</div>
-            <div class="sum-value">${formatNumber(receipt.paid)}</div>
+            <div class="sum-value">${money(receipt.paid)}</div>
           </div>
           <div class="sum-row">
             <div class="sum-label">เงินทอน</div>
-            <div class="sum-value">${formatNumber(receipt.change)}</div>
+            <div class="sum-value">${money(receipt.change)}</div>
           </div>
         </div>
+
+        <div class="dash"></div>
 
         <div class="footer">ขอบคุณที่ใช้บริการ</div>
       `;
     }
 
-    function loadReceipt() {
-      const box = document.getElementById('receiptBox');
+    function startup() {
       const stored = getStoredReceipt();
+      const normalized = normalizeData(stored);
 
-      if (!stored) {
-        box.className = 'message error';
-        box.textContent = 'ไม่พบบิลสำหรับพิมพ์';
+      if (!normalized) {
+        const el = document.getElementById('printArea');
+        el.className = 'message error';
+        el.textContent = 'ไม่พบบิลสำหรับพิมพ์';
         return;
       }
 
-      renderReceipt(normalizeReceipt(stored));
+      renderReceipt(normalized);
     }
 
-    document.addEventListener('DOMContentLoaded', loadReceipt);
+    document.addEventListener('DOMContentLoaded', startup);
   </script>
 </body>
 </html>
