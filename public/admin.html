@@ -302,6 +302,28 @@
               <button type="button" class="btn-light" onclick="resetForm()">ล้างฟอร์ม</button>
             </div>
           </form>
+
+        <div class="card" style="margin-top:14px;">
+          <h2>เติมสต๊อกด้วยบาร์โค้ด</h2>
+          <div class="form-grid">
+            <div class="full">
+              <label>ยิงบาร์โค้ดสินค้าเดิมในระบบ</label>
+              <input id="stockBarcode" placeholder="ยิงบาร์โค้ดแล้วกด Enter" />
+            </div>
+            <div>
+              <label>จำนวนที่เติมเข้า</label>
+              <input id="stockBarcodeQty" type="number" min="1" step="1" value="1" />
+            </div>
+            <div>
+              <label>สถานะ</label>
+              <input id="stockBarcodeResult" placeholder="รอการสแกน" readonly />
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn-green" onclick="stockInByBarcode()">เติมสต๊อก</button>
+            <button type="button" class="btn-light" onclick="clearBarcodeStockForm()">ล้าง</button>
+          </div>
+        </div>
         </div>
 
         <div>
@@ -602,6 +624,46 @@
         }
       }
 
+
+
+      function clearBarcodeStockForm() {
+        document.getElementById("stockBarcode").value = "";
+        document.getElementById("stockBarcodeQty").value = 1;
+        document.getElementById("stockBarcodeResult").value = "รอการสแกน";
+      }
+
+      async function stockInByBarcode() {
+        try {
+          const barcode = document.getElementById("stockBarcode").value.trim();
+          const qty = Number(document.getElementById("stockBarcodeQty").value) || 0;
+
+          if (!barcode) {
+            return alert("กรุณายิงหรือกรอกบาร์โค้ด");
+          }
+          if (qty <= 0) {
+            return alert("กรุณาใส่จำนวนให้ถูกต้อง");
+          }
+
+          const res = await fetch("/api/items/stock-by-barcode", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ barcode, qty })
+          });
+
+          const result = await res.json();
+          if (!res.ok || !result.success) {
+            throw new Error(result.message || "เติมสต๊อกไม่สำเร็จ");
+          }
+
+          document.getElementById("stockBarcodeResult").value = `${result.item.name} | คงเหลือ ${money(result.item.quantity)}`;
+          document.getElementById("stockBarcode").value = "";
+          document.getElementById("stockBarcodeQty").value = 1;
+          await loadItems();
+        } catch (err) {
+          alert(err.message || "เกิดข้อผิดพลาด");
+        }
+      }
+
       async function copyBarcode(barcode) {
         try {
           if (!barcode || barcode === "-") {
@@ -617,6 +679,12 @@
       document.getElementById("itemForm").addEventListener("submit", saveItem);
       document.getElementById("searchInput").addEventListener("input", renderItems);
       document.getElementById("filterMode").addEventListener("change", renderItems);
+      document.getElementById("stockBarcode").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          stockInByBarcode();
+        }
+      });
 
       loadItems();
     </script>
