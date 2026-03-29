@@ -368,8 +368,7 @@
         </div>
         <div class="meta-row">
           <div class="meta-label">วันที่:</div>
-          <div class="meta-value">${escapeHtml(receipt.date || '-')}</div>
-        </div>
+          <div class="meta-value">${escapeHtml(formatThaiDate(receipt.date))}</div>
         <div class="meta-row">
           <div class="meta-label">ลูกค้า:</div>
           <div class="meta-value">${escapeHtml(receipt.customerName || '-')}</div>
@@ -452,6 +451,30 @@
 
       renderReceipt(normalized);
     }
+    function formatThaiDate(dateStr, withSeconds = false) {
+  if (!dateStr) return '-';
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr))) {
+    return String(dateStr);
+  }
+
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return String(dateStr);
+
+  const parts = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    ...(withSeconds ? { second: '2-digit' } : {}),
+    hour12: false
+  }).formatToParts(d);
+
+  const get = (type) => parts.find((p) => p.type === type)?.value || '';
+  return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}${withSeconds ? ':' + get('second') : ''}`;
+}
 
     document.addEventListener('DOMContentLoaded', startup);
   </script>
