@@ -440,7 +440,17 @@ app.post('/api/logout', (req, res) => {
 // items
 app.get('/api/items', async (req, res) => {
   try {
-    res.json(await getItems());
+    const items = await getItems();
+    res.json(
+      items.map((item) => ({
+        ...item,
+        retailPrice: asNumber(item.retailPrice ?? item.retail_price, 0),
+        wholesalePrice: asNumber(item.wholesalePrice ?? item.wholesale_price, 0),
+        mechanicPrice: asNumber(item.mechanicPrice ?? item.mechanic_price, 0),
+        costPrice: asNumber(item.costPrice ?? item.cost_price, 0),
+        minStock: asNumber(item.minStock ?? item.min_stock, 0),
+      }))
+    );
   } catch (error) {
     console.error('GET /api/items', error);
     res.status(500).json({ success: false, message: error.message || 'โหลดสินค้าไม่สำเร็จ' });
@@ -819,6 +829,256 @@ app.get('/api/sales', async (req, res) => {
   } catch (error) {
     console.error('GET /api/sales', error);
     res.status(500).json({ success: false, message: error.message || 'โหลดข้อมูลการขายไม่สำเร็จ' });
+  }
+});
+app.get('/api/sales/:saleId', async (req, res) => {
+  try {
+    const saleId = cleanText(req.params.saleId);
+    if (!saleId) {
+      return res.status(400).json({ success: false, message: 'ไม่พบเลขที่บิล' });
+    }
+
+    const rows = await getSalesRows();
+    const bill = aggregateBills(rows).find((b) => b.saleId === saleId);
+
+    if (!bill) {
+      return res.status(404).json({ success: false, message: 'ไม่พบบิลที่ต้องการ' });
+    }
+
+    return res.json({ success: true, bill });
+  } catch (error) {
+    console.error('GET /api/sales/:saleId', error);
+    return res.status(500).json({ success: false, message: error.message || 'โหลดบิลไม่สำเร็จ' });
+  }
+});
+
+app.delete('/api/sales/:saleId', async (req, res) => {
+  try {
+    const saleId = cleanText(req.params.saleId);
+    if (!saleId) {
+      return res.status(400).json({ success: false, message: 'ไม่พบเลขที่บิล' });
+    }
+
+    const rows = await getSalesRows();
+    const targetRows = rows.filter((row) => cleanText(row.saleId) === saleId);
+
+    if (!targetRows.length) {
+      return res.status(404).json({ success: false, message: 'ไม่พบบิลที่ต้องการลบ' });
+    }
+
+    const items = await getItems();
+    const itemMap = new Map(items.map((item) => [Number(item.id), item]));
+
+    // คืนสต๊อกก่อนลบบิล
+    for (const row of targetRows) {
+      const item = itemMap.get(Number(row.itemId));
+      if (!item) continue;
+      const nextQty = asNumber(item.quantity, 0) + asNumber(row.qty, 0);
+      await setItemQuantity(item.id, nextQty);
+      item.quantity = nextQty;
+    }
+
+    if (supabase) {
+      const { error } = await supabase.from('sales').delete().eq('sale_id', saleId);
+      if (error) throw error;
+    } else {
+      const db = getLocalDB();
+      db.sales = (db.sales || []).filter((row) => cleanText(row.saleId) !== saleId);
+      saveLocalDB(db);
+    }
+
+    return res.json({
+      success: true,
+      message: 'ลบบิลเรียบร้อย และคืนสต๊อกแล้ว'
+    });
+  } catch (error) {
+    console.error('DELETE /api/sales/:saleId', error);
+    return res.status(500).json({ success: false, message: error.message || 'ลบบิลไม่สำเร็จ' });
+  }
+});
+
+app.post('/api/sales/:saleId/duplicate', async (req, res) => {
+  try {
+    const saleId = cleanText(req.params.saleId);
+    if (!saleId) {
+      return res.status(400).json({ success: false, message: 'ไม่พบเลขที่บิล' });
+    }
+
+    const rows = await getSalesRows();
+    const bill = aggregateBills(rows).find((b) => b.saleId === saleId);
+
+    if (!bill) {
+      return res.status(404).json({ success: false, message: 'ไม่พบบิลที่ต้องการทำซ้ำ' });
+    }
+
+    return res.json({
+      success: true,
+      draft: {
+        saleId,
+        customerName: bill.customerName || '',
+        laborCost: asNumber(bill.laborCost, 0),
+        paid: 0,
+        items: (bill.items || []).map((item) => ({
+          id: Number(item.id),
+          qty: asNumber(item.qty, 0),
+          price: asNumber(item.price, 0),
+          total: asNumber(item.total, 0),
+          priceType: cleanText(item.priceType) || 'retail',
+          priceLabel: cleanText(item.priceLabel)
+        }))
+      }
+    });
+  } catch (error) {
+    console.error('POST /api/sales/:saleId/duplicate', error);
+    return res.status(500).json({ success: false, message: error.message || 'ทำซ้ำบิลไม่สำเร็จ' });
+  }
+});
+
+app.put('/api/sales/:saleId', async (req, res) => {
+  try {
+    const saleId = cleanText(req.params.saleId);
+    if (!saleId) {
+      return res.status(400).json({ success: false, message: 'ไม่พบเลขที่บิล' });
+    }
+
+    const oldRows = (await getSalesRows()).filter((row) => cleanText(row.saleId) === saleId);
+    if (!oldRows.length) {
+      return res.status(404).json({ success: false, message: 'ไม่พบบิลที่ต้องการแก้ไข' });
+    }
+
+    const itemsBefore = await getItems();
+    const itemMapBefore = new Map(itemsBefore.map((item) => [Number(item.id), item]));
+
+    // คืนสต๊อกของบิลเดิมก่อน
+    for (const row of oldRows) {
+      const item = itemMapBefore.get(Number(row.itemId));
+      if (!item) continue;
+      const nextQty = asNumber(item.quantity, 0) + asNumber(row.qty, 0);
+      await setItemQuantity(item.id, nextQty);
+      item.quantity = nextQty;
+    }
+
+    // ลบแถวเดิม
+    if (supabase) {
+      const { error: deleteError } = await supabase.from('sales').delete().eq('sale_id', saleId);
+      if (deleteError) throw deleteError;
+    } else {
+      const db = getLocalDB();
+      db.sales = (db.sales || []).filter((row) => cleanText(row.saleId) !== saleId);
+      saveLocalDB(db);
+    }
+
+    const items = await getItems();
+    const itemMap = new Map(items.map((item) => [Number(item.id), item]));
+    const list = Array.isArray(req.body?.items) ? req.body.items : [];
+    if (!list.length) {
+      return res.status(400).json({ success: false, message: 'ยังไม่มีสินค้าในตะกร้า' });
+    }
+
+    const customerName = cleanText(req.body?.customerName);
+    const laborCost = asNumber(req.body?.laborCost, 0);
+    const paid = asNumber(req.body?.paid, 0);
+    const createdAt = cleanText(req.body?.createdAt) || oldRows[0]?.created_at || nowIso();
+    const saleRows = [];
+    let itemsTotal = 0;
+
+    for (const raw of list) {
+      const itemId = Number(raw.id);
+      const qty = asNumber(raw.qty, 0);
+      const item = itemMap.get(itemId);
+
+      if (!item) throw new Error('พบสินค้าที่ไม่มีในระบบ');
+      if (qty <= 0) throw new Error('จำนวนสินค้าไม่ถูกต้อง');
+      if (asNumber(item.quantity, 0) < qty) throw new Error(`สินค้า ${item.name} มีไม่พอ`);
+
+      const priceType = cleanText(raw.priceType) || 'retail';
+      const price = asNumber(raw.price, getItemPrice(item, priceType));
+      const total = price * qty;
+      const costPrice = asNumber(item.costPrice, 0);
+      const profit = total - costPrice * qty;
+      itemsTotal += total;
+
+      saleRows.push({
+        id: newId(),
+        saleId,
+        itemId: Number(item.id),
+        barcode: item.barcode || '',
+        name: item.name || '',
+        category: item.category || '',
+        model: item.model || '',
+        year: item.year || '',
+        qty,
+        priceType,
+        priceLabel: cleanText(raw.priceLabel) || repairPriceLabel(priceType),
+        price,
+        total,
+        costPrice,
+        profit,
+        laborCost,
+        itemsTotal: 0,
+        grandTotal: 0,
+        customerName,
+        paid,
+        change: 0,
+        created_at: createdAt
+      });
+    }
+
+    const grandTotal = itemsTotal + laborCost;
+    const change = paid - grandTotal;
+    if (paid < grandTotal) {
+      return res.status(400).json({ success: false, message: 'จำนวนเงินที่รับมาไม่พอ' });
+    }
+
+    for (const row of saleRows) {
+      row.itemsTotal = itemsTotal;
+      row.grandTotal = grandTotal;
+      row.change = change;
+    }
+
+    for (const row of saleRows) {
+      const item = itemMap.get(Number(row.itemId));
+      const nextQty = asNumber(item.quantity, 0) - row.qty;
+      await setItemQuantity(item.id, nextQty);
+      item.quantity = nextQty;
+    }
+
+    if (supabase) {
+      const { error } = await supabase.from('sales').insert(saleRows.map(saleToDb));
+      if (error) throw error;
+    } else {
+      const db = getLocalDB();
+      db.sales = Array.isArray(db.sales) ? db.sales : [];
+      db.sales.unshift(...saleRows);
+      saveLocalDB(db);
+    }
+
+    return res.json({
+      success: true,
+      receipt: {
+        saleId,
+        id: saleId,
+        date: createdAt,
+        customerName,
+        items: saleRows.map((row) => ({
+          id: row.itemId,
+          barcode: row.barcode,
+          name: row.name,
+          qty: row.qty,
+          price: row.price,
+          total: row.total,
+          priceType: row.priceType,
+          priceLabel: row.priceLabel
+        })),
+        laborCost,
+        total: grandTotal,
+        paid,
+        change
+      }
+    });
+  } catch (error) {
+    console.error('PUT /api/sales/:saleId', error);
+    return res.status(500).json({ success: false, message: error.message || 'แก้ไขบิลไม่สำเร็จ' });
   }
 });
 

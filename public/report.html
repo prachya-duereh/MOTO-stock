@@ -1,78 +1,493 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
-  <head>
-    <link rel="icon" type="image/jpg" href="D.jpg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>รายงานยอดขาย</title>
-    <style>
-      *{box-sizing:border-box;font-family:"Kanit",sans-serif} body{margin:0;background:#eef2f7;color:#1f2937}.page{padding:16px}.topbar,.panel{background:#fff;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
-      .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;margin-bottom:16px}.nav{display:flex;gap:10px;flex-wrap:wrap}.nav button,button{border:none;border-radius:12px;cursor:pointer}.nav button{background:#2563eb;color:#fff;padding:11px 14px}
-      .panel{padding:16px;margin-bottom:16px}.title{font-size:22px;font-weight:700;margin-bottom:12px}.split{display:grid;grid-template-columns:1fr 1fr 180px;gap:10px} input{width:100%;padding:13px;border:1px solid #d5dbe4;border-radius:12px;font-size:15px}
-      .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.stat{border:1px solid #e5e7eb;border-radius:14px;background:#fbfdff;padding:12px}.label{color:#6b7280;font-size:13px}.value{font-size:24px;font-weight:700}
-      .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{border:1px solid #e5e7eb;border-radius:14px;background:#fbfdff;padding:12px;margin-bottom:10px}.muted{color:#6b7280}.danger{color:#dc2626;font-weight:700}
-      @media (max-width:1100px){.split,.stats,.grid{grid-template-columns:1fr}}
-    </style>
-  </head>
-  <body>
-    <div class="page">
-      <div class="topbar">
-        <div class="title" style="margin:0">รายงานยอดขาย / กำไร / สต๊อก</div>
-        <div class="nav">
-          <button onclick="location.href='/pos.html'">หน้าร้าน</button>
-          <button onclick="location.href='/admin.html'">หลังบ้าน</button>
-          <button onclick="location.href='/repair-history.html'">ประวัติการซ่อม</button>
-          <button onclick="logout()" style="background:#dc2626">ออกจากระบบ</button>
-        </div>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>รายงานยอดขาย</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Kanit", sans-serif;
+      background: #f3f5f7;
+      color: #0f172a;
+    }
+    .container {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav a {
+      text-decoration: none;
+      color: #fff;
+      background: #2563eb;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: end;
+      background: #fff;
+      border: 1px solid #d9e0e7;
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 18px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 180px;
+    }
+    .field label {
+      font-size: 14px;
+      color: #475569;
+      font-weight: 600;
+    }
+    .field input {
+      height: 48px;
+      border: 1px solid #cfd8e3;
+      border-radius: 12px;
+      padding: 0 14px;
+      font-family: inherit;
+      font-size: 16px;
+      background: #f8fafc;
+    }
+    .btn {
+      height: 48px;
+      border: none;
+      border-radius: 12px;
+      padding: 0 18px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-secondary { background: #0f766e; color: #fff; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #d9e0e7;
+      border-radius: 18px;
+      padding: 18px;
+      min-height: 110px;
+    }
+    .card .title {
+      color: #475569;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .card .value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .panel {
+      background: #fff;
+      border: 1px solid #d9e0e7;
+      border-radius: 22px;
+      padding: 18px;
+    }
+    .panel h2 {
+      margin: 0 0 16px;
+      font-size: 22px;
+    }
+    .profit-item, .bill-item, .stock-item {
+      border: 1px solid #d9e0e7;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      background: #fbfcfd;
+    }
+    .profit-item:last-child,
+    .bill-item:last-child,
+    .stock-item:last-child {
+      margin-bottom: 0;
+    }
+    .bill-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .bill-lines {
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    .bill-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .bill-actions .action-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+    }
+    .print-btn { background: #16a34a; }
+    .copy-btn { background: #2563eb; }
+    .edit-btn { background: #f59e0b; }
+    .delete-btn { background: #dc2626; }
+    .empty {
+      color: #64748b;
+      font-size: 18px;
+    }
+    .bill-item-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .bill-item-table th,
+    .bill-item-table td {
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      padding: 8px 6px;
+      font-size: 14px;
+    }
+    .bill-item-table th {
+      color: #475569;
+      font-weight: 700;
+    }
 
-      <div class="panel">
-        <div class="split">
-          <input id="startDate" type="date" />
-          <input id="endDate" type="date" />
-          <button style="background:#16a34a;color:#fff;font-weight:700" onclick="loadReport()">โหลดรายงาน</button>
-        </div>
-      </div>
+    @media (max-width: 1200px) {
+      .cards { grid-template-columns: repeat(3, minmax(180px, 1fr)); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
 
-      <div class="panel">
-        <div class="stats">
-          <div class="stat"><div class="label">ยอดขายวันนี้</div><div class="value" id="todaySales">0</div></div>
-          <div class="stat"><div class="label">ยอดขายเดือนนี้</div><div class="value" id="monthSales">0</div></div>
-          <div class="stat"><div class="label">ยอดขายช่วงที่เลือก</div><div class="value" id="rangeSales">0</div></div>
-          <div class="stat"><div class="label">ค่าแรงรวม</div><div class="value" id="laborTotal">0</div></div>
-          <div class="stat"><div class="label">จำนวนบิล</div><div class="value" id="billCount">0</div></div>
-          <div class="stat"><div class="label">กำไรรวม</div><div class="value" id="profitTotal">0</div></div>
-        </div>
-      </div>
+    @media (max-width: 768px) {
+      .cards { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+      .container { padding: 12px; }
+      .card .value { font-size: 24px; }
+    }
 
-      <div class="grid">
-        <div class="panel">
-          <div class="title" style="font-size:20px">กำไรต่อสินค้า</div>
-          <div id="itemProfitList"></div>
-        </div>
-        <div class="panel">
-          <div class="title" style="font-size:20px">สต๊อกใกล้หมด</div>
-          <div id="lowStockList"></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="title" style="font-size:20px">บิลในช่วงที่เลือก</div>
-        <div id="billList"></div>
+    @media (max-width: 520px) {
+      .cards { grid-template-columns: 1fr; }
+      .filters { flex-direction: column; align-items: stretch; }
+      .field { min-width: 100%; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="nav">
+        <a href="/admin.html">⚙️ หลังบ้าน</a>
+        <a href="/pos.html">🛒 หน้าร้าน</a>
+        <a href="/repair-history.html">🛠️ ประวัติซ่อม</a>
       </div>
     </div>
 
-    <script>
-      function $(id){ return document.getElementById(id); }
-      function money(n){ return Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:2}); }
-      async function api(url, options){ const res=await fetch(url,options); const text=await res.text(); let data={}; try{ data=text?JSON.parse(text):{}; }catch{ throw new Error(text||'server ส่งข้อมูลไม่ถูกต้อง'); } if(!res.ok||data.success===false) throw new Error(data.message||'เกิดข้อผิดพลาด'); return data; }
-      async function loadReport(){ try{ const result = await api('/api/report?startDate='+encodeURIComponent($('startDate').value)+'&endDate='+encodeURIComponent($('endDate').value)); $('todaySales').innerText=money(result.summary.todaySales); $('monthSales').innerText=money(result.summary.monthSales); $('rangeSales').innerText=money(result.summary.rangeSales); $('laborTotal').innerText=money(result.summary.laborTotal); $('billCount').innerText=money(result.summary.billCount); $('profitTotal').innerText=money(result.summary.profitTotal); $('itemProfitList').innerHTML = result.itemProfits.length ? result.itemProfits.map((row)=>`<div class="card"><b>${row.name}</b> [${row.barcode||'-'}]<div>จำนวนขาย ${money(row.qty)} | ยอดขาย ${money(row.sales)} | ต้นทุนรวม ${money(row.cost)} | <b>กำไร ${money(row.profit)}</b></div></div>`).join('') : '<div class="muted">ยังไม่มีข้อมูลกำไร</div>'; $('lowStockList').innerHTML = result.lowStock.length ? result.lowStock.map((row)=>`<div class="card"><b class="danger">${row.name}</b><div>รหัส: ${row.barcode||'-'} | คงเหลือ ${money(row.quantity)} | จุดเตือน ${money(row.minStock||0)}</div></div>`).join('') : '<div class="muted">ยังไม่มีสินค้าที่ต่ำกว่าจุดเตือน</div>'; $('billList').innerHTML = result.bills.length ? result.bills.map((row)=>`<div class="card"><b>${row.saleId}</b><div>วันที่: ${row.createdAt || '-'} | ลูกค้า: ${row.customerName || '-'}</div><div>ค่าสินค้า ${money(row.itemsTotal)} | ค่าแรง ${money(row.laborCost)} | <b>รวม ${money(row.grandTotal)}</b></div></div>`).join('') : '<div class="muted">ยังไม่มีบิลในช่วงนี้</div>'; }catch(err){ $('billList').innerHTML='<div class="danger">'+err.message+'</div>'; } }
-      async function logout(){ try{ await fetch('/api/logout',{method:'POST'});}catch{} location.href='/login.html'; }
-      (async function checkAuth(){ try{ const res=await fetch('/api/auth/me'); if(!res.ok) location.href='/login.html'; }catch{ location.href='/login.html'; }})();
-      (function startup(){ const today=new Date().toISOString().slice(0,10); $('startDate').value=today; $('endDate').value=today; loadReport(); })();
-    </script>
-  </body>
+    <div class="filters">
+      <div class="field">
+        <label for="startDate">วันที่เริ่ม</label>
+        <input type="date" id="startDate" />
+      </div>
+      <div class="field">
+        <label for="endDate">วันที่สิ้นสุด</label>
+        <input type="date" id="endDate" />
+      </div>
+      <button class="btn btn-primary" onclick="loadReport()">ดูรายงาน</button>
+      <button class="btn btn-secondary" onclick="setToday()">วันนี้</button>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="title">ยอดขายวันนี้</div>
+        <div class="value" id="todaySales">0</div>
+      </div>
+      <div class="card">
+        <div class="title">ยอดขายเดือนนี้</div>
+        <div class="value" id="monthSales">0</div>
+      </div>
+      <div class="card">
+        <div class="title">ยอดขายช่วงที่เลือก</div>
+        <div class="value" id="rangeSales">0</div>
+      </div>
+      <div class="card">
+        <div class="title">ค่าแรงรวม</div>
+        <div class="value" id="laborTotal">0</div>
+      </div>
+      <div class="card">
+        <div class="title">จำนวนบิล</div>
+        <div class="value" id="billCount">0</div>
+      </div>
+      <div class="card">
+        <div class="title">กำไรรวม</div>
+        <div class="value" id="profitTotal">0</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h2>กำไรต่อสินค้า</h2>
+        <div id="itemProfitList"></div>
+      </div>
+      <div class="panel">
+        <h2>สต๊อกใกล้หมด</h2>
+        <div id="lowStockList"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>บิลในช่วงที่เลือก</h2>
+      <div id="billList"></div>
+    </div>
+  </div>
+
+  <script>
+    function formatNumber(value) {
+      return Number(value || 0).toLocaleString('th-TH');
+    }
+
+    function setToday() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const day = `${yyyy}-${mm}-${dd}`;
+      document.getElementById('startDate').value = day;
+      document.getElementById('endDate').value = day;
+      loadReport();
+    }
+
+    async function loadReport() {
+      try {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        const params = new URLSearchParams();
+        if (startDate) params.set('startDate', startDate);
+        if (endDate) params.set('endDate', endDate);
+
+        const res = await fetch(`/api/report?${params.toString()}`);
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'โหลดรายงานไม่สำเร็จ');
+        }
+
+        document.getElementById('todaySales').textContent = formatNumber(data.summary?.todaySales || 0);
+        document.getElementById('monthSales').textContent = formatNumber(data.summary?.monthSales || 0);
+        document.getElementById('rangeSales').textContent = formatNumber(data.summary?.rangeSales || 0);
+        document.getElementById('laborTotal').textContent = formatNumber(data.summary?.laborTotal || 0);
+        document.getElementById('billCount').textContent = formatNumber(data.summary?.billCount || 0);
+        document.getElementById('profitTotal').textContent = formatNumber(data.summary?.profitTotal || 0);
+
+        renderItemProfits(data.itemProfits || []);
+        renderLowStock(data.lowStock || []);
+        renderBills(data.bills || []);
+      } catch (error) {
+        alert(error.message || 'โหลดรายงานไม่สำเร็จ');
+      }
+    }
+
+    function renderItemProfits(list) {
+      const box = document.getElementById('itemProfitList');
+      if (!list.length) {
+        box.innerHTML = '<div class="empty">ยังไม่มีข้อมูลกำไรสินค้า</div>';
+        return;
+      }
+
+      box.innerHTML = list.map(item => `
+        <div class="profit-item">
+          <div style="font-size:20px;font-weight:800;">${item.name || '-' } [${item.barcode || '-'}]</div>
+          <div style="font-size:18px;margin-top:6px;">
+            จำนวนขาย ${formatNumber(item.qty)} |
+            ยอดขาย ${formatNumber(item.sales)} |
+            ต้นทุนรวม ${formatNumber(item.cost)} |
+            <strong>กำไร ${formatNumber(item.profit)}</strong>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderLowStock(list) {
+      const box = document.getElementById('lowStockList');
+      if (!list.length) {
+        box.innerHTML = '<div class="empty">ยังไม่มีสินค้าที่ต่ำกว่าจุดเตือน</div>';
+        return;
+      }
+
+      box.innerHTML = list.map(item => `
+        <div class="stock-item">
+          <div style="font-size:20px;font-weight:800;">${item.name || '-'}</div>
+          <div style="font-size:18px;margin-top:6px;">
+            รหัสสินค้า: ${item.barcode || '-'} |
+            คงเหลือ ${formatNumber(item.quantity)} |
+            จุดเตือน ${formatNumber(item.minStock)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderBills(list) {
+      const box = document.getElementById('billList');
+      if (!list.length) {
+        box.innerHTML = '<div class="empty">ไม่พบบิลในช่วงที่เลือก</div>';
+        return;
+      }
+
+      box.innerHTML = list.map(bill => `
+        <div class="bill-item">
+          <div class="bill-title">${bill.saleId || '-'}</div>
+          <div class="bill-lines">
+            วันที่: ${bill.createdAt || '-'} | ลูกค้า: ${bill.customerName || '-'}<br>
+            ค่าสินค้า ${formatNumber(bill.itemsTotal)} | ค่าแรง ${formatNumber(bill.laborCost)} | <strong>รวม ${formatNumber(bill.grandTotal)}</strong>
+          </div>
+
+          <table class="bill-item-table">
+            <thead>
+              <tr>
+                <th>รหัสสินค้า</th>
+                <th>รายการ</th>
+                <th>จำนวน</th>
+                <th>ราคา</th>
+                <th>เป็นเงิน</th>
+                <th>ประเภทราคา</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(bill.items || []).map(item => `
+                <tr>
+                  <td>${item.barcode || '-'}</td>
+                  <td>${item.name || '-'}</td>
+                  <td>${formatNumber(item.qty)}</td>
+                  <td>${formatNumber(item.price)}</td>
+                  <td>${formatNumber(item.total)}</td>
+                  <td>${item.priceLabel || '-'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div class="bill-actions">
+            <button class="action-btn print-btn" onclick="printBill('${bill.saleId}')">พิมพ์บิล</button>
+            <button class="action-btn copy-btn" onclick="duplicateBill('${bill.saleId}')">ทำซ้ำ</button>
+            <button class="action-btn edit-btn" onclick="editBill('${bill.saleId}')">แก้ไขบิล</button>
+            <button class="action-btn delete-btn" onclick="deleteBill('${bill.saleId}')">ลบบิล</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function printBill(saleId) {
+      window.open(`/print.html?saleId=${encodeURIComponent(saleId)}`, '_blank');
+    }
+
+    async function duplicateBill(saleId) {
+      try {
+        const res = await fetch(`/api/sales/${encodeURIComponent(saleId)}/duplicate`, {
+          method: 'POST'
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'ทำซ้ำบิลไม่สำเร็จ');
+        }
+
+        localStorage.setItem('posDraftSale', JSON.stringify({
+          mode: 'duplicate',
+          ...data.draft
+        }));
+
+        location.href = `/pos.html?duplicateSaleId=${encodeURIComponent(saleId)}`;
+      } catch (error) {
+        alert(error.message || 'ทำซ้ำบิลไม่สำเร็จ');
+      }
+    }
+
+    async function editBill(saleId) {
+      try {
+        const res = await fetch(`/api/sales/${encodeURIComponent(saleId)}`);
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'โหลดบิลไม่สำเร็จ');
+        }
+
+        localStorage.setItem('posDraftSale', JSON.stringify({
+          mode: 'edit',
+          saleId,
+          customerName: data.bill.customerName || '',
+          laborCost: Number(data.bill.laborCost || 0),
+          paid: Number(data.bill.paid || 0),
+          createdAt: data.bill.createdAt || '',
+          items: (data.bill.items || []).map(item => ({
+            id: Number(item.id),
+            qty: Number(item.qty || 0),
+            price: Number(item.price || 0),
+            total: Number(item.total || 0),
+            priceType: item.priceType || 'retail',
+            priceLabel: item.priceLabel || ''
+          }))
+        }));
+
+        location.href = `/pos.html?editSaleId=${encodeURIComponent(saleId)}`;
+      } catch (error) {
+        alert(error.message || 'แก้ไขบิลไม่สำเร็จ');
+      }
+    }
+
+    async function deleteBill(saleId) {
+      const ok = confirm(`ต้องการลบบิล ${saleId} ใช่ไหม?\nระบบจะคืนสต๊อกกลับให้อัตโนมัติ`);
+      if (!ok) return;
+
+      try {
+        const res = await fetch(`/api/sales/${encodeURIComponent(saleId)}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'ลบบิลไม่สำเร็จ');
+        }
+
+        alert(data.message || 'ลบบิลเรียบร้อย');
+        loadReport();
+      } catch (error) {
+        alert(error.message || 'ลบบิลไม่สำเร็จ');
+      }
+    }
+
+    setToday();
+  </script>
+</body>
 </html>

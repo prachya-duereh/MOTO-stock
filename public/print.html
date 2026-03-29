@@ -1,492 +1,153 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
-  <head>
-    <link rel="icon" type="image/jpg" href="D.jpg" />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>พิมพ์เอกสาร</title>
-    <style>
-      :root {
-        --paper-width: 80mm;
-        --font-main: 11px;
-        --font-small: 10px;
-      }
-
-      body.paper-58 {
-        --paper-width: 58mm;
-        --font-main: 10px;
-        --font-small: 9px;
-      }
-
-      body.paper-80 {
-        --paper-width: 80mm;
-        --font-main: 11px;
-        --font-small: 10px;
-      }
-
-      @page {
-        size: auto;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>พิมพ์บิล</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      background: #f4f4f5;
+      font-family: "Kanit", sans-serif;
+      color: #111827;
+    }
+    .page {
+      max-width: 380px;
+      margin: 20px auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 18px;
+    }
+    .center { text-align: center; }
+    .title { font-size: 22px; font-weight: 800; }
+    .sub { font-size: 14px; color: #6b7280; }
+    .line {
+      border-top: 1px dashed #cbd5e1;
+      margin: 12px 0;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 15px;
+      margin: 4px 0;
+    }
+    .item {
+      padding: 10px 0;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+    .item-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .total {
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      margin: 16px 0;
+    }
+    .btn {
+      border: none;
+      background: #16a34a;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    @media print {
+      body { background: #fff; }
+      .page {
         margin: 0;
-      }
-
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        background: #fff;
-        color: #000;
-        font-family: "Courier New", monospace;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-
-      body {
-        width: var(--paper-width);
-        margin: 0 auto;
-        padding: 4px;
-        font-size: var(--font-main);
-        box-sizing: border-box;
-      }
-
-      .center {
-        text-align: center;
-      }
-
-      .row {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 8px;
-      }
-
-      .bold {
-        font-weight: bold;
-      }
-
-      .small {
-        font-size: var(--font-small);
-      }
-
-      hr {
         border: none;
-        border-top: 1px dashed #000;
-        margin: 6px 0;
+        border-radius: 0;
+        max-width: 100%;
       }
-
-      .logo {
-        max-width: 100px;
-        max-height: 56px;
-        object-fit: contain;
-        margin-bottom: 4px;
-      }
-
-      .sign {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        margin-top: 18px;
-      }
-
-      .sign .box {
-        flex: 1;
-        text-align: center;
-      }
-
-      .line {
-        border-top: 1px solid #000;
-        margin-top: 26px;
-        padding-top: 4px;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-      }
-
-      th,
-      td {
-        padding: 3px 0;
-        border-bottom: 1px dashed #bbb;
-        vertical-align: top;
-        font-size: var(--font-main);
-        word-wrap: break-word;
-        overflow-wrap: anywhere;
-      }
-
-      th {
-        text-align: left;
-      }
-
-      .text-right {
-        text-align: right;
-      }
-
-      .text-center {
-        text-align: center;
-      }
-
-      .col-no {
-        width: 8%;
-      }
-
-      .col-name {
-        width: 40%;
-      }
-
-      .col-qty {
-        width: 14%;
-      }
-
-      .col-price {
-        width: 18%;
-      }
-
-      .col-total {
-        width: 20%;
-      }
-
-      body.paper-58 .col-name {
-        width: 36%;
-      }
-
-      body.paper-58 .col-qty {
-        width: 14%;
-      }
-
-      body.paper-58 .col-price {
-        width: 22%;
-      }
-
-      body.paper-58 .col-total {
-        width: 20%;
-      }
-
-      .shop-name {
-        font-size: 16px;
-        font-weight: bold;
-        line-height: 1.2;
-      }
-
-      .doc-title {
-        font-size: 15px;
-        font-weight: bold;
-        margin-top: 4px;
-      }
-
-      .mt-4 {
-        margin-top: 4px;
-      }
-
-      .mb-4 {
-        margin-bottom: 4px;
-      }
-
-      .nowrap {
-        white-space: nowrap;
-      }
-
-      @media print {
-        html,
-        body {
-          width: var(--paper-width);
-        }
-
-        body {
-          margin: 0 auto;
-          padding: 3px;
-        }
-      }
-    </style>
-  </head>
-  <body class="paper-80">
+      .actions { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
     <div class="center">
-      <img src="/logo.jpg" class="logo" alt="logo" onerror="this.style.display='none'" />
-      <div class="shop-name">ดี อะไหล่ กรงปินัง</div>
-      <div class="small">จำหน่ายอะไหล่มอเตอร์ไซค์</div>
-      <div class="small">Tel: 081-766-7549</div>
+      <div class="title">ใบเสร็จรับเงิน</div>
+      <div class="sub">ร้านอะไหล่มอเตอร์ไซค์</div>
     </div>
 
-    <hr />
-    <div id="content"></div>
-    <hr />
-    <div class="center small bold">ขอบคุณที่ใช้บริการ</div>
+    <div class="line"></div>
 
-    <script>
-      const payload = JSON.parse(localStorage.getItem("printData") || "{}");
+    <div id="receiptBox">กำลังโหลด...</div>
 
-      function getPaperSize() {
-        const params = new URLSearchParams(window.location.search);
-        const queryPaper = (params.get("paper") || "").trim();
-        const savedPaper = (localStorage.getItem("paperSize") || "").trim();
-        const paper = queryPaper || savedPaper || "80";
-        return paper === "58" ? "58" : "80";
+    <div class="actions">
+      <button class="btn" onclick="window.print()">พิมพ์บิล</button>
+    </div>
+  </div>
+
+  <script>
+    function formatNumber(value) {
+      return Number(value || 0).toLocaleString('th-TH');
+    }
+
+    async function loadBillForPrint() {
+      const params = new URLSearchParams(location.search);
+      const saleId = params.get('saleId');
+      const box = document.getElementById('receiptBox');
+
+      if (!saleId) {
+        box.innerHTML = '<div>ไม่พบบิลสำหรับพิมพ์</div>';
+        return;
       }
 
-      function applyPaperSize() {
-        const paper = getPaperSize();
-        document.body.classList.remove("paper-58", "paper-80");
-        document.body.classList.add(`paper-${paper}`);
-      }
+      try {
+        const res = await fetch(`/api/sales/${encodeURIComponent(saleId)}`);
+        const data = await res.json();
 
-      function money(n) {
-        const num = Number(n || 0);
-        if (Number.isInteger(num)) {
-          return num.toLocaleString("th-TH");
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'โหลดบิลไม่สำเร็จ');
         }
-        return num.toLocaleString("th-TH", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
-      }
 
-      function qtyText(n) {
-        const num = Number(n || 0);
-        if (Number.isInteger(num)) {
-          return num.toLocaleString("th-TH");
-        }
-        return num.toLocaleString("th-TH", {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2,
-        });
-      }
+        const bill = data.bill || {};
+        const items = Array.isArray(bill.items) ? bill.items : [];
 
-      function dateText(v) {
-        if (!v) return new Date().toLocaleString("th-TH");
-        const d = new Date(v);
-        if (isNaN(d.getTime())) return v;
-        return d.toLocaleString("th-TH");
-      }
+        box.innerHTML = `
+          <div class="row"><span>เลขที่บิล</span><strong>${bill.saleId || '-'}</strong></div>
+          <div class="row"><span>วันที่</span><span>${bill.createdAt || '-'}</span></div>
+          <div class="row"><span>ลูกค้า</span><span>${bill.customerName || '-'}</span></div>
+          <div class="line"></div>
 
-      function renderSale(receipt) {
-        const items = Array.isArray(receipt.items) ? receipt.items : [];
-
-        const subtotal = items.reduce(
-          (sum, i) =>
-            sum + Number(i.total ?? Number(i.price || 0) * Number(i.qty || 0)),
-          0
-        );
-
-        const labor = Number(receipt.laborCost || 0);
-        const total = Number(receipt.total || subtotal + labor);
-        const paid = Number(receipt.paid || 0);
-        const change = Number(receipt.change ?? paid - total);
-
-        const itemsHTML = items
-          .map((i, index) => {
-            const lineTotal = Number(
-              i.total ?? Number(i.price || 0) * Number(i.qty || 0)
-            );
-
-            return `
-              <tr>
-                <td class="col-no">${index + 1}</td>
-                <td class="col-name">[${i.barcode || i.code || "-"}] ${i.name || "-"}</td>
-                <td class="col-qty text-center">${qtyText(i.qty || 0)}</td>
-                <td class="col-price text-right">${money(i.price)}</td>
-                <td class="col-total text-right">${money(lineTotal)}</td>
-              </tr>
-            `;
-          })
-          .join("");
-
-        return `
-          <div class="center doc-title">ใบเสร็จรับเงิน</div>
-          <div class="small">เลขที่: ${receipt.saleId || receipt.id || "-"}</div>
-          <div class="small">วันที่: ${dateText(receipt.date)}</div>
-          <div class="small">ลูกค้า: ${receipt.customerName || "-"}</div>
-          <hr>
-          <table>
-            <thead>
-              <tr>
-                <th class="col-no">#</th>
-                <th class="col-name">รายการ</th>
-                <th class="col-qty text-center">จำนวน</th>
-                <th class="col-price text-right">ราคา</th>
-                <th class="col-total text-right">รวม</th>
-              </tr>
-            </thead>
-            <tbody>${itemsHTML}</tbody>
-          </table>
-          <hr>
-          <div class="row bold">
-            <span>รวม ${items.length} รายการ</span>
-            <span>${money(subtotal)}</span>
-          </div>
-          <div class="row">
-            <span>ค่าบริการ</span>
-            <span>${money(labor)}</span>
-          </div>
-          <div class="row bold">
-            <span>ยอดรวม</span>
-            <span>${money(total)}</span>
-          </div>
-          <hr>
-          <div class="row">
-            <span>รับเงิน</span>
-            <span>${money(paid)}</span>
-          </div>
-          <div class="row">
-            <span>เงินทอน</span>
-            <span>${money(change)}</span>
-          </div>
-        `;
-      }
-
-      function renderRepairForm(repair) {
-        const parts = Array.isArray(repair.parts) ? repair.parts : [];
-        const rows = parts
-          .map(
-            (p, index) => `
-              <tr>
-                <td class="col-no">${index + 1}</td>
-                <td class="col-name">[${p.barcode || "-"}] ${p.name || "-"}</td>
-                <td class="col-qty text-center">${qtyText(p.qty || 0)}</td>
-                <td class="col-price text-right">${money(p.unitPrice)}</td>
-                <td class="col-total text-right">${money(p.total)}</td>
-              </tr>
-            `
-          )
-          .join("");
-
-        return `
-          <div class="center doc-title">ใบรับซ่อม</div>
-          <div class="small">เลขที่: RP${repair.id || "-"}</div>
-          <div class="small">วันที่พิมพ์: ${dateText()}</div>
-          <hr>
-          <div class="small">ชื่อลูกค้า: ${repair.customerName || "-"}</div>
-          <div class="small">เบอร์โทร: ${repair.phone || "-"}</div>
-          <div class="small">รุ่นรถ: ${repair.bikeModel || "-"}</div>
-          <div class="small">ทะเบียน: ${repair.plate || "-"}</div>
-          <div class="small">วันที่รับซ่อม: ${repair.repairDate || "-"}</div>
-          <hr>
-          <div><b>อาการ / งานซ่อม</b></div>
-          <div class="small">${repair.symptom || "-"}</div>
-          <hr>
-          <table>
-            <thead>
-              <tr>
-                <th class="col-no">#</th>
-                <th class="col-name">รายการ</th>
-                <th class="col-qty text-center">จำนวน</th>
-                <th class="col-price text-right">ราคา</th>
-                <th class="col-total text-right">รวม</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-          <hr>
-          <div class="row">
-            <span>ค่าอะไหล่</span>
-            <span>${money(repair.partsCost)}</span>
-          </div>
-          <div class="row">
-            <span>ค่าแรง</span>
-            <span>${money(repair.laborCost)}</span>
-          </div>
-          <div class="row bold">
-            <span>รวมเงิน</span>
-            <span>${money(repair.totalCost)}</span>
-          </div>
-          <hr>
-          <div><b>หมายเหตุ</b></div>
-          <div class="small">${repair.note || "-"}</div>
-          <div class="sign">
-            <div class="box">
-              <div class="line">ลายเซ็นร้าน</div>
+          ${items.map(item => `
+            <div class="item">
+              <div class="item-name">${item.name || '-'}</div>
+              <div class="row"><span>รหัสสินค้า</span><span>${item.barcode || '-'}</span></div>
+              <div class="row"><span>จำนวน x ราคา</span><span>${formatNumber(item.qty)} x ${formatNumber(item.price)}</span></div>
+              <div class="row"><span>ประเภทราคา</span><span>${item.priceLabel || '-'}</span></div>
+              <div class="row"><strong>รวม</strong><strong>${formatNumber(item.total)}</strong></div>
             </div>
-            <div class="box">
-              <div class="line">ลายเซ็นลูกค้า</div>
-            </div>
-          </div>
+          `).join('')}
+
+          <div class="line"></div>
+          <div class="row"><span>ค่าสินค้า</span><strong>${formatNumber(bill.itemsTotal)}</strong></div>
+          <div class="row"><span>ค่าแรง</span><strong>${formatNumber(bill.laborCost)}</strong></div>
+          <div class="row total"><span>รวมสุทธิ</span><span>${formatNumber(bill.grandTotal)}</span></div>
+          <div class="row"><span>รับเงิน</span><strong>${formatNumber(bill.paid)}</strong></div>
+          <div class="row"><span>เงินทอน</span><strong>${formatNumber(bill.change)}</strong></div>
         `;
+      } catch (error) {
+        box.innerHTML = `<div>${error.message || 'โหลดบิลไม่สำเร็จ'}</div>`;
       }
+    }
 
-      function renderRepairReceipt(repair, extraLabor) {
-        const parts = Array.isArray(repair.parts) ? repair.parts : [];
-        const subtotal = Number(repair.partsCost || 0);
-        const baseLabor = Number(repair.laborCost || 0);
-        const addLabor = Number(extraLabor || 0);
-        const labor = baseLabor + addLabor;
-        const total = subtotal + labor;
-
-        const itemsHTML = parts
-          .map(
-            (p, index) => `
-              <tr>
-                <td class="col-no">${index + 1}</td>
-                <td class="col-name">[${p.barcode || "-"}] ${p.name || "-"}</td>
-                <td class="col-qty text-center">${qtyText(p.qty || 0)}</td>
-                <td class="col-price text-right">${money(p.unitPrice)}</td>
-                <td class="col-total text-right">${money(p.total)}</td>
-              </tr>
-            `
-          )
-          .join("");
-
-        return `
-          <div class="center doc-title">ใบเสร็จรับเงินงานซ่อม</div>
-          <div class="small">เลขที่: RR${repair.id || "-"}</div>
-          <div class="small">วันที่: ${dateText()}</div>
-          <div class="small">ลูกค้า: ${repair.customerName || "-"}</div>
-          <div class="small">ทะเบียน: ${repair.plate || "-"}</div>
-          <hr>
-          <table>
-            <thead>
-              <tr>
-                <th class="col-no">#</th>
-                <th class="col-name">รายการ</th>
-                <th class="col-qty text-center">จำนวน</th>
-                <th class="col-price text-right">ราคา</th>
-                <th class="col-total text-right">รวม</th>
-              </tr>
-            </thead>
-            <tbody>${itemsHTML}</tbody>
-          </table>
-          <hr>
-          <div class="row">
-            <span>ค่าอะไหล่</span>
-            <span>${money(subtotal)}</span>
-          </div>
-          <div class="row">
-            <span>ค่าแรงเดิม</span>
-            <span>${money(baseLabor)}</span>
-          </div>
-          <div class="row">
-            <span>ค่าแรงเพิ่ม</span>
-            <span>${money(addLabor)}</span>
-          </div>
-          <div class="row bold">
-            <span>ยอดรวม</span>
-            <span>${money(total)}</span>
-          </div>
-          <hr>
-          <div class="small">หมายเหตุ: ${repair.note || "-"}</div>
-        `;
-      }
-
-      applyPaperSize();
-
-      let html = '<div class="small">ไม่พบข้อมูลสำหรับพิมพ์</div>';
-
-      if (payload.type === "sale" && payload.receipt) {
-        html = renderSale(payload.receipt);
-      }
-
-      if (payload.type === "repair_form" && payload.repair) {
-        html = renderRepairForm(payload.repair);
-      }
-
-      if (payload.type === "repair_receipt" && payload.repair) {
-        html = renderRepairReceipt(payload.repair, payload.extraLabor || 0);
-      }
-
-      document.getElementById("content").innerHTML = html;
-
-      window.onload = () => {
-        window.print();
-        setTimeout(() => window.close(), 500);
-      };
-    </script>
-  </body>
+    document.addEventListener('DOMContentLoaded', loadBillForPrint);
+  </script>
+</body>
 </html>
