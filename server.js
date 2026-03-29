@@ -1,10 +1,52 @@
-// =========================
-// ITEMS ROUTES
-// =========================
-const express = require("express");
-const app = express();
+require("dotenv").config();
 
-app.use(express.json());
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+const { createClient } = require("@supabase/supabase-js");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+const USE_SUPABASE = String(process.env.USE_SUPABASE || "false").toLowerCase() === "true";
+
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+
+const DB_FILE = path.join(__dirname, "data.json");
+
+const SUPABASE_URL = process.env.SUPABASE_URL || "";
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+
+const supabase =
+  USE_SUPABASE && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+        auth: { persistSession: false },
+      })
+    : null;
+
+function readJSON(file, fallback = {}) {
+  try {
+    if (!fs.existsSync(file)) return fallback;
+    const raw = fs.readFileSync(file, "utf8");
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (err) {
+    console.error("readJSON error:", err);
+    return fallback;
+  }
+}
+
+function writeJSON(file, data) {
+  fs.writeFileSync(file, JSON.stringify(data, null, 2), "utf8");
+}
+
+function ensureLocalDB() {
+  if (!fs.existsSync(DB_FILE)) {
+    writeJSON(DB_FILE, { items: [], sales: [], repairs: [] });
+  }
+}
+
+ensureLocalDB();
 
 function normalizeItemPayload(body = {}, oldItem = {}) {
   return {
@@ -21,7 +63,7 @@ function normalizeItemPayload(body = {}, oldItem = {}) {
     costPrice: Number(body.costPrice ?? oldItem.costPrice ?? 0) || 0,
     minStock: Number(body.minStock ?? oldItem.minStock ?? 0) || 0,
     note: String(body.note || oldItem.note || "").trim(),
-    created_at: oldItem.created_at || new Date().toISOString()
+    created_at: oldItem.created_at || new Date().toISOString(),
   };
 }
 
@@ -40,12 +82,12 @@ function sanitizeItemForResponse(item = {}) {
     costPrice: Number(item.costPrice || 0),
     minStock: Number(item.minStock || 0),
     note: item.note || "",
-    created_at: item.created_at || null
+    created_at: item.created_at || null,
   };
 }
 
 async function getItems() {
-  if (USE_SUPABASE) {
+  if (USE_SUPABASE && supabase) {
     const { data, error } = await supabase
       .from("items")
       .select("*")
@@ -63,6 +105,24 @@ async function getItems() {
   return Array.isArray(db.items) ? db.items.map(sanitizeItemForResponse) : [];
 }
 
+app.get("/api/health", async (req, res) => {
+  try {
+    return res.json({
+      ok: true,
+      provider: USE_SUPABASE ? "supabase" : "json",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      error: err.message,
+    });
+  }
+});
+
+// =========================
+// ITEMS ROUTES
+// =========================
+
 // GET items
 app.get("/api/items", async (req, res) => {
   try {
@@ -72,7 +132,7 @@ app.get("/api/items", async (req, res) => {
     console.error("GET /api/items error:", err);
     return res.status(500).json({
       success: false,
-      message: err.message || "โหลดสินค้าไม่สำเร็จ"
+      message: err.message || "โหลดสินค้าไม่สำเร็จ",
     });
   }
 });
@@ -85,11 +145,11 @@ app.post("/api/items", async (req, res) => {
     if (!payload.name) {
       return res.status(400).json({
         success: false,
-        message: "กรุณาใส่ชื่อสินค้า"
+        message: "กรุณาใส่ชื่อสินค้า",
       });
     }
 
-    if (USE_SUPABASE) {
+    if (USE_SUPABASE && supabase) {
       const { data, error } = await supabase
         .from("items")
         .insert([payload])
@@ -103,7 +163,7 @@ app.post("/api/items", async (req, res) => {
 
       return res.json({
         success: true,
-        item: sanitizeItemForResponse(data)
+        item: sanitizeItemForResponse(data),
       });
     }
 
@@ -113,13 +173,13 @@ app.post("/api/items", async (req, res) => {
 
     return res.json({
       success: true,
-      item: sanitizeItemForResponse(payload)
+      item: sanitizeItemForResponse(payload),
     });
   } catch (err) {
     console.error("POST /api/items error:", err);
     return res.status(500).json({
       success: false,
-      message: err.message || "บันทึกสินค้าไม่สำเร็จ"
+      message: err.message || "บันทึกสินค้าไม่สำเร็จ",
     });
   }
 });
@@ -132,18 +192,27 @@ app.put("/api/items/:id", async (req, res) => {
     if (!itemId) {
       return res.status(400).json({
         success: false,
-        message: "ไม่พบรหัสสินค้า"
+        message: "ไม่พบรหัสสินค้า",
       });
     }
 
-    if (USE_SUPABASE) {
-      const items = await getItems();
-      const current = items.find(i => String(i.id) === itemId);
+    if (USE_SUPABASE && supabase) {
+      const { data: rows, error: fetchError } = await supabase
+        .from("items")
+        .select("*")
+        .eq("id", itemId);
+
+      if (fetchError) {
+        console.error("SUPABASE fetch item for update error:", fetchError);
+        throw fetchError;
+      }
+
+      const current = Array.isArray(rows) && rows.length ? rows[0] : null;
 
       if (!current) {
         return res.status(404).json({
           success: false,
-          message: "ไม่พบสินค้า"
+          message: "ไม่พบสินค้า",
         });
       }
 
@@ -163,30 +232,30 @@ app.put("/api/items/:id", async (req, res) => {
           mechanicPrice: payload.mechanicPrice,
           costPrice: payload.costPrice,
           minStock: payload.minStock,
-          note: payload.note
+          note: payload.note,
         })
         .eq("id", current.id)
         .select()
         .single();
 
       if (error) {
-        console.error("SUPABASE updateItem error:", error);
+        console.error("SUPABASE update item error:", error);
         throw error;
       }
 
       return res.json({
         success: true,
-        item: sanitizeItemForResponse(data)
+        item: sanitizeItemForResponse(data),
       });
     }
 
     const db = readJSON(DB_FILE, { items: [], sales: [], repairs: [] });
-    const index = db.items.findIndex(i => String(i.id) === itemId);
+    const index = db.items.findIndex((i) => String(i.id) === itemId);
 
     if (index === -1) {
       return res.status(404).json({
         success: false,
-        message: "ไม่พบสินค้า"
+        message: "ไม่พบสินค้า",
       });
     }
 
@@ -196,13 +265,13 @@ app.put("/api/items/:id", async (req, res) => {
 
     return res.json({
       success: true,
-      item: sanitizeItemForResponse(payload)
+      item: sanitizeItemForResponse(payload),
     });
   } catch (err) {
     console.error("PUT /api/items/:id error:", err);
     return res.status(500).json({
       success: false,
-      message: err.message || "แก้ไขสินค้าไม่สำเร็จ"
+      message: err.message || "แก้ไขสินค้าไม่สำเร็จ",
     });
   }
 });
@@ -214,79 +283,78 @@ app.patch("/api/items/:id/stock", async (req, res) => {
     const change = Number(req.body?.change || 0);
 
     console.log("PATCH /api/items/:id/stock");
-    console.log("params.id =", req.params.id, typeof req.params.id);
+    console.log("params.id =", req.params.id);
     console.log("body =", req.body);
 
     if (!itemId) {
       return res.status(400).json({
         success: false,
-        message: "ไม่พบรหัสสินค้า"
+        message: "ไม่พบรหัสสินค้า",
       });
     }
 
     if (!Number.isFinite(change) || change === 0) {
       return res.status(400).json({
         success: false,
-        message: "จำนวนไม่ถูกต้อง"
+        message: "จำนวนไม่ถูกต้อง",
       });
     }
 
-    if (USE_SUPABASE) {
-      const items = await getItems();
-      const current = items.find(i => String(i.id) === itemId);
+    if (USE_SUPABASE && supabase) {
+      const { data: rows, error: fetchError } = await supabase
+        .from("items")
+        .select("id,name,quantity")
+        .eq("id", itemId);
 
-      console.log("current =", current);
+      console.log("fetch rows =", rows);
+      console.log("fetch error =", fetchError);
+
+      if (fetchError) throw fetchError;
+
+      const current = Array.isArray(rows) && rows.length ? rows[0] : null;
 
       if (!current) {
         return res.status(404).json({
           success: false,
-          message: "ไม่พบสินค้า"
+          message: "ไม่พบสินค้า",
         });
       }
 
       const oldQty = Number(current.quantity || 0);
       const newQty = oldQty + change;
 
-      console.log("oldQty =", oldQty, "change =", change, "newQty =", newQty);
-
       if (newQty < 0) {
         return res.status(400).json({
           success: false,
-          message: "จำนวนคงเหลือไม่พอ"
+          message: "จำนวนคงเหลือไม่พอ",
         });
       }
 
       const { data, error } = await supabase
         .from("items")
-        .update({
-          quantity: newQty
-        })
+        .update({ quantity: newQty })
         .eq("id", current.id)
-        .select()
+        .select("*")
         .single();
 
       console.log("updated data =", data);
       console.log("update error =", error);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return res.json({
         success: true,
-        item: sanitizeItemForResponse(data)
+        item: sanitizeItemForResponse(data),
       });
     }
 
     const db = readJSON(DB_FILE, { items: [], sales: [], repairs: [] });
-    const index = db.items.findIndex(i => String(i.id) === itemId);
-
-    console.log("json index =", index);
+    const index = db.items.findIndex((i) => String(i.id) === itemId);
 
     if (index === -1) {
       return res.status(404).json({
         success: false,
-        message: "ไม่พบสินค้า"
+        message: "ไม่พบสินค้า",
       });
     }
 
@@ -296,7 +364,7 @@ app.patch("/api/items/:id/stock", async (req, res) => {
     if (newQty < 0) {
       return res.status(400).json({
         success: false,
-        message: "จำนวนคงเหลือไม่พอ"
+        message: "จำนวนคงเหลือไม่พอ",
       });
     }
 
@@ -305,13 +373,13 @@ app.patch("/api/items/:id/stock", async (req, res) => {
 
     return res.json({
       success: true,
-      item: sanitizeItemForResponse(db.items[index])
+      item: sanitizeItemForResponse(db.items[index]),
     });
   } catch (err) {
     console.error("PATCH /api/items/:id/stock error:", err);
     return res.status(500).json({
       success: false,
-      message: err.message || "เกิดข้อผิดพลาดในเซิร์ฟเวอร์"
+      message: err.message || "เกิดข้อผิดพลาดในเซิร์ฟเวอร์",
     });
   }
 });
@@ -324,18 +392,24 @@ app.delete("/api/items/:id", async (req, res) => {
     if (!itemId) {
       return res.status(400).json({
         success: false,
-        message: "ไม่พบรหัสสินค้า"
+        message: "ไม่พบรหัสสินค้า",
       });
     }
 
-    if (USE_SUPABASE) {
-      const items = await getItems();
-      const current = items.find(i => String(i.id) === itemId);
+    if (USE_SUPABASE && supabase) {
+      const { data: rows, error: fetchError } = await supabase
+        .from("items")
+        .select("id")
+        .eq("id", itemId);
+
+      if (fetchError) throw fetchError;
+
+      const current = Array.isArray(rows) && rows.length ? rows[0] : null;
 
       if (!current) {
         return res.status(404).json({
           success: false,
-          message: "ไม่พบสินค้า"
+          message: "ไม่พบสินค้า",
         });
       }
 
@@ -345,23 +419,23 @@ app.delete("/api/items/:id", async (req, res) => {
         .eq("id", current.id);
 
       if (error) {
-        console.error("SUPABASE deleteItem error:", error);
+        console.error("SUPABASE delete item error:", error);
         throw error;
       }
 
       return res.json({
         success: true,
-        message: "ลบสินค้าเรียบร้อย"
+        message: "ลบสินค้าเรียบร้อย",
       });
     }
 
     const db = readJSON(DB_FILE, { items: [], sales: [], repairs: [] });
-    const index = db.items.findIndex(i => String(i.id) === itemId);
+    const index = db.items.findIndex((i) => String(i.id) === itemId);
 
     if (index === -1) {
       return res.status(404).json({
         success: false,
-        message: "ไม่พบสินค้า"
+        message: "ไม่พบสินค้า",
       });
     }
 
@@ -370,13 +444,46 @@ app.delete("/api/items/:id", async (req, res) => {
 
     return res.json({
       success: true,
-      message: "ลบสินค้าเรียบร้อย"
+      message: "ลบสินค้าเรียบร้อย",
     });
   } catch (err) {
     console.error("DELETE /api/items/:id error:", err);
     return res.status(500).json({
       success: false,
-      message: err.message || "ลบสินค้าไม่สำเร็จ"
+      message: err.message || "ลบสินค้าไม่สำเร็จ",
     });
   }
+});
+
+// =========================
+// STATIC PAGES
+// =========================
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.get("/admin.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "admin.html"));
+});
+
+app.get("/pos.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "pos.html"));
+});
+
+app.get("/repair-history.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "repair-history.html"));
+});
+
+app.get("/report.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "report.html"));
+});
+
+app.get("/print.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "print.html"));
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Data provider: ${USE_SUPABASE ? "Supabase" : "JSON"}`);
 });
