@@ -9,6 +9,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const USE_SUPABASE = String(process.env.USE_SUPABASE || "false").toLowerCase() === "true";
 
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "1234";
+
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -106,15 +109,45 @@ async function getItems() {
 }
 
 app.get("/api/health", async (req, res) => {
+  return res.json({
+    ok: true,
+    provider: USE_SUPABASE ? "supabase" : "json",
+  });
+});
+
+// =========================
+// AUTH ROUTES
+// =========================
+
+app.get("/api/auth/me", (req, res) => {
+  return res.json({
+    success: true,
+    user: {
+      username: ADMIN_USERNAME,
+    },
+  });
+});
+
+app.post("/api/auth/login", (req, res) => {
   try {
-    return res.json({
-      ok: true,
-      provider: USE_SUPABASE ? "supabase" : "json",
+    const username = String(req.body?.username || "").trim();
+    const password = String(req.body?.password || "").trim();
+
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      return res.json({
+        success: true,
+        redirectTo: "/admin.html",
+      });
+    }
+
+    return res.status(401).json({
+      success: false,
+      message: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
     });
   } catch (err) {
     return res.status(500).json({
-      ok: false,
-      error: err.message,
+      success: false,
+      message: err.message || "เข้าสู่ระบบไม่สำเร็จ",
     });
   }
 });
@@ -123,7 +156,6 @@ app.get("/api/health", async (req, res) => {
 // ITEMS ROUTES
 // =========================
 
-// GET items
 app.get("/api/items", async (req, res) => {
   try {
     const items = await getItems();
@@ -137,7 +169,6 @@ app.get("/api/items", async (req, res) => {
   }
 });
 
-// POST create item
 app.post("/api/items", async (req, res) => {
   try {
     const payload = normalizeItemPayload(req.body);
@@ -184,7 +215,6 @@ app.post("/api/items", async (req, res) => {
   }
 });
 
-// PUT update item
 app.put("/api/items/:id", async (req, res) => {
   try {
     const itemId = String(req.params.id || "").trim();
@@ -276,15 +306,10 @@ app.put("/api/items/:id", async (req, res) => {
   }
 });
 
-// PATCH adjust stock
 app.patch("/api/items/:id/stock", async (req, res) => {
   try {
     const itemId = String(req.params.id || "").trim();
     const change = Number(req.body?.change || 0);
-
-    console.log("PATCH /api/items/:id/stock");
-    console.log("params.id =", req.params.id);
-    console.log("body =", req.body);
 
     if (!itemId) {
       return res.status(400).json({
@@ -306,10 +331,10 @@ app.patch("/api/items/:id/stock", async (req, res) => {
         .select("id,name,quantity")
         .eq("id", itemId);
 
-      console.log("fetch rows =", rows);
-      console.log("fetch error =", fetchError);
-
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error("SUPABASE fetch stock item error:", fetchError);
+        throw fetchError;
+      }
 
       const current = Array.isArray(rows) && rows.length ? rows[0] : null;
 
@@ -337,10 +362,10 @@ app.patch("/api/items/:id/stock", async (req, res) => {
         .select("*")
         .single();
 
-      console.log("updated data =", data);
-      console.log("update error =", error);
-
-      if (error) throw error;
+      if (error) {
+        console.error("SUPABASE update stock error:", error);
+        throw error;
+      }
 
       return res.json({
         success: true,
@@ -384,7 +409,6 @@ app.patch("/api/items/:id/stock", async (req, res) => {
   }
 });
 
-// DELETE item
 app.delete("/api/items/:id", async (req, res) => {
   try {
     const itemId = String(req.params.id || "").trim();
@@ -460,7 +484,11 @@ app.delete("/api/items/:id", async (req, res) => {
 // =========================
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
+app.get("/login.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "login.html"));
 });
 
 app.get("/admin.html", (req, res) => {

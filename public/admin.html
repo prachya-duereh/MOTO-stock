@@ -11,10 +11,7 @@
       rel="stylesheet"
     />
     <style>
-      * {
-        box-sizing: border-box;
-      }
-
+      * { box-sizing: border-box; }
       :root {
         --bg: #f4f7fb;
         --card: #ffffff;
@@ -27,27 +24,23 @@
         --red: #e63232;
         --gray: #7a8393;
       }
-
       body {
         margin: 0;
         font-family: "Kanit", sans-serif;
         background: var(--bg);
         color: var(--text);
       }
-
       .wrap {
         max-width: 1400px;
         margin: 0 auto;
         padding: 18px;
       }
-
       .topbar {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
         margin-bottom: 14px;
       }
-
       .topbar a {
         text-decoration: none;
         color: white;
@@ -56,7 +49,6 @@
         border-radius: 12px;
         font-weight: 600;
       }
-
       .card {
         background: var(--card);
         border: 1px solid var(--line);
@@ -64,35 +56,27 @@
         padding: 16px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.04);
       }
-
-      h1, h2, h3 {
-        margin: 0 0 12px;
-      }
-
+      h1, h2, h3 { margin: 0 0 12px; }
       .grid-2 {
         display: grid;
         grid-template-columns: 420px 1fr;
         gap: 16px;
         align-items: start;
       }
-
       .form-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 10px;
       }
-
       .form-grid .full {
         grid-column: 1 / -1;
       }
-
       label {
         display: block;
         font-size: 14px;
         color: var(--muted);
         margin-bottom: 4px;
       }
-
       input, textarea, select {
         width: 100%;
         border: 1px solid var(--line);
@@ -103,19 +87,16 @@
         font-size: 16px;
         outline: none;
       }
-
       textarea {
         min-height: 90px;
         resize: vertical;
       }
-
       .actions {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
         margin-top: 12px;
       }
-
       button {
         border: 0;
         border-radius: 12px;
@@ -125,52 +106,44 @@
         font-weight: 700;
         cursor: pointer;
       }
-
       .btn-primary { background: var(--primary); color: #fff; }
       .btn-green { background: var(--green); color: #fff; }
       .btn-orange { background: var(--orange); color: #fff; }
       .btn-red { background: var(--red); color: #fff; }
       .btn-gray { background: var(--gray); color: #fff; }
       .btn-light { background: #e9eef6; color: var(--text); }
-
       .search-row {
         display: grid;
         grid-template-columns: 1fr 180px;
         gap: 10px;
         margin-bottom: 14px;
       }
-
       .summary {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 12px;
         margin-bottom: 14px;
       }
-
       .summary .box {
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: 18px;
         padding: 14px;
       }
-
       .summary .label {
         color: var(--muted);
         font-size: 14px;
       }
-
       .summary .value {
         font-size: 28px;
         font-weight: 800;
         margin-top: 4px;
       }
-
       .item-list {
         display: flex;
         flex-direction: column;
         gap: 14px;
       }
-
       .item-card {
         display: grid;
         grid-template-columns: 1fr 300px;
@@ -180,77 +153,50 @@
         border-radius: 18px;
         padding: 16px;
       }
-
       .item-name {
         font-size: 20px;
         font-weight: 800;
         margin-bottom: 2px;
       }
-
       .meta {
         color: var(--muted);
         line-height: 1.7;
         font-size: 15px;
       }
-
       .warn {
         color: var(--red);
         font-weight: 700;
       }
-
       .stock-panel {
         display: flex;
         flex-direction: column;
         gap: 10px;
         justify-content: center;
       }
-
       .stock-input {
         display: grid;
         grid-template-columns: 1fr;
         gap: 10px;
       }
-
       .stock-btns-2,
       .stock-btns-3 {
         display: grid;
         gap: 10px;
       }
-
-      .stock-btns-2 {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .stock-btns-3 {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
-
+      .stock-btns-2 { grid-template-columns: 1fr 1fr; }
+      .stock-btns-3 { grid-template-columns: 1fr 1fr 1fr; }
       .empty {
         text-align: center;
         color: var(--muted);
         padding: 30px 10px;
       }
-
       @media (max-width: 1000px) {
-        .grid-2 {
-          grid-template-columns: 1fr;
-        }
-
-        .summary {
-          grid-template-columns: repeat(2, 1fr);
-        }
-
-        .item-card {
-          grid-template-columns: 1fr;
-        }
+        .grid-2 { grid-template-columns: 1fr; }
+        .summary { grid-template-columns: repeat(2, 1fr); }
+        .item-card { grid-template-columns: 1fr; }
       }
-
       @media (max-width: 640px) {
-        .form-grid,
-        .summary,
-        .search-row {
-          grid-template-columns: 1fr;
-        }
+        .form-grid, .summary, .search-row { grid-template-columns: 1fr; }
       }
     </style>
   </head>
@@ -263,7 +209,7 @@
         <a href="/report.html">📊 รายงาน</a>
       </div>
 
-      <div class="summary" id="summaryBox">
+      <div class="summary">
         <div class="box">
           <div class="label">จำนวนสินค้า</div>
           <div class="value" id="sumItems">0</div>
@@ -402,17 +348,11 @@
 
       function updateSummary(list) {
         document.getElementById("sumItems").textContent = list.length.toLocaleString("th-TH");
-
         const qty = list.reduce((sum, i) => sum + Number(i.quantity || 0), 0);
         document.getElementById("sumQty").textContent = qty.toLocaleString("th-TH");
-
         const low = list.filter(isLowStock).length;
         document.getElementById("sumLow").textContent = low.toLocaleString("th-TH");
-
-        const cost = list.reduce(
-          (sum, i) => sum + Number(i.quantity || 0) * Number(i.costPrice || 0),
-          0
-        );
+        const cost = list.reduce((sum, i) => sum + Number(i.quantity || 0) * Number(i.costPrice || 0), 0);
         document.getElementById("sumCost").textContent = money(cost);
       }
 
@@ -448,7 +388,6 @@
               .includes(q);
 
           const stockHit = mode === "low" ? isLowStock(item) : true;
-
           return hit && stockHit;
         });
       }

@@ -1,166 +1,164 @@
 <!doctype html>
 <html lang="th">
   <head>
-    <link rel="icon" type="image/jpg" href="D.jpg" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>เข้าสู่ระบบผู้ดูแล</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>เข้าสู่ระบบ</title>
     <style>
-      * {
-        font-family: "Kanit", sans-serif;
-        scrollbar-gutter: stable;
-      }
+      * { box-sizing: border-box; }
       body {
         margin: 0;
-
-        background: #eef2f7;
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 16px;
-        color: #222;
+        background: #eef2f7;
+        font-family: "Kanit", sans-serif;
       }
       .card {
         width: 100%;
-        max-width: 420px;
+        max-width: 560px;
         background: #fff;
-        border-radius: 20px;
-        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
-        padding: 24px;
+        border: 1px solid #d8dee8;
+        border-radius: 28px;
+        padding: 28px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
       }
       .logo {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 18px;
-      }
-      .logo img {
-        width: 82px;
-        height: 82px;
+        width: 110px;
+        height: 110px;
         object-fit: contain;
-        border-radius: 16px;
+        display: block;
+        margin: 0 auto 16px;
+        border-radius: 20px;
         background: #fff;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        padding: 6px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        padding: 10px;
       }
       h1 {
-        margin: 0;
-        font-size: 24px;
+        text-align: center;
+        margin: 0 0 8px;
+        font-size: 32px;
       }
       .sub {
-        color: #666;
-        font-size: 14px;
         text-align: center;
+        color: #5c687a;
+        margin-bottom: 22px;
       }
       label {
         display: block;
-        font-weight: bold;
+        font-size: 16px;
+        font-weight: 700;
         margin: 14px 0 6px;
       }
       input {
         width: 100%;
-        box-sizing: border-box;
-        padding: 14px;
-        border: 1px solid #ccd5df;
-        border-radius: 12px;
-        font-size: 16px;
+        border: 1px solid #cfd7e3;
+        border-radius: 16px;
+        padding: 16px 18px;
+        font-size: 18px;
+        font-family: "Kanit", sans-serif;
+        outline: none;
       }
       button {
         width: 100%;
-        border: none;
-        background: #2563eb;
+        margin-top: 18px;
+        border: 0;
+        border-radius: 16px;
+        padding: 16px 18px;
+        font-size: 22px;
+        font-weight: 800;
+        font-family: "Kanit", sans-serif;
+        background: #2f63dc;
         color: #fff;
-        padding: 14px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: bold;
         cursor: pointer;
-        margin-top: 16px;
       }
-      .help {
-        margin-top: 12px;
-        color: #666;
-        font-size: 13px;
+      .msg {
         text-align: center;
+        margin-top: 14px;
+        min-height: 28px;
+        font-weight: 600;
       }
-      .error {
-        margin-top: 12px;
-        color: #dc2626;
-        font-size: 14px;
-        min-height: 20px;
+      .err { color: #e63232; }
+      .ok { color: #18a84b; }
+      .hint {
         text-align: center;
+        color: #707b8d;
+        margin-top: 12px;
       }
     </style>
   </head>
   <body>
     <div class="card">
-      <div class="logo">
-        <img src="/logo.jpg" alt="logo" />
-        <h1>เข้าสู่ระบบผู้ดูแล</h1>
-        <div class="sub">ระบบ POS + สต๊อก + ประวัติการซ่อม</div>
-      </div>
+      <img src="/logo.jpg" class="logo" alt="logo" onerror="this.style.display='none'" />
+      <h1>เข้าสู่ระบบผู้ดูแล</h1>
+      <div class="sub">ระบบ POS + สต๊อก + ประวัติการซ่อม</div>
+
       <form id="loginForm">
-        <label for="username">ชื่อผู้ใช้</label>
-        <input id="username" autocomplete="username" value="admin" required />
-        <label for="password">รหัสผ่าน</label>
-        <input
-          id="password"
-          type="password"
-          autocomplete="current-password"
-          required
-        />
+        <label>ชื่อผู้ใช้</label>
+        <input id="username" autocomplete="username" value="admin" />
+
+        <label>รหัสผ่าน</label>
+        <input id="password" type="password" autocomplete="current-password" value="1234" />
+
         <button type="submit">เข้าสู่ระบบ</button>
-        <div class="error" id="errorText"></div>
       </form>
-      <div class="help">เปลี่ยนชื่อผู้ใช้และรหัสผ่านได้ในไฟล์ <b>.env</b></div>
+
+      <div id="msg" class="msg"></div>
+      <div class="hint">เปลี่ยนชื่อผู้ใช้และรหัสผ่านได้ในไฟล์ .env</div>
     </div>
+
     <script>
-      async function go() {
+      async function checkMe() {
         try {
-          const me = await fetch("/api/auth/me");
-          if (me.ok) {
-            location.href = "/pos.html";
-            return;
+          const res = await fetch("/api/auth/me");
+          if (res.ok) {
+            // ไม่ redirect อัตโนมัติ เพื่อให้ login ใช้งานได้ปกติ
           }
-        } catch {}
+        } catch (err) {}
       }
-      go();
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const errorText = document.getElementById("errorText");
-          errorText.textContent = "";
-          const username = document.getElementById("username").value.trim();
-          const password = document.getElementById("password").value;
-          try {
-            const res = await fetch("/api/login", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username, password }),
-            });
-            const text = await res.text();
-            let result = {};
-            try {
-              result = text ? JSON.parse(text) : {};
-            } catch {
-              throw new Error("server ไม่ได้ส่ง JSON กลับมา");
-            }
-            if (!res.ok || !result.success)
-              throw new Error(result.message || "เข้าสู่ระบบไม่สำเร็จ");
-            location.href = "/pos.html";
-          } catch (err) {
-            errorText.textContent = err.message || "เข้าสู่ระบบไม่สำเร็จ";
+
+      checkMe();
+
+      document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById("msg");
+        msg.className = "msg";
+        msg.textContent = "กำลังเข้าสู่ระบบ...";
+
+        try {
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: document.getElementById("username").value.trim(),
+              password: document.getElementById("password").value.trim()
+            })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            throw new Error(data.message || "เข้าสู่ระบบไม่สำเร็จ");
           }
-        });
+
+          msg.className = "msg ok";
+          msg.textContent = "เข้าสู่ระบบสำเร็จ";
+
+          setTimeout(() => {
+            location.href = data.redirectTo || "/admin.html";
+          }, 300);
+        } catch (err) {
+          msg.className = "msg err";
+          msg.textContent = err.message || "server ไม่ได้ส่ง JSON กลับมา";
+        }
+      });
     </script>
   </body>
 </html>
