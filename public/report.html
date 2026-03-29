@@ -403,26 +403,18 @@ function printBillByData(encodedBill) {
 function formatThaiDate(dateStr, withSeconds = false) {
   if (!dateStr) return '-';
 
-  if (/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr))) {
-    return String(dateStr);
-  }
-
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return String(dateStr);
 
-  const parts = new Intl.DateTimeFormat('sv-SE', {
+  return d.toLocaleString('th-TH', {
     timeZone: 'Asia/Bangkok',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    ...(withSeconds ? { second: '2-digit' } : {}),
-    hour12: false
-  }).formatToParts(d);
-
-  const get = (type) => parts.find((p) => p.type === type)?.value || '';
-  return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}${withSeconds ? ':' + get('second') : ''}`;
+    ...(withSeconds ? { second: '2-digit' } : {})
+  });
 }
 
     function renderBills(list) {
@@ -438,7 +430,7 @@ function formatThaiDate(dateStr, withSeconds = false) {
           <div class="bill-item">
             <div class="bill-title">${escapeHtml(bill.saleId || '-')}</div>
             <div class="bill-lines">
-              วันที่: ${escapeHtml(bill.createdAt || '-')} | ลูกค้า: ${escapeHtml(bill.customerName || '-')}<br>
+              วันที่: ${escapeHtml(formatThaiDate(bill.createdAt))} | ลูกค้า: ${escapeHtml(bill.customerName || '-')}<br>
               ค่าสินค้า ${formatNumber(bill.itemsTotal)} | ค่าแรง ${formatNumber(bill.laborCost)} | <strong>รวม ${formatNumber(bill.grandTotal)}</strong>
             </div>
 
