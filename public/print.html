@@ -3,93 +3,225 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>พิมพ์บิล</title>
+  <title>พิมพ์ใบเสร็จ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      background: #f4f4f5;
       font-family: "Kanit", sans-serif;
+      background: #ececec;
       color: #111827;
     }
+
     .page {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 12px;
+    }
+
+    .receipt {
+      width: 100%;
       max-width: 380px;
-      margin: 20px auto;
       background: #fff;
-      border: 1px solid #e5e7eb;
       border-radius: 18px;
-      padding: 18px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      border: 1px solid #e5e7eb;
+      padding: 16px;
     }
-    .center { text-align: center; }
-    .title { font-size: 22px; font-weight: 800; }
-    .sub { font-size: 14px; color: #6b7280; }
-    .line {
-      border-top: 1px dashed #cbd5e1;
-      margin: 12px 0;
+
+    .header {
+      text-align: center;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 10px;
     }
-    .row {
+
+    .title {
+      font-size: 28px;
+      line-height: 1.1;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 4px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #64748b;
+      margin: 0;
+    }
+
+    .meta {
+      border-bottom: 1px dashed #cbd5e1;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+
+    .meta-row,
+    .sum-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 4px 0;
+      font-size: 15px;
+    }
+
+    .meta-row .label,
+    .sum-row .label {
+      color: #334155;
+      font-weight: 500;
+      flex: 0 0 95px;
+    }
+
+    .meta-row .value,
+    .sum-row .value {
+      text-align: right;
+      flex: 1;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .items {
+      margin-top: 6px;
+    }
+
+    .item {
+      padding: 10px 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    .item-name {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #0f172a;
+    }
+
+    .item-line {
       display: flex;
       justify-content: space-between;
       gap: 10px;
+      margin: 2px 0;
       font-size: 15px;
-      margin: 4px 0;
     }
-    .item {
-      padding: 10px 0;
-      border-bottom: 1px dashed #e5e7eb;
+
+    .item-line .label {
+      color: #334155;
+      font-weight: 500;
     }
-    .item-name {
-      font-size: 16px;
+
+    .item-line .value {
+      text-align: right;
       font-weight: 700;
-      margin-bottom: 4px;
+      word-break: break-word;
     }
-    .total {
-      font-size: 20px;
+
+    .item-total {
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
       font-weight: 800;
+      color: #0f172a;
     }
+
+    .summary {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #cbd5e1;
+    }
+
+    .grand {
+      font-size: 16px;
+      margin-top: 6px;
+    }
+
+    .grand .value {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed #cbd5e1;
+      color: #64748b;
+      font-size: 13px;
+    }
+
     .actions {
       display: flex;
       justify-content: center;
-      margin: 16px 0;
+      margin-top: 14px;
     }
-    .btn {
+
+    .print-btn {
       border: none;
       background: #16a34a;
       color: #fff;
-      padding: 12px 18px;
       border-radius: 12px;
+      padding: 12px 28px;
       font-family: inherit;
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 18px;
+      font-weight: 800;
       cursor: pointer;
     }
+
+    .loading,
+    .error {
+      text-align: center;
+      padding: 40px 16px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+
     @media print {
-      body { background: #fff; }
+      body {
+        background: #fff;
+      }
+
       .page {
-        margin: 0;
+        padding: 0;
+      }
+
+      .receipt {
+        max-width: 100%;
+        width: 80mm;
         border: none;
         border-radius: 0;
-        max-width: 100%;
+        box-shadow: none;
+        padding: 8mm 6mm;
       }
-      .actions { display: none; }
+
+      .actions {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <div class="center">
-      <div class="title">ใบเสร็จรับเงิน</div>
-      <div class="sub">ร้านอะไหล่มอเตอร์ไซค์</div>
-    </div>
-
-    <div class="line"></div>
-
-    <div id="receiptBox">กำลังโหลด...</div>
-
-    <div class="actions">
-      <button class="btn" onclick="window.print()">พิมพ์บิล</button>
+    <div class="receipt">
+      <div id="receiptBox" class="loading">กำลังโหลดใบเสร็จ...</div>
+      <div class="actions">
+        <button class="print-btn" onclick="window.print()">พิมพ์บิล</button>
+      </div>
     </div>
   </div>
 
@@ -98,56 +230,198 @@
       return Number(value || 0).toLocaleString('th-TH');
     }
 
-    async function loadBillForPrint() {
-      const params = new URLSearchParams(location.search);
-      const saleId = params.get('saleId');
-      const box = document.getElementById('receiptBox');
+    function escapeHtml(text) {
+      return String(text ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
-      if (!saleId) {
-        box.innerHTML = '<div>ไม่พบบิลสำหรับพิมพ์</div>';
-        return;
+    function formatDateText(value) {
+      if (!value) return '-';
+      return String(value);
+    }
+
+    function getSearchParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    async function fetchSaleBillById(saleId) {
+      const res = await fetch(`/api/sales/${encodeURIComponent(saleId)}`);
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'โหลดบิลไม่สำเร็จ');
       }
+      return data.bill;
+    }
 
+    function normalizeReceiptFromBill(bill) {
+      return {
+        saleId: bill.saleId || bill.id || '-',
+        date: bill.createdAt || bill.date || '-',
+        customerName: bill.customerName || '-',
+        items: Array.isArray(bill.items) ? bill.items.map(item => ({
+          barcode: item.barcode || item.id || '-',
+          name: item.name || '-',
+          qty: Number(item.qty || 0),
+          price: Number(item.price || 0),
+          total: Number(item.total || 0),
+          priceLabel: item.priceLabel || '-'
+        })) : [],
+        itemsTotal: Number(bill.itemsTotal || 0),
+        laborCost: Number(bill.laborCost || 0),
+        total: Number(bill.grandTotal || bill.total || 0),
+        paid: Number(bill.paid || 0),
+        change: Number(bill.change || 0)
+      };
+    }
+
+    function getStoredReceipt() {
       try {
-        const res = await fetch(`/api/sales/${encodeURIComponent(saleId)}`);
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-          throw new Error(data.message || 'โหลดบิลไม่สำเร็จ');
-        }
-
-        const bill = data.bill || {};
-        const items = Array.isArray(bill.items) ? bill.items : [];
-
-        box.innerHTML = `
-          <div class="row"><span>เลขที่บิล</span><strong>${bill.saleId || '-'}</strong></div>
-          <div class="row"><span>วันที่</span><span>${bill.createdAt || '-'}</span></div>
-          <div class="row"><span>ลูกค้า</span><span>${bill.customerName || '-'}</span></div>
-          <div class="line"></div>
-
-          ${items.map(item => `
-            <div class="item">
-              <div class="item-name">${item.name || '-'}</div>
-              <div class="row"><span>รหัสสินค้า</span><span>${item.barcode || '-'}</span></div>
-              <div class="row"><span>จำนวน x ราคา</span><span>${formatNumber(item.qty)} x ${formatNumber(item.price)}</span></div>
-              <div class="row"><span>ประเภทราคา</span><span>${item.priceLabel || '-'}</span></div>
-              <div class="row"><strong>รวม</strong><strong>${formatNumber(item.total)}</strong></div>
-            </div>
-          `).join('')}
-
-          <div class="line"></div>
-          <div class="row"><span>ค่าสินค้า</span><strong>${formatNumber(bill.itemsTotal)}</strong></div>
-          <div class="row"><span>ค่าแรง</span><strong>${formatNumber(bill.laborCost)}</strong></div>
-          <div class="row total"><span>รวมสุทธิ</span><span>${formatNumber(bill.grandTotal)}</span></div>
-          <div class="row"><span>รับเงิน</span><strong>${formatNumber(bill.paid)}</strong></div>
-          <div class="row"><span>เงินทอน</span><strong>${formatNumber(bill.change)}</strong></div>
-        `;
+        const raw =
+          localStorage.getItem('lastReceipt') ||
+          sessionStorage.getItem('lastReceipt') ||
+          localStorage.getItem('printReceipt') ||
+          sessionStorage.getItem('printReceipt');
+        if (!raw) return null;
+        return JSON.parse(raw);
       } catch (error) {
-        box.innerHTML = `<div>${error.message || 'โหลดบิลไม่สำเร็จ'}</div>`;
+        return null;
       }
     }
 
-    document.addEventListener('DOMContentLoaded', loadBillForPrint);
+    function renderReceipt(receipt) {
+      const box = document.getElementById('receiptBox');
+
+      const items = Array.isArray(receipt.items) ? receipt.items : [];
+      const itemsHtml = items.map(item => `
+        <div class="item">
+          <div class="item-name">${escapeHtml(item.name || '-')}</div>
+
+          <div class="item-line">
+            <div class="label">รหัสสินค้า</div>
+            <div class="value">${escapeHtml(item.barcode || '-')}</div>
+          </div>
+
+          <div class="item-line">
+            <div class="label">จำนวน x ราคา</div>
+            <div class="value">${formatNumber(item.qty)} x ${formatNumber(item.price)}</div>
+          </div>
+
+          <div class="item-line">
+            <div class="label">ประเภทราคา</div>
+            <div class="value">${escapeHtml(item.priceLabel || '-')}</div>
+          </div>
+
+          <div class="item-total">
+            <div>รวม</div>
+            <div>${formatNumber(item.total)}</div>
+          </div>
+        </div>
+      `).join('');
+
+      box.className = '';
+      box.innerHTML = `
+        <div class="header">
+          <div class="title">ใบเสร็จรับเงิน</div>
+          <div class="subtitle">ร้านอะไหล่มอเตอร์ไซค์</div>
+        </div>
+
+        <div class="meta">
+          <div class="meta-row">
+            <div class="label">เลขที่บิล</div>
+            <div class="value">${escapeHtml(receipt.saleId || '-')}</div>
+          </div>
+          <div class="meta-row">
+            <div class="label">วันที่</div>
+            <div class="value">${escapeHtml(formatDateText(receipt.date))}</div>
+          </div>
+          <div class="meta-row">
+            <div class="label">ลูกค้า</div>
+            <div class="value">${escapeHtml(receipt.customerName || '-')}</div>
+          </div>
+        </div>
+
+        <div class="items">
+          ${itemsHtml || '<div class="item"><div class="item-name">ไม่มีรายการสินค้า</div></div>'}
+        </div>
+
+        <div class="summary">
+          <div class="sum-row">
+            <div class="label">ค่าสินค้า</div>
+            <div class="value">${formatNumber(receipt.itemsTotal)}</div>
+          </div>
+          <div class="sum-row">
+            <div class="label">ค่าแรง</div>
+            <div class="value">${formatNumber(receipt.laborCost)}</div>
+          </div>
+          <div class="sum-row grand">
+            <div class="label">รวมสุทธิ</div>
+            <div class="value">${formatNumber(receipt.total)}</div>
+          </div>
+          <div class="sum-row">
+            <div class="label">รับเงิน</div>
+            <div class="value">${formatNumber(receipt.paid)}</div>
+          </div>
+          <div class="sum-row">
+            <div class="label">เงินทอน</div>
+            <div class="value">${formatNumber(receipt.change)}</div>
+          </div>
+        </div>
+
+        <div class="footer">
+          ขอบคุณที่ใช้บริการ
+        </div>
+      `;
+    }
+
+    async function loadReceipt() {
+      const box = document.getElementById('receiptBox');
+
+      try {
+        const saleId = getSearchParam('saleId');
+
+        if (saleId) {
+          const bill = await fetchSaleBillById(saleId);
+          const receipt = normalizeReceiptFromBill(bill);
+          renderReceipt(receipt);
+          return;
+        }
+
+        const stored = getStoredReceipt();
+        if (stored) {
+          const receipt = {
+            saleId: stored.saleId || stored.id || '-',
+            date: stored.date || stored.createdAt || '-',
+            customerName: stored.customerName || '-',
+            items: Array.isArray(stored.items) ? stored.items : [],
+            itemsTotal: Number(
+              stored.itemsTotal ??
+              (Array.isArray(stored.items)
+                ? stored.items.reduce((sum, item) => sum + Number(item.total || 0), 0)
+                : 0)
+            ),
+            laborCost: Number(stored.laborCost || 0),
+            total: Number(stored.total || stored.grandTotal || 0),
+            paid: Number(stored.paid || 0),
+            change: Number(stored.change || 0)
+          };
+          renderReceipt(receipt);
+          return;
+        }
+
+        box.className = 'error';
+        box.textContent = 'ไม่พบบิลสำหรับพิมพ์';
+      } catch (error) {
+        box.className = 'error';
+        box.textContent = error.message || 'โหลดใบเสร็จไม่สำเร็จ';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadReceipt);
   </script>
 </body>
 </html>

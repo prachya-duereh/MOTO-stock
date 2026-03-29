@@ -67,7 +67,6 @@
       margin-bottom: 16px;
     }
     .search-row input,
-    .search-row select,
     .field input {
       width: 100%;
       height: 52px;
@@ -126,13 +125,7 @@
     }
     .btn-primary { background: #16a34a; color: #fff; }
     .btn-secondary { background: #2563eb; color: #fff; }
-    .btn-warning { background: #f59e0b; color: #fff; }
-    .btn-danger { background: #dc2626; color: #fff; }
     .btn-muted { background: #6b7280; color: #fff; }
-    .btn-light {
-      background: #e5e7eb;
-      color: #0f172a;
-    }
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -481,6 +474,7 @@
 
     function updateDraftStatus() {
       const box = document.getElementById('draftStatus');
+
       if (!draftMode) {
         box.className = 'status-bar';
         box.textContent = '';
@@ -492,7 +486,7 @@
         box.textContent = `กำลังแก้ไขบิล ${editingSaleId || ''} เมื่อบันทึก ระบบจะคืนสต๊อกบิลเดิมแล้วตัดใหม่อัตโนมัติ`;
       } else if (draftMode === 'duplicate') {
         box.className = 'status-bar show status-duplicate';
-        box.textContent = `กำลังทำซ้ำบิลเดิม เมื่อบันทึกจะสร้างบิลใหม่อีกใบ`;
+        box.textContent = 'กำลังทำซ้ำบิลเดิม เมื่อบันทึกจะสร้างบิลใหม่อีกใบ';
       }
     }
 
@@ -519,21 +513,7 @@
       document.getElementById('tab-wholesale').classList.toggle('active', type === 'wholesale');
       document.getElementById('tab-mechanic').classList.toggle('active', type === 'mechanic');
 
-      cart = cart.map(row => {
-        const item = allItems.find(i => Number(i.id) === Number(row.id));
-        if (!item) return row;
-        const price = getItemPrice(item, type);
-        return {
-          ...row,
-          priceType: type,
-          priceLabel: getPriceLabel(type),
-          price,
-          total: price * asNumber(row.qty, 0)
-        };
-      });
-
       renderItems();
-      renderCart();
     }
 
     function renderItems() {
@@ -561,6 +541,7 @@
       list.innerHTML = filtered.map(item => {
         const stock = getItemStock(item);
         const price = getItemPrice(item, currentPriceType);
+
         return `
           <div class="product-card">
             <div class="product-name">${escapeHtml(item.name || '-')}</div>
@@ -588,21 +569,25 @@
       if (!item) return alert('ไม่พบสินค้า');
 
       const stock = getItemStock(item);
-      const existing = cart.find(row => Number(row.id) === Number(itemId));
-      const currentQty = existing ? asNumber(existing.qty, 0) : 0;
+      const price = getItemPrice(item, currentPriceType);
+      const priceLabel = getPriceLabel(currentPriceType);
 
-      if (currentQty + 1 > stock) {
+      const existing = cart.find(row =>
+        Number(row.id) === Number(itemId) &&
+        String(row.priceType || '') === String(currentPriceType)
+      );
+
+      const usedQtySameItem = cart
+        .filter(row => Number(row.id) === Number(itemId))
+        .reduce((sum, row) => sum + asNumber(row.qty, 0), 0);
+
+      if (usedQtySameItem + 1 > stock) {
         return alert(`สินค้า ${item.name} มีไม่พอในสต๊อก`);
       }
 
-      const price = getItemPrice(item, currentPriceType);
-
       if (existing) {
         existing.qty += 1;
-        existing.priceType = currentPriceType;
-        existing.priceLabel = getPriceLabel(currentPriceType);
-        existing.price = price;
-        existing.total = existing.qty * price;
+        existing.total = existing.qty * asNumber(existing.price, 0);
       } else {
         cart.push({
           id: Number(item.id),
@@ -612,25 +597,41 @@
           price,
           total: price,
           priceType: currentPriceType,
-          priceLabel: getPriceLabel(currentPriceType)
+          priceLabel
         });
       }
 
       renderCart();
     }
 
-    function updateQty(itemId, delta) {
-      const row = cart.find(item => Number(item.id) === Number(itemId));
+    function updateQty(itemId, priceType, delta) {
+      const row = cart.find(item =>
+        Number(item.id) === Number(itemId) &&
+        String(item.priceType || '') === String(priceType || '')
+      );
       const source = allItems.find(i => Number(i.id) === Number(itemId));
+
       if (!row || !source) return;
 
       const nextQty = asNumber(row.qty, 0) + delta;
+
       if (nextQty <= 0) {
-        cart = cart.filter(item => Number(item.id) !== Number(itemId));
+        cart = cart.filter(item =>
+          !(Number(item.id) === Number(itemId) && String(item.priceType || '') === String(priceType || ''))
+        );
         return renderCart();
       }
 
-      if (nextQty > getItemStock(source)) {
+      const totalUsedQty = cart
+        .filter(item => Number(item.id) === Number(itemId))
+        .reduce((sum, item) => {
+          if (String(item.priceType || '') === String(priceType || '')) {
+            return sum + nextQty;
+          }
+          return sum + asNumber(item.qty, 0);
+        }, 0);
+
+      if (totalUsedQty > getItemStock(source)) {
         return alert(`สินค้า ${source.name} มีไม่พอในสต๊อก`);
       }
 
@@ -639,8 +640,10 @@
       renderCart();
     }
 
-    function removeItem(itemId) {
-      cart = cart.filter(item => Number(item.id) !== Number(itemId));
+    function removeItem(itemId, priceType) {
+      cart = cart.filter(item =>
+        !(Number(item.id) === Number(itemId) && String(item.priceType || '') === String(priceType || ''))
+      );
       renderCart();
     }
 
@@ -683,10 +686,10 @@
             </td>
             <td>
               <div class="qty-controls">
-                <button class="qty-btn minus-btn" onclick="updateQty(${Number(item.id)}, -1)">-</button>
+                <button class="qty-btn minus-btn" onclick="updateQty(${Number(item.id)}, '${item.priceType}', -1)">-</button>
                 <strong>${formatNumber(item.qty)}</strong>
-                <button class="qty-btn plus-btn" onclick="updateQty(${Number(item.id)}, 1)">+</button>
-                <button class="remove-btn" onclick="removeItem(${Number(item.id)})">ลบ</button>
+                <button class="qty-btn plus-btn" onclick="updateQty(${Number(item.id)}, '${item.priceType}', 1)">+</button>
+                <button class="remove-btn" onclick="removeItem(${Number(item.id)}, '${item.priceType}')">ลบ</button>
               </div>
             </td>
             <td>${formatNumber(item.price)}</td>
@@ -773,7 +776,15 @@
           throw new Error(result.message || 'บันทึกบิลไม่สำเร็จ');
         }
 
-        const saleId = result.receipt?.saleId || result.receipt?.id || '';
+        const receipt = result.receipt || null;
+        const saleId = receipt?.saleId || receipt?.id || '';
+
+        if (receipt) {
+          try {
+            localStorage.setItem('lastReceipt', JSON.stringify(receipt));
+            sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
+          } catch (error) {}
+        }
 
         alert(method === 'PUT' ? 'แก้ไขบิลเรียบร้อย' : 'คิดเงินสำเร็จ');
 
@@ -792,6 +803,8 @@
 
         if (saleId) {
           window.open(`/print.html?saleId=${encodeURIComponent(saleId)}`, '_blank');
+        } else {
+          window.open('/print.html', '_blank');
         }
       } catch (error) {
         alert(error.message || 'บันทึกบิลไม่สำเร็จ');
@@ -856,12 +869,12 @@
       cart = cart.map(row => {
         const item = allItems.find(i => Number(i.id) === Number(row.id));
         if (!item) return row;
+
         return {
           ...row,
           barcode: row.barcode || item.barcode || '',
           name: row.name || item.name || '',
-          price: asNumber(row.price, getItemPrice(item, row.priceType || currentPriceType)),
-          total: asNumber(row.qty, 0) * asNumber(row.price, getItemPrice(item, row.priceType || currentPriceType))
+          total: asNumber(row.qty, 0) * asNumber(row.price, 0)
         };
       });
 
