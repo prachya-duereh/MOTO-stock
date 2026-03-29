@@ -277,6 +277,15 @@
       return Number(value || 0).toLocaleString('th-TH');
     }
 
+    function escapeHtml(text) {
+      return String(text ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     function setToday() {
       const now = new Date();
       const yyyy = now.getFullYear();
@@ -328,7 +337,7 @@
 
       box.innerHTML = list.map(item => `
         <div class="profit-item">
-          <div style="font-size:20px;font-weight:800;">${item.name || '-' } [${item.barcode || '-'}]</div>
+          <div style="font-size:20px;font-weight:800;">${escapeHtml(item.name || '-')} [${escapeHtml(item.barcode || '-')} ]</div>
           <div style="font-size:18px;margin-top:6px;">
             จำนวนขาย ${formatNumber(item.qty)} |
             ยอดขาย ${formatNumber(item.sales)} |
@@ -348,14 +357,48 @@
 
       box.innerHTML = list.map(item => `
         <div class="stock-item">
-          <div style="font-size:20px;font-weight:800;">${item.name || '-'}</div>
+          <div style="font-size:20px;font-weight:800;">${escapeHtml(item.name || '-')}</div>
           <div style="font-size:18px;margin-top:6px;">
-            รหัสสินค้า: ${item.barcode || '-'} |
+            รหัสสินค้า: ${escapeHtml(item.barcode || '-')} |
             คงเหลือ ${formatNumber(item.quantity)} |
             จุดเตือน ${formatNumber(item.minStock)}
           </div>
         </div>
       `).join('');
+    }
+
+    function storeBillForPrint(bill) {
+      const receipt = {
+        saleId: bill.saleId || '-',
+        date: bill.createdAt || '-',
+        customerName: bill.customerName || '-',
+        items: Array.isArray(bill.items) ? bill.items.map(item => ({
+          barcode: item.barcode || item.id || '-',
+          name: item.name || '-',
+          qty: Number(item.qty || 0),
+          price: Number(item.price || 0),
+          total: Number(item.total || 0),
+          priceLabel: item.priceLabel || '-'
+        })) : [],
+        itemsTotal: Number(bill.itemsTotal || 0),
+        laborCost: Number(bill.laborCost || 0),
+        total: Number(bill.grandTotal || 0),
+        paid: Number(bill.paid || 0),
+        change: Number(bill.change || 0)
+      };
+
+      try {
+        localStorage.setItem('lastReceipt', JSON.stringify(receipt));
+        sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
+        localStorage.setItem('printReceipt', JSON.stringify(receipt));
+        sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
+      } catch (error) {}
+    }
+
+    function printBillByData(encodedBill) {
+      const bill = JSON.parse(decodeURIComponent(encodedBill));
+      storeBillForPrint(bill);
+      window.open('/print.html', '_blank');
     }
 
     function renderBills(list) {
@@ -365,126 +408,47 @@
         return;
       }
 
-      box.innerHTML = list.map(bill => `
-        <div class="bill-item">
-          <div class="bill-title">${bill.saleId || '-'}</div>
-          <div class="bill-lines">
-            วันที่: ${bill.createdAt || '-'} | ลูกค้า: ${bill.customerName || '-'}<br>
-            ค่าสินค้า ${formatNumber(bill.itemsTotal)} | ค่าแรง ${formatNumber(bill.laborCost)} | <strong>รวม ${formatNumber(bill.grandTotal)}</strong>
-          </div>
+      box.innerHTML = list.map(bill => {
+        const encodedBill = encodeURIComponent(JSON.stringify(bill));
+        return `
+          <div class="bill-item">
+            <div class="bill-title">${escapeHtml(bill.saleId || '-')}</div>
+            <div class="bill-lines">
+              วันที่: ${escapeHtml(bill.createdAt || '-')} | ลูกค้า: ${escapeHtml(bill.customerName || '-')}<br>
+              ค่าสินค้า ${formatNumber(bill.itemsTotal)} | ค่าแรง ${formatNumber(bill.laborCost)} | <strong>รวม ${formatNumber(bill.grandTotal)}</strong>
+            </div>
 
-          <table class="bill-item-table">
-            <thead>
-              <tr>
-                <th>รหัสสินค้า</th>
-                <th>รายการ</th>
-                <th>จำนวน</th>
-                <th>ราคา</th>
-                <th>เป็นเงิน</th>
-                <th>ประเภทราคา</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${(bill.items || []).map(item => `
+            <table class="bill-item-table">
+              <thead>
                 <tr>
-                  <td>${item.barcode || '-'}</td>
-                  <td>${item.name || '-'}</td>
-                  <td>${formatNumber(item.qty)}</td>
-                  <td>${formatNumber(item.price)}</td>
-                  <td>${formatNumber(item.total)}</td>
-                  <td>${item.priceLabel || '-'}</td>
+                  <th>รหัสสินค้า</th>
+                  <th>รายการ</th>
+                  <th>จำนวน</th>
+                  <th>ราคา</th>
+                  <th>เป็นเงิน</th>
+                  <th>ประเภทราคา</th>
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                ${(bill.items || []).map(item => `
+                  <tr>
+                    <td>${escapeHtml(item.barcode || '-')}</td>
+                    <td>${escapeHtml(item.name || '-')}</td>
+                    <td>${formatNumber(item.qty)}</td>
+                    <td>${formatNumber(item.price)}</td>
+                    <td>${formatNumber(item.total)}</td>
+                    <td>${escapeHtml(item.priceLabel || '-')}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
 
-          <div class="bill-actions">
-            <button class="action-btn print-btn" onclick="printBill('${bill.saleId}')">พิมพ์บิล</button>
-            <button class="action-btn copy-btn" onclick="duplicateBill('${bill.saleId}')">ทำซ้ำ</button>
-            <button class="action-btn edit-btn" onclick="editBill('${bill.saleId}')">แก้ไขบิล</button>
-            <button class="action-btn delete-btn" onclick="deleteBill('${bill.saleId}')">ลบบิล</button>
+            <div class="bill-actions">
+              <button class="action-btn print-btn" onclick="printBillByData('${encodedBill}')">พิมพ์บิล</button>
+            </div>
           </div>
-        </div>
-      `).join('');
-    }
-
-    async function printBill(saleId) {
-      window.open(`/print.html?saleId=${encodeURIComponent(saleId)}`, '_blank');
-    }
-
-    async function duplicateBill(saleId) {
-      try {
-        const res = await fetch(`/api/sales/${encodeURIComponent(saleId)}/duplicate`, {
-          method: 'POST'
-        });
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-          throw new Error(data.message || 'ทำซ้ำบิลไม่สำเร็จ');
-        }
-
-        localStorage.setItem('posDraftSale', JSON.stringify({
-          mode: 'duplicate',
-          ...data.draft
-        }));
-
-        location.href = `/pos.html?duplicateSaleId=${encodeURIComponent(saleId)}`;
-      } catch (error) {
-        alert(error.message || 'ทำซ้ำบิลไม่สำเร็จ');
-      }
-    }
-
-    async function editBill(saleId) {
-      try {
-        const res = await fetch(`/api/sales/${encodeURIComponent(saleId)}`);
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-          throw new Error(data.message || 'โหลดบิลไม่สำเร็จ');
-        }
-
-        localStorage.setItem('posDraftSale', JSON.stringify({
-          mode: 'edit',
-          saleId,
-          customerName: data.bill.customerName || '',
-          laborCost: Number(data.bill.laborCost || 0),
-          paid: Number(data.bill.paid || 0),
-          createdAt: data.bill.createdAt || '',
-          items: (data.bill.items || []).map(item => ({
-            id: Number(item.id),
-            qty: Number(item.qty || 0),
-            price: Number(item.price || 0),
-            total: Number(item.total || 0),
-            priceType: item.priceType || 'retail',
-            priceLabel: item.priceLabel || ''
-          }))
-        }));
-
-        location.href = `/pos.html?editSaleId=${encodeURIComponent(saleId)}`;
-      } catch (error) {
-        alert(error.message || 'แก้ไขบิลไม่สำเร็จ');
-      }
-    }
-
-    async function deleteBill(saleId) {
-      const ok = confirm(`ต้องการลบบิล ${saleId} ใช่ไหม?\nระบบจะคืนสต๊อกกลับให้อัตโนมัติ`);
-      if (!ok) return;
-
-      try {
-        const res = await fetch(`/api/sales/${encodeURIComponent(saleId)}`, {
-          method: 'DELETE'
-        });
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-          throw new Error(data.message || 'ลบบิลไม่สำเร็จ');
-        }
-
-        alert(data.message || 'ลบบิลเรียบร้อย');
-        loadReport();
-      } catch (error) {
-        alert(error.message || 'ลบบิลไม่สำเร็จ');
-      }
+        `;
+      }).join('');
     }
 
     setToday();

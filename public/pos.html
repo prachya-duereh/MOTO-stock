@@ -124,12 +124,7 @@
       cursor: pointer;
     }
     .btn-primary { background: #16a34a; color: #fff; }
-    .btn-secondary { background: #2563eb; color: #fff; }
     .btn-muted { background: #6b7280; color: #fff; }
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
 
     .price-type-tabs {
       display: grid;
@@ -295,32 +290,20 @@
     }
 
     @media (max-width: 1200px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
+      .layout { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 900px) {
-      .products {
-        grid-template-columns: 1fr;
-      }
-      .search-row {
-        grid-template-columns: 1fr;
-      }
+      .products { grid-template-columns: 1fr; }
+      .search-row { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 640px) {
       .container { padding: 12px; }
       .brand { font-size: 22px; }
-      .price-type-tabs {
-        grid-template-columns: 1fr;
-      }
-      .quick-money {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .checkout-actions {
-        grid-template-columns: 1fr;
-      }
+      .price-type-tabs { grid-template-columns: 1fr; }
+      .quick-money { grid-template-columns: repeat(2, 1fr); }
+      .checkout-actions { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -459,12 +442,8 @@
     }
 
     function getItemPrice(item, priceType = currentPriceType) {
-      if (priceType === 'wholesale') {
-        return asNumber(item.wholesalePrice ?? item.wholesale_price, 0);
-      }
-      if (priceType === 'mechanic') {
-        return asNumber(item.mechanicPrice ?? item.mechanic_price, 0);
-      }
+      if (priceType === 'wholesale') return asNumber(item.wholesalePrice ?? item.wholesale_price, 0);
+      if (priceType === 'mechanic') return asNumber(item.mechanicPrice ?? item.mechanic_price, 0);
       return asNumber(item.retailPrice ?? item.retail_price, 0);
     }
 
@@ -521,15 +500,7 @@
       const list = document.getElementById('productList');
 
       const filtered = allItems.filter(item => {
-        const text = [
-          item.name,
-          item.barcode,
-          item.category,
-          item.model,
-          item.year,
-          item.id
-        ].join(' ').toLowerCase();
-
+        const text = [item.name, item.barcode, item.category, item.model, item.year, item.id].join(' ').toLowerCase();
         return !keyword || text.includes(keyword);
       });
 
@@ -551,13 +522,7 @@
             <div class="product-line">คงเหลือ: ${formatNumber(stock)}</div>
             <div class="product-line">${escapeHtml(getPriceLabel(currentPriceType))}: ${formatNumber(price)} บาท</div>
             <div class="product-footer">
-              <button
-                class="btn btn-primary"
-                onclick="addToCart(${Number(item.id)})"
-                ${stock <= 0 ? 'disabled' : ''}
-              >
-                เลือกสินค้า
-              </button>
+              <button class="btn btn-primary" onclick="addToCart(${Number(item.id)})" ${stock <= 0 ? 'disabled' : ''}>เลือกสินค้า</button>
             </div>
           </div>
         `;
@@ -610,11 +575,9 @@
         String(item.priceType || '') === String(priceType || '')
       );
       const source = allItems.find(i => Number(i.id) === Number(itemId));
-
       if (!row || !source) return;
 
       const nextQty = asNumber(row.qty, 0) + delta;
-
       if (nextQty <= 0) {
         cart = cart.filter(item =>
           !(Number(item.id) === Number(itemId) && String(item.priceType || '') === String(priceType || ''))
@@ -625,9 +588,7 @@
       const totalUsedQty = cart
         .filter(item => Number(item.id) === Number(itemId))
         .reduce((sum, item) => {
-          if (String(item.priceType || '') === String(priceType || '')) {
-            return sum + nextQty;
-          }
+          if (String(item.priceType || '') === String(priceType || '')) return sum + nextQty;
           return sum + asNumber(item.qty, 0);
         }, 0);
 
@@ -777,12 +738,13 @@
         }
 
         const receipt = result.receipt || null;
-        const saleId = receipt?.saleId || receipt?.id || '';
 
         if (receipt) {
           try {
             localStorage.setItem('lastReceipt', JSON.stringify(receipt));
             sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
+            localStorage.setItem('printReceipt', JSON.stringify(receipt));
+            sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
           } catch (error) {}
         }
 
@@ -801,11 +763,7 @@
         renderCart();
         await loadItems();
 
-        if (saleId) {
-          window.open(`/print.html?saleId=${encodeURIComponent(saleId)}`, '_blank');
-        } else {
-          window.open('/print.html', '_blank');
-        }
+        window.open('/print.html', '_blank');
       } catch (error) {
         alert(error.message || 'บันทึกบิลไม่สำเร็จ');
       }
