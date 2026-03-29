@@ -478,6 +478,72 @@ app.delete("/api/items/:id", async (req, res) => {
     });
   }
 });
+// =========================
+// REPAIRS ROUTES
+// =========================
+
+// GET repairs
+app.get("/api/repairs", async (req, res) => {
+  try {
+    if (USE_SUPABASE && supabase) {
+      const { data, error } = await supabase
+        .from("repairs")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      return res.json(data || []);
+    }
+
+    const db = readJSON(DB_FILE, { items: [], sales: [], repairs: [] });
+    return res.json(db.repairs || []);
+  } catch (err) {
+    console.error("GET repairs error:", err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// POST repairs
+app.post("/api/repairs", async (req, res) => {
+  try {
+    const payload = {
+      id: Date.now(),
+      customerName: req.body.customerName || "",
+      phone: req.body.phone || "",
+      bikeModel: req.body.bikeModel || "",
+      plate: req.body.plate || "",
+      repairDate: req.body.repairDate || new Date().toISOString(),
+      symptom: req.body.symptom || "",
+      parts: req.body.parts || [],
+      laborCost: Number(req.body.laborCost || 0),
+      total: Number(req.body.total || 0),
+      note: req.body.note || "",
+      created_at: new Date().toISOString()
+    };
+
+    if (USE_SUPABASE && supabase) {
+      const { data, error } = await supabase
+        .from("repairs")
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return res.json({ success: true, repair: data });
+    }
+
+    const db = readJSON(DB_FILE, { items: [], sales: [], repairs: [] });
+    db.repairs.unshift(payload);
+    writeJSON(DB_FILE, db);
+
+    return res.json({ success: true, repair: payload });
+  } catch (err) {
+    console.error("POST repairs error:", err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 // =========================
 // STATIC PAGES
