@@ -4,16 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ใบเสร็จรับเงิน</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
       background: #f0f0f0;
-      font-family: "Kanit", sans-serif;
+      font-family: "Tahoma", "Noto Sans Thai", sans-serif;
       color: #111;
     }
 
@@ -22,156 +19,144 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 18px 10px;
+      padding: 10px 0;
     }
 
     .paper {
       width: 80mm;
       min-height: 100vh;
       background: #fff;
-      padding: 10px 8px 18px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+      padding: 8px 10px 16px;
     }
 
-    .logo-wrap {
-      text-align: center;
+    .center { text-align: center; }
+
+    .logo {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      display: inline-block;
       margin-bottom: 2px;
     }
 
-    .logo {
-      max-width: 54px;
-      max-height: 54px;
-      object-fit: contain;
-      display: inline-block;
-    }
-
     .shop-name {
-      text-align: center;
       font-size: 24px;
       font-weight: 800;
       line-height: 1.1;
-      margin-top: 2px;
+      margin: 2px 0 0;
     }
 
     .shop-sub {
-      text-align: center;
       font-size: 14px;
-      line-height: 1.25;
-      margin-top: 2px;
+      line-height: 1.2;
+      margin: 2px 0 0;
     }
 
     .shop-tel {
-      text-align: center;
       font-size: 14px;
-      line-height: 1.25;
-      margin-top: 2px;
+      line-height: 1.2;
+      margin: 2px 0 4px;
     }
 
     .dash {
       border-top: 2px dashed #666;
-      margin: 8px 0 6px;
+      margin: 6px 0;
     }
 
-    .receipt-title {
+    .title {
       text-align: center;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 800;
+      margin: 4px 0 6px;
       line-height: 1.1;
-      margin: 2px 0 6px;
     }
 
-    .meta-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
+    .meta {
       font-size: 14px;
       line-height: 1.35;
       margin: 1px 0;
+      white-space: nowrap;
     }
 
-    .meta-label {
-      width: 44px;
-      flex: 0 0 44px;
-      font-weight: 700;
-    }
-
-    .meta-value {
-      flex: 1;
-      word-break: break-word;
+    .meta b {
+      display: inline-block;
+      min-width: 48px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 6px;
-      font-size: 13px;
+      table-layout: fixed;
+      font-size: 12px;
       line-height: 1.25;
     }
 
     thead th {
       font-weight: 800;
       text-align: center;
-      padding: 3px 2px;
+      padding: 2px 1px;
     }
 
     tbody td {
-      padding: 4px 2px;
+      padding: 2px 1px;
       vertical-align: top;
     }
 
-    .col-no { width: 22px; text-align: center; }
-    .col-qty { width: 36px; text-align: center; }
-    .col-price { width: 52px; text-align: right; }
-    .col-total { width: 52px; text-align: right; }
+    .c-no { width: 18px; text-align: center; }
+    .c-name { width: auto; }
+    .c-qty { width: 28px; text-align: center; }
+    .c-price { width: 42px; text-align: right; }
+    .c-total { width: 42px; text-align: right; }
 
-    .item-name {
-      font-weight: 700;
-      line-height: 1.2;
+    .code {
+      color: #555;
+      word-break: break-word;
     }
 
-    .item-code {
-      color: #444;
-      line-height: 1.2;
+    .name {
+      font-weight: 700;
+      word-break: break-word;
     }
 
     .summary {
-      margin-top: 6px;
       font-size: 14px;
       line-height: 1.35;
+      margin-top: 4px;
     }
 
-    .sum-row {
+    .row {
       display: flex;
       justify-content: space-between;
       gap: 10px;
       margin: 1px 0;
+      white-space: nowrap;
     }
 
-    .sum-label {
+    .row .label {
       font-weight: 700;
     }
 
-    .sum-value {
+    .row .value {
       text-align: right;
-      min-width: 72px;
+      min-width: 70px;
     }
 
-    .sum-grand {
+    .grand {
       font-size: 16px;
       font-weight: 800;
     }
 
     .footer {
       text-align: center;
-      margin-top: 8px;
       font-size: 14px;
       font-weight: 700;
+      margin-top: 6px;
     }
 
     .actions {
       display: flex;
       justify-content: center;
-      margin-top: 14px;
+      margin-top: 12px;
     }
 
     .print-btn {
@@ -180,7 +165,6 @@
       color: #fff;
       border-radius: 10px;
       padding: 10px 24px;
-      font-family: inherit;
       font-size: 18px;
       font-weight: 800;
       cursor: pointer;
@@ -198,24 +182,14 @@
     }
 
     @media print {
-      body {
-        background: #fff;
-      }
-
-      .page {
-        padding: 0;
-      }
-
+      body { background: #fff; }
+      .page { padding: 0; }
       .paper {
         width: 80mm;
         min-height: auto;
-        box-shadow: none;
-        padding: 6px 6px 10px;
+        padding: 6px 8px 10px;
       }
-
-      .actions {
-        display: none;
-      }
+      .actions { display: none; }
     }
   </style>
 </head>
@@ -246,6 +220,42 @@
         .replace(/'/g, '&#039;');
     }
 
+    function formatThaiDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return String(dateStr);
+
+      const parts = new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'Asia/Bangkok',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).formatToParts(d);
+
+      const get = (type) => parts.find(p => p.type === type)?.value || '';
+      return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}`;
+    }
+
+    function formatThaiDateOnly(dateStr) {
+      if (!dateStr) return '-';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr))) return String(dateStr);
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return String(dateStr);
+
+      const parts = new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'Asia/Bangkok',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).formatToParts(d);
+
+      const get = (type) => parts.find(p => p.type === type)?.value || '';
+      return `${get('year')}-${get('month')}-${get('day')}`;
+    }
+
     function getStoredReceipt() {
       const keys = ['lastReceipt', 'printReceipt', 'printData', 'lastRepairPrint'];
       for (const key of keys) {
@@ -264,7 +274,6 @@
     function normalizeData(data) {
       if (!data) return null;
 
-      // กรณี repair form / repair receipt เดิม
       if (data.type === 'repair_receipt' && data.repair) {
         const repair = data.repair;
         const extraLabor = Number(data.extraLabor || 0);
@@ -287,7 +296,8 @@
           laborCost,
           total: itemsTotal + laborCost,
           paid: itemsTotal + laborCost,
-          change: 0
+          change: 0,
+          dateOnly: !!repair.repairDate && /^\d{4}-\d{2}-\d{2}$/.test(String(repair.repairDate))
         };
       }
 
@@ -313,11 +323,11 @@
           laborCost,
           total: itemsTotal + laborCost,
           paid: itemsTotal + laborCost,
-          change: 0
+          change: 0,
+          dateOnly: !!repair.repairDate && /^\d{4}-\d{2}-\d{2}$/.test(String(repair.repairDate))
         };
       }
 
-      // กรณีใบเสร็จขายจาก POS / report
       const items = Array.isArray(data.items) ? data.items.map(item => ({
         barcode: item.barcode || item.id || '-',
         name: item.name || '-',
@@ -339,7 +349,8 @@
         laborCost: Number(data.laborCost || 0),
         total: Number(data.total || data.totalCost || data.grandTotal || 0),
         paid: Number(data.paid || 0),
-        change: Number(data.change || 0)
+        change: Number(data.change || 0),
+        dateOnly: !!data.repairDate && /^\d{4}-\d{2}-\d{2}$/.test(String(data.repairDate))
       };
     }
 
@@ -347,56 +358,47 @@
       const el = document.getElementById('printArea');
       const items = Array.isArray(receipt.items) ? receipt.items : [];
       const itemCount = items.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+      const showDate = receipt.dateOnly ? formatThaiDateOnly(receipt.date) : formatThaiDate(receipt.date);
 
       el.className = '';
       el.innerHTML = `
-        <div class="logo-wrap">
+        <div class="center">
           <img src="/D.jpg" alt="logo" class="logo" onerror="this.style.display='none'">
+          <div class="shop-name">ดี อะไหล่ กรุงปืนัง</div>
+          <div class="shop-sub">จำหน่ายอะไหล่มอเตอร์ไซค์</div>
+          <div class="shop-tel">Tel: 081-766-7549</div>
         </div>
-
-        <div class="shop-name">ดี อะไหล่ กรุงปืนัง</div>
-        <div class="shop-sub">จำหน่ายอะไหล่มอเตอร์ไซค์</div>
-        <div class="shop-tel">Tel: 081-766-7549</div>
 
         <div class="dash"></div>
+        <div class="title">ใบเสร็จรับเงิน</div>
 
-        <div class="receipt-title">ใบเสร็จรับเงิน</div>
-
-        <div class="meta-row">
-          <div class="meta-label">เลขที่:</div>
-          <div class="meta-value">${escapeHtml(receipt.saleId || '-')}</div>
-        </div>
-        <div class="meta-row">
-          <div class="meta-label">วันที่:</div>
-          <div class="meta-value">${escapeHtml(formatThaiDate(receipt.date))}</div>
-        <div class="meta-row">
-          <div class="meta-label">ลูกค้า:</div>
-          <div class="meta-value">${escapeHtml(receipt.customerName || '-')}</div>
-        </div>
+        <div class="meta"><b>เลขที่:</b> ${escapeHtml(receipt.saleId || '-')}</div>
+        <div class="meta"><b>วันที่:</b> ${escapeHtml(showDate)}</div>
+        <div class="meta"><b>ลูกค้า:</b> ${escapeHtml(receipt.customerName || '-')}</div>
 
         <div class="dash"></div>
 
         <table>
           <thead>
             <tr>
-              <th class="col-no">#</th>
-              <th>รายการ</th>
-              <th class="col-qty">จำนวน</th>
-              <th class="col-price">ราคา</th>
-              <th class="col-total">รวม</th>
+              <th class="c-no">#</th>
+              <th class="c-name">รายการ</th>
+              <th class="c-qty">จำนวน</th>
+              <th class="c-price">ราคา</th>
+              <th class="c-total">รวม</th>
             </tr>
           </thead>
           <tbody>
             ${items.map((item, index) => `
               <tr>
-                <td class="col-no">${index + 1}</td>
-                <td>
-                  <div class="item-code">[${escapeHtml(item.barcode || '-')} ]</div>
-                  <div class="item-name">${escapeHtml(item.name || '-')}</div>
+                <td class="c-no">${index + 1}</td>
+                <td class="c-name">
+                  <div class="code">[${escapeHtml(item.barcode || '-')} ]</div>
+                  <div class="name">${escapeHtml(item.name || '-')}</div>
                 </td>
-                <td class="col-qty">${money(item.qty)}</td>
-                <td class="col-price">${money(item.price)}</td>
-                <td class="col-total">${money(item.total)}</td>
+                <td class="c-qty">${money(item.qty)}</td>
+                <td class="c-price">${money(item.price)}</td>
+                <td class="c-total">${money(item.total)}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -405,35 +407,34 @@
         <div class="dash"></div>
 
         <div class="summary">
-          <div class="sum-row">
-            <div class="sum-label">รวม ${money(itemCount)} รายการ</div>
-            <div class="sum-value">${money(receipt.itemsTotal)}</div>
+          <div class="row">
+            <div class="label">รวม ${money(itemCount)} รายการ</div>
+            <div class="value">${money(receipt.itemsTotal)}</div>
           </div>
-          <div class="sum-row">
-            <div class="sum-label">ค่าบริการ</div>
-            <div class="sum-value">${money(receipt.laborCost)}</div>
+          <div class="row">
+            <div class="label">ค่าบริการ</div>
+            <div class="value">${money(receipt.laborCost)}</div>
           </div>
-          <div class="sum-row sum-grand">
-            <div class="sum-label">ยอดรวม</div>
-            <div class="sum-value">${money(receipt.total)}</div>
+          <div class="row grand">
+            <div class="label">ยอดรวม</div>
+            <div class="value">${money(receipt.total)}</div>
           </div>
         </div>
 
         <div class="dash"></div>
 
         <div class="summary">
-          <div class="sum-row">
-            <div class="sum-label">รับเงิน</div>
-            <div class="sum-value">${money(receipt.paid)}</div>
+          <div class="row">
+            <div class="label">รับเงิน</div>
+            <div class="value">${money(receipt.paid)}</div>
           </div>
-          <div class="sum-row">
-            <div class="sum-label">เงินทอน</div>
-            <div class="sum-value">${money(receipt.change)}</div>
+          <div class="row">
+            <div class="label">เงินทอน</div>
+            <div class="value">${money(receipt.change)}</div>
           </div>
         </div>
 
         <div class="dash"></div>
-
         <div class="footer">ขอบคุณที่ใช้บริการ</div>
       `;
     }
@@ -451,30 +452,6 @@
 
       renderReceipt(normalized);
     }
-    function formatThaiDate(dateStr, withSeconds = false) {
-  if (!dateStr) return '-';
-
-  if (/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr))) {
-    return String(dateStr);
-  }
-
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return String(dateStr);
-
-  const parts = new Intl.DateTimeFormat('sv-SE', {
-    timeZone: 'Asia/Bangkok',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    ...(withSeconds ? { second: '2-digit' } : {}),
-    hour12: false
-  }).formatToParts(d);
-
-  const get = (type) => parts.find((p) => p.type === type)?.value || '';
-  return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}${withSeconds ? ':' + get('second') : ''}`;
-}
 
     document.addEventListener('DOMContentLoaded', startup);
   </script>
