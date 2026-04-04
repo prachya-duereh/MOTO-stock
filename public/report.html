@@ -3,17 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>รายงานยอดขาย</title>
+  <title>แดชบอร์ดรายงานยอดขาย</title>
+  <link rel="icon" href="/logo.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --bg: #eef3f8;
+      --panel: #ffffff;
+      --line: #d9e0e7;
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #2563eb;
+      --teal: #0f766e;
+      --green: #16a34a;
+      --orange: #f59e0b;
+      --shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: "Prompt", sans-serif;
-      background: #f3f5f7;
-      color: #0f172a;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(15,118,110,0.10), transparent 24%),
+        var(--bg);
+      color: var(--text);
     }
     .container {
       max-width: 1800px;
@@ -28,62 +44,107 @@
       flex-wrap: wrap;
       margin-bottom: 18px;
     }
-    .nav {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .nav { display: flex; gap: 10px; flex-wrap: wrap; }
     .nav a {
       text-decoration: none;
       color: #fff;
-      background: #2563eb;
-      padding: 10px 16px;
-      border-radius: 12px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .hero-card, .filters, .card, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .hero-card {
+      border-radius: 24px;
+      padding: 20px 22px;
+      min-height: 148px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .hero-title {
+      font-size: 30px;
+      font-weight: 800;
+      margin: 0 0 8px;
+    }
+    .hero-sub {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.65;
+      margin: 0;
+    }
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 14px;
       font-weight: 700;
     }
+    .hero-highlight {
+      min-width: 220px;
+      background: linear-gradient(135deg, #0f766e, #115e59);
+      color: #fff;
+      border-radius: 22px;
+      padding: 18px;
+    }
+    .hero-highlight .kicker { font-size: 13px; opacity: 0.85; }
+    .hero-highlight .big { font-size: 36px; font-weight: 800; margin: 8px 0; }
+    .hero-highlight .small { font-size: 14px; opacity: 0.9; }
     .filters {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       align-items: end;
-      background: #fff;
-      border: 1px solid #d9e0e7;
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 14px;
       margin-bottom: 18px;
     }
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 180px;
-    }
-    .field label {
-      font-size: 14px;
-      color: #475569;
-      font-weight: 600;
-    }
+    .field { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+    .field label { font-size: 14px; color: #475569; font-weight: 600; }
     .field input {
-      height: 48px;
+      height: 50px;
       border: 1px solid #cfd8e3;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 0 14px;
       font-family: inherit;
       font-size: 16px;
       background: #f8fafc;
     }
     .btn {
-      height: 48px;
+      height: 50px;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 0 18px;
       font-family: inherit;
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
+      box-shadow: var(--shadow);
     }
-    .btn-primary { background: #2563eb; color: #fff; }
-    .btn-secondary { background: #0f766e; color: #fff; }
+    .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
+    .btn-secondary { background: linear-gradient(135deg, #0f766e, #0d9488); color: #fff; }
     .cards {
       display: grid;
       grid-template-columns: repeat(6, minmax(180px, 1fr));
@@ -91,66 +152,72 @@
       margin-bottom: 18px;
     }
     .card {
-      background: #fff;
-      border: 1px solid #d9e0e7;
-      border-radius: 18px;
+      border-radius: 22px;
       padding: 18px;
-      min-height: 110px;
+      min-height: 132px;
+      position: relative;
+      overflow: hidden;
     }
-    .card .title {
-      color: #475569;
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 6px;
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 92px;
+      height: 92px;
+      right: -22px;
+      top: -22px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.08);
     }
-    .card .value {
-      font-size: 28px;
-      font-weight: 800;
-      color: #0f172a;
-    }
-    .grid-2 {
+    .card .title { color: #475569; font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .card .value { font-size: 34px; font-weight: 800; color: #0f172a; line-height: 1.15; }
+    .card .hint { font-size: 13px; color: var(--muted); margin-top: 10px; }
+    .card.sales::after { background: rgba(37, 99, 235, 0.10); }
+    .card.labor::after { background: rgba(15, 118, 110, 0.12); }
+    .card.bills::after { background: rgba(245, 158, 11, 0.13); }
+    .card.profit::after { background: rgba(22, 163, 74, 0.12); }
+    .analytics-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1.15fr 0.85fr;
       gap: 18px;
       margin-bottom: 18px;
     }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
     .panel {
-      background: #fff;
-      border: 1px solid #d9e0e7;
-      border-radius: 22px;
+      border-radius: 24px;
       padding: 18px;
     }
-    .panel h2 {
-      margin: 0 0 16px;
-      font-size: 22px;
+    .panel h2 { margin: 0 0 8px; font-size: 24px; }
+    .panel-sub { color: var(--muted); margin: 0 0 16px; font-size: 15px; }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
     }
-    .profit-item, .bill-item, .stock-item {
-      border: 1px solid #d9e0e7;
+    .mini-stat {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 10px 12px;
+      min-width: 132px;
+      text-align: right;
+    }
+    .mini-stat .label { display:block; color: var(--muted); font-size: 12px; margin-bottom: 2px; }
+    .mini-stat .num { font-size: 22px; font-weight: 800; }
+    .profit-item, .bill-item, .stock-item, .insight-card {
+      border: 1px solid var(--line);
       border-radius: 18px;
       padding: 16px;
       margin-bottom: 14px;
       background: #fbfcfd;
     }
-    .profit-item:last-child,
-    .bill-item:last-child,
-    .stock-item:last-child {
-      margin-bottom: 0;
-    }
-    .bill-title {
-      font-size: 18px;
-      font-weight: 800;
-      margin-bottom: 6px;
-    }
-    .bill-lines {
-      font-size: 15px;
-      line-height: 1.8;
-    }
-    .bill-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
+    .profit-item:last-child, .bill-item:last-child, .stock-item:last-child, .insight-card:last-child { margin-bottom: 0; }
+    .stock-item.warning { border-color: rgba(245, 158, 11, 0.35); background: #fffaf0; }
+    .stock-item.critical { border-color: rgba(220, 38, 38, 0.35); background: #fff5f5; }
+    .bill-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .bill-lines { font-size: 15px; line-height: 1.8; }
+    .bill-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
     .bill-actions .action-btn {
       border: none;
       border-radius: 12px;
@@ -165,43 +232,83 @@
     .copy-btn { background: #2563eb; }
     .edit-btn { background: #f59e0b; }
     .delete-btn { background: #dc2626; }
-    .empty {
-      color: #64748b;
-      font-size: 18px;
-    }
-    .bill-item-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    .bill-item-table th,
-    .bill-item-table td {
+    .empty { color: #64748b; font-size: 18px; }
+    .bill-item-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .bill-item-table th, .bill-item-table td {
       border-bottom: 1px solid #e5e7eb;
       text-align: left;
       padding: 8px 6px;
       font-size: 14px;
     }
-    .bill-item-table th {
-      color: #475569;
-      font-weight: 700;
+    .bill-item-table th { color: #475569; font-weight: 700; }
+    .trend-chart {
+      display: flex;
+      align-items: end;
+      gap: 10px;
+      min-height: 260px;
+      padding: 20px 6px 4px;
+      overflow-x: auto;
     }
-
-    @media (max-width: 1200px) {
+    .trend-bar-wrap {
+      flex: 1 0 82px;
+      min-width: 82px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .trend-bar-value { font-size: 13px; color: var(--muted); font-weight: 700; }
+    .trend-bar {
+      width: 100%;
+      max-width: 66px;
+      border-radius: 16px 16px 8px 8px;
+      background: linear-gradient(180deg, #60a5fa, #2563eb);
+      min-height: 8px;
+      box-shadow: inset 0 -8px 14px rgba(0,0,0,0.08);
+    }
+    .trend-label { font-size: 13px; color: var(--muted); text-align: center; }
+    .top-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .top-item:last-child { margin-bottom: 0; }
+    .top-meta strong { font-size: 16px; }
+    .top-meta div { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .bar-track {
+      grid-column: 1 / -1;
+      height: 12px;
+      background: #e8eef5;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #0f766e, #14b8a6); }
+    .insights { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .insight-card .label { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+    .insight-card .big { font-size: 26px; font-weight: 800; }
+    .insight-card .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+    @media (max-width: 1400px) {
+      .hero { grid-template-columns: 1fr; }
       .cards { grid-template-columns: repeat(3, minmax(180px, 1fr)); }
+      .analytics-grid { grid-template-columns: 1fr; }
+      .insights { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 900px) {
+      .cards { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
       .grid-2 { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 768px) {
-      .cards { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
       .container { padding: 12px; }
-      .card .value { font-size: 24px; }
+      .hero-title { font-size: 26px; }
+      .card .value { font-size: 28px; }
     }
-
-    @media (max-width: 520px) {
+    @media (max-width: 560px) {
       .cards { grid-template-columns: 1fr; }
       .filters { flex-direction: column; align-items: stretch; }
       .field { min-width: 100%; }
       .btn { width: 100%; }
+      .hero-card { padding: 16px; }
+      .hero-highlight { min-width: 100%; }
     }
   </style>
 </head>
@@ -212,6 +319,25 @@
         <a href="/admin.html">⚙️ หลังบ้าน</a>
         <a href="/pos.html">🛒 หน้าร้าน</a>
         <a href="/repair-history.html">🛠️ ประวัติซ่อม</a>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-card">
+        <div>
+          <div class="hero-title">แดชบอร์ดรายงานยอดขาย</div>
+          <p class="hero-sub">ดูยอดขาย กำไร ค่าแรง บิลขาย สินค้าใกล้หมด และสรุปสินค้าขายดีในหน้าเดียว ใช้งานง่ายขึ้น อ่านตัวเลขไวขึ้น และเหมาะกับการเปิดดูทั้งบนคอมและแท็บเล็ต</p>
+          <div class="hero-badges">
+            <span class="badge">📈 ดูยอดแบบวันต่อวัน</span>
+            <span class="badge">💸 แยกกำไรชัดเจน</span>
+            <span class="badge">📦 เช็กของใกล้หมดไว</span>
+          </div>
+        </div>
+        <div class="hero-highlight">
+          <div class="kicker">ยอดขายช่วงที่เลือก</div>
+          <div class="big" id="heroRangeSales">0</div>
+          <div class="small">จำนวนบิล <span id="heroBillCount">0</span> บิล • กำไร <span id="heroProfitTotal">0</span> บาท</div>
+        </div>
       </div>
     </div>
 
@@ -229,30 +355,75 @@
     </div>
 
     <div class="cards">
-      <div class="card">
+      <div class="card sales">
         <div class="title">ยอดขายวันนี้</div>
         <div class="value" id="todaySales">0</div>
+        <div class="hint">ยอดรวมเฉพาะวันปัจจุบัน</div>
       </div>
-      <div class="card">
+      <div class="card sales">
         <div class="title">ยอดขายเดือนนี้</div>
         <div class="value" id="monthSales">0</div>
+        <div class="hint">รวมตั้งแต่ต้นเดือนถึงวันนี้</div>
       </div>
-      <div class="card">
+      <div class="card sales">
         <div class="title">ยอดขายช่วงที่เลือก</div>
         <div class="value" id="rangeSales">0</div>
+        <div class="hint">เปลี่ยนตามวันที่ที่กรอง</div>
       </div>
-      <div class="card">
+      <div class="card labor">
         <div class="title">ค่าแรงรวม</div>
         <div class="value" id="laborTotal">0</div>
+        <div class="hint">รวมค่าแรงจากทุกบิล</div>
       </div>
-      <div class="card">
+      <div class="card bills">
         <div class="title">จำนวนบิล</div>
         <div class="value" id="billCount">0</div>
+        <div class="hint">นับจากบิลที่อยู่ในช่วงเลือก</div>
       </div>
-      <div class="card">
+      <div class="card profit">
         <div class="title">กำไรรวม</div>
         <div class="value" id="profitTotal">0</div>
+        <div class="hint">ยอดขายหักต้นทุนสินค้าแล้ว</div>
       </div>
+    </div>
+
+    <div class="analytics-grid">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>แนวโน้มยอดขายตามวัน</h2>
+            <p class="panel-sub">สรุปจากบิลในช่วงวันที่ที่เลือก ช่วยดูว่าวันไหนขายดีและวันไหนยอดตก</p>
+          </div>
+          <div class="mini-stat">
+            <span class="label">เฉลี่ยต่อบิล</span>
+            <span class="num" id="avgPerBill">0</span>
+          </div>
+        </div>
+        <div id="trendChart" class="trend-chart"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>สินค้าทำเงินสูงสุด</h2>
+            <p class="panel-sub">เรียงตามกำไรในช่วงวันที่ที่เลือก</p>
+          </div>
+          <div class="mini-stat">
+            <span class="label">ขายดีที่สุด</span>
+            <span class="num" id="topItemProfit">0</span>
+          </div>
+        </div>
+        <div id="topProducts"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="panel-header">
+        <div>
+          <h2>ภาพรวมเร็ว</h2>
+          <p class="panel-sub">ดูตัวเลขสำคัญแบบสรุปสั้นก่อนลงลึกในรายละเอียด</p>
+        </div>
+      </div>
+      <div class="insights" id="quickInsights"></div>
     </div>
 
     <div class="grid-2">
@@ -275,6 +446,103 @@
   <script>
     function formatNumber(value) {
       return Number(value || 0).toLocaleString('th-TH');
+    }
+    function formatCurrency(value) {
+      return `${formatNumber(value)} บาท`;
+    }
+
+    function shortThaiDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return String(dateStr);
+      return d.toLocaleDateString('th-TH', {
+        timeZone: 'Asia/Bangkok',
+        day: '2-digit',
+        month: '2-digit'
+      });
+    }
+
+    function summarizeDailySales(bills) {
+      const map = new Map();
+      for (const bill of bills || []) {
+        const key = String(bill.createdAt || '').slice(0, 10) || '-';
+        if (!key || key === '-') continue;
+        const current = map.get(key) || 0;
+        map.set(key, current + Number(bill.grandTotal || 0));
+      }
+      return Array.from(map.entries())
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([date, total]) => ({ date, total }));
+    }
+
+    function renderTrendChart(bills) {
+      const box = document.getElementById('trendChart');
+      const daily = summarizeDailySales(bills);
+      if (!daily.length) {
+        box.innerHTML = '<div class="empty">ยังไม่มีข้อมูลยอดขายในช่วงที่เลือก</div>';
+        return;
+      }
+      const max = Math.max(...daily.map(d => Number(d.total || 0)), 1);
+      box.innerHTML = daily.map(d => {
+        const height = Math.max(12, Math.round((Number(d.total || 0) / max) * 180));
+        return `
+          <div class="trend-bar-wrap">
+            <div class="trend-bar-value">${formatNumber(d.total)}</div>
+            <div class="trend-bar" style="height:${height}px"></div>
+            <div class="trend-label">${escapeHtml(shortThaiDate(d.date))}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTopProducts(list) {
+      const box = document.getElementById('topProducts');
+      const best = (list || []).slice().sort((a, b) => Number(b.profit || 0) - Number(a.profit || 0)).slice(0, 5);
+      document.getElementById('topItemProfit').textContent = formatNumber(best[0]?.profit || 0);
+      if (!best.length) {
+        box.innerHTML = '<div class="empty">ยังไม่มีข้อมูลสินค้าทำเงิน</div>';
+        return;
+      }
+      const max = Math.max(...best.map(item => Number(item.profit || 0)), 1);
+      box.innerHTML = best.map((item, index) => {
+        const width = Math.max(8, Math.round((Number(item.profit || 0) / max) * 100));
+        return `
+          <div class="top-item">
+            <div class="top-meta">
+              <strong>${index + 1}. ${escapeHtml(item.name || '-')}</strong>
+              <div>กำไร ${formatNumber(item.profit)} • ขาย ${formatNumber(item.qty)} ชิ้น • ยอดขาย ${formatNumber(item.sales)}</div>
+            </div>
+            <strong>${formatNumber(item.profit)}</strong>
+            <div class="bar-track"><div class="bar-fill" style="width:${width}%"></div></div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderQuickInsights(summary, bills, lowStock, itemProfits) {
+      const box = document.getElementById('quickInsights');
+      const avgBill = Number(summary.billCount || 0) > 0 ? Number(summary.rangeSales || 0) / Number(summary.billCount || 1) : 0;
+      const laborShare = Number(summary.rangeSales || 0) > 0 ? (Number(summary.laborTotal || 0) / Number(summary.rangeSales || 0)) * 100 : 0;
+      const lowStockCount = Array.isArray(lowStock) ? lowStock.length : 0;
+      const topName = (itemProfits || []).slice().sort((a, b) => Number(b.profit || 0) - Number(a.profit || 0))[0]?.name || '-';
+      box.innerHTML = `
+        <div class="insight-card">
+          <div class="label">ยอดเฉลี่ยต่อบิล</div>
+          <div class="big">${formatNumber(avgBill)}</div>
+          <div class="sub">คำนวณจากยอดขายช่วงที่เลือกหารด้วยจำนวนบิล</div>
+        </div>
+        <div class="insight-card">
+          <div class="label">สัดส่วนค่าแรง</div>
+          <div class="big">${laborShare.toFixed(1)}%</div>
+          <div class="sub">เทียบค่าแรงรวมกับยอดขายทั้งหมดในช่วงที่เลือก</div>
+        </div>
+        <div class="insight-card">
+          <div class="label">สินค้าทำกำไรสูงสุด</div>
+          <div class="big" style="font-size:22px;">${escapeHtml(topName)}</div>
+          <div class="sub">มีสินค้าใกล้หมด ${formatNumber(lowStockCount)} รายการ</div>
+        </div>
+      `;
+      document.getElementById('avgPerBill').textContent = formatNumber(avgBill);
     }
 
     function escapeHtml(text) {
@@ -319,7 +587,13 @@
         document.getElementById('laborTotal').textContent = formatNumber(data.summary?.laborTotal || 0);
         document.getElementById('billCount').textContent = formatNumber(data.summary?.billCount || 0);
         document.getElementById('profitTotal').textContent = formatNumber(data.summary?.profitTotal || 0);
+        document.getElementById('heroRangeSales').textContent = formatNumber(data.summary?.rangeSales || 0);
+        document.getElementById('heroBillCount').textContent = formatNumber(data.summary?.billCount || 0);
+        document.getElementById('heroProfitTotal').textContent = formatNumber(data.summary?.profitTotal || 0);
 
+        renderTrendChart(data.bills || []);
+        renderTopProducts(data.itemProfits || []);
+        renderQuickInsights(data.summary || {}, data.bills || [], data.lowStock || [], data.itemProfits || []);
         renderItemProfits(data.itemProfits || []);
         renderLowStock(data.lowStock || []);
         renderBills(data.bills || []);
@@ -355,16 +629,21 @@
         return;
       }
 
-      box.innerHTML = list.map(item => `
-        <div class="stock-item">
-          <div style="font-size:20px;font-weight:800;">${escapeHtml(item.name || '-')}</div>
-          <div style="font-size:18px;margin-top:6px;">
-            รหัสสินค้า: ${escapeHtml(item.barcode || '-')} |
-            คงเหลือ ${formatNumber(item.quantity)} |
-            จุดเตือน ${formatNumber(item.minStock)}
+      box.innerHTML = list.map(item => {
+        const qty = Number(item.quantity || 0);
+        const min = Number(item.minStock || 0);
+        const levelClass = qty <= Math.max(1, min * 0.5) ? 'critical' : 'warning';
+        return `
+          <div class="stock-item ${levelClass}">
+            <div style="font-size:20px;font-weight:800;">${escapeHtml(item.name || '-')}</div>
+            <div style="font-size:18px;margin-top:6px;">
+              รหัสสินค้า: ${escapeHtml(item.barcode || '-')} |
+              คงเหลือ ${formatNumber(qty)} |
+              จุดเตือน ${formatNumber(min)}
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
 
