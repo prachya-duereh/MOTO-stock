@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ใบเสร็จรับเงิน</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
 
@@ -181,119 +184,67 @@
       color: #b91c1c;
     }
 
-    .job-sheet {
-      border: 1.5px solid #111;
-      padding: 10px;
+    .document-paper {
+      width: 210mm;
+      max-width: calc(100vw - 24px);
+      min-height: auto;
+      padding: 18px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 14px 34px rgba(15,23,42,.10);
+      font-family: "Prompt", sans-serif;
+      color: #0f172a;
     }
-
-    .job-sheet-header {
-      text-align: center;
-      border-bottom: 2px solid #111;
-      padding-bottom: 8px;
-      margin-bottom: 8px;
+    .repair-doc {
+      border: 1px solid #cbd5e1;
+      border-radius: 22px;
+      overflow: hidden;
+      background: #fff;
     }
-
-    .job-sheet-title {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      margin-top: 4px;
+    .repair-doc-header {
+      padding: 24px 28px 18px;
+      background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+      color: #fff;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:20px;
+      flex-wrap:wrap;
     }
-
-    .job-sheet-subtitle {
-      font-size: 13px;
-      color: #333;
-      margin-top: 2px;
-    }
-
-    .job-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px 10px;
-      font-size: 13px;
-      margin-bottom: 8px;
-    }
-
-    .job-field {
-      border: 1px solid #bbb;
-      border-radius: 6px;
-      padding: 6px 8px;
-      min-height: 44px;
-    }
-
-    .job-field.full {
-      grid-column: 1 / -1;
-    }
-
-    .job-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #444;
-      margin-bottom: 3px;
-    }
-
-    .job-value {
-      font-size: 14px;
-      font-weight: 700;
-      word-break: break-word;
-      white-space: pre-wrap;
-      min-height: 18px;
-    }
-
-    .job-section-title {
-      font-size: 13px;
-      font-weight: 800;
-      margin: 10px 0 6px;
-      padding: 4px 6px;
-      border-left: 4px solid #111;
-      background: #f6f6f6;
-    }
-
-    .job-parts-table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      font-size: 12px;
-    }
-
-    .job-parts-table th,
-    .job-parts-table td {
-      border: 1px solid #cfcfcf;
-      padding: 5px 4px;
-      vertical-align: top;
-    }
-
-    .job-parts-table th {
-      background: #f5f5f5;
-      font-weight: 800;
-      text-align: center;
-    }
-
-    .job-note-box {
-      border: 1px solid #bbb;
-      border-radius: 6px;
-      min-height: 66px;
-      padding: 8px;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-size: 13px;
-    }
-
-    .job-signatures {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-top: 18px;
-      text-align: center;
-      font-size: 12px;
-    }
-
-    .job-signatures .line {
-      border-top: 1px solid #111;
-      margin-top: 30px;
-      padding-top: 6px;
-      font-weight: 700;
-    }
+    .repair-brand { display:flex; gap:14px; align-items:center; }
+    .repair-brand .doc-logo { width:64px; height:64px; object-fit:contain; background:rgba(255,255,255,.12); border-radius:16px; padding:8px; }
+    .repair-brand-title { font-size: 30px; font-weight: 800; line-height:1.1; }
+    .repair-brand-sub { font-size: 14px; opacity:.9; margin-top:4px; }
+    .repair-doc-code { text-align:right; }
+    .repair-doc-code .caption { font-size: 12px; opacity:.8; }
+    .repair-doc-code .number { font-size: 24px; font-weight: 800; margin-top:3px; }
+    .repair-doc-code .date { margin-top:6px; font-size: 14px; }
+    .repair-doc-body { padding: 24px 28px 28px; }
+    .repair-title-row { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .repair-title { font-size: 28px; font-weight: 800; }
+    .repair-pill { padding:8px 14px; border-radius:999px; background:#dbeafe; color:#1d4ed8; font-weight:700; font-size:14px; }
+    .repair-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:16px; }
+    .repair-card { border:1px solid #e2e8f0; border-radius:18px; padding:16px; background:#f8fafc; }
+    .repair-card h3 { margin:0 0 10px; font-size:16px; }
+    .repair-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .repair-field .label { font-size:12px; color:#64748b; font-weight:600; margin-bottom:4px; }
+    .repair-field .value { font-size:15px; font-weight:600; min-height:24px; word-break:break-word; }
+    .repair-note { border:1px solid #e2e8f0; border-radius:18px; padding:16px; background:#fff; margin-bottom:16px; }
+    .repair-note-title { font-size:15px; font-weight:700; margin-bottom:8px; }
+    .repair-table-wrap { border:1px solid #e2e8f0; border-radius:18px; overflow:hidden; margin-bottom:16px; }
+    .repair-table { width:100%; border-collapse:collapse; table-layout:auto; font-family:"Prompt", sans-serif; }
+    .repair-table th { background:#eff6ff; color:#1e3a8a; font-size:13px; text-align:left; padding:12px 14px; }
+    .repair-table td { padding:12px 14px; border-top:1px solid #e2e8f0; font-size:14px; vertical-align:top; }
+    .repair-table .num, .repair-table .money { text-align:right; white-space:nowrap; }
+    .repair-summary { display:grid; grid-template-columns:1.1fr .9fr; gap:16px; align-items:stretch; }
+    .repair-box { border:1px solid #e2e8f0; border-radius:18px; padding:16px; background:#fff; }
+    .repair-box h4 { margin:0 0 10px; font-size:15px; }
+    .repair-total-row { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dashed #cbd5e1; }
+    .repair-total-row:last-child { border-bottom:none; }
+    .repair-total-row.grand { font-size:20px; font-weight:800; color:#0f172a; }
+    .signature-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:22px; }
+    .signature-box { border:1px solid #cbd5e1; border-radius:16px; padding:18px 16px 12px; min-height:110px; display:flex; flex-direction:column; justify-content:flex-end; }
+    .signature-line { border-top:1px solid #94a3b8; padding-top:8px; text-align:center; color:#475569; font-size:14px; }
 
     @media print {
       body { background: #fff; }
@@ -303,7 +254,24 @@
         min-height: auto;
         padding: 6px 8px 10px;
       }
+      .document-paper {
+        width: 100%;
+        max-width: none;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+      }
+      .repair-doc { border: none; border-radius: 0; }
+      .repair-doc-header { padding: 18px 22px 14px; }
+      .repair-doc-body { padding: 18px 22px 20px; }
       .actions { display: none; }
+    }
+    @media (max-width: 900px) {
+      .document-paper { width: 100%; border-radius: 14px; padding: 12px; }
+      .repair-grid, .repair-fields, .repair-summary, .signature-grid { grid-template-columns: 1fr; }
+      .repair-doc-header, .repair-title-row { align-items: flex-start; }
+      .repair-brand-title { font-size: 24px; }
+      .repair-title { font-size: 22px; }
     }
   </style>
 </head>
@@ -439,15 +407,14 @@
           name: p.name || '-',
           qty: Number(p.qty || 0),
           price: Number(p.unitPrice || 0),
-          total: Number(p.total || 0),
-          priceLabel: p.priceLabel || '-'
+          total: Number(p.total || 0)
         })) : [];
 
         const itemsTotal = Number(repair.partsCost || 0);
         const laborCost = Number(repair.laborCost || 0);
 
         return {
-          docType: 'repair_form',
+          type: 'repair_form',
           saleId: repair.id || '-',
           date: repair.repairDate || repair.created_at || '-',
           customerName: repair.customerName || '-',
@@ -456,6 +423,7 @@
           plate: repair.plate || '-',
           symptom: repair.symptom || '-',
           note: repair.note || '-',
+          repairPriceLabel: repair.repairPriceLabel || '-',
           items,
           itemsTotal,
           laborCost,
@@ -479,7 +447,6 @@
         : items.reduce((sum, item) => sum + Number(item.total || 0), 0);
 
       return {
-        docType: 'receipt',
         saleId: data.saleId || data.id || data.code || '-',
         date: data.date || data.createdAt || data.repairDate || '-',
         customerName: data.customerName || '-',
@@ -497,104 +464,96 @@
       const el = document.getElementById('printArea');
       const items = Array.isArray(repair.items) ? repair.items : [];
       const showDate = repair.dateOnly ? formatThaiDateOnly(repair.date) : formatThaiDate(repair.date);
-
+      const symptom = repair.symptom || '-';
+      const note = repair.note || '-';
       el.className = '';
+      el.parentElement.className = 'document-paper';
       el.innerHTML = `
-        <div class="job-sheet">
-          <div class="job-sheet-header">
-            <img src="/D.jpg" alt="logo" class="logo" onerror="this.style.display='none'">
-            <div class="shop-name">ดี อะไหล่ กรงปินัง</div>
-            <div class="job-sheet-title">ใบรับซ่อม / ใบแจ้งงาน</div>
-            <div class="job-sheet-subtitle">เอกสารรับงานซ่อมรถและรายการอะไหล่ที่ใช้</div>
-          </div>
-
-          <div class="job-grid">
-            <div class="job-field">
-              <div class="job-label">เลขที่เอกสาร</div>
-              <div class="job-value">${escapeHtml(repair.saleId || '-')}</div>
+        <div class="repair-doc">
+          <div class="repair-doc-header">
+            <div class="repair-brand">
+              <img src="/D.jpg" alt="logo" class="doc-logo" onerror="this.style.display='none'">
+              <div>
+                <div class="repair-brand-title">ดี อะไหล่ กรุงปินัง</div>
+                <div class="repair-brand-sub">เอกสารรับงานซ่อม / Repair Service Intake Form</div>
+              </div>
             </div>
-            <div class="job-field">
-              <div class="job-label">วันที่รับซ่อม</div>
-              <div class="job-value">${escapeHtml(showDate)}</div>
-            </div>
-            <div class="job-field">
-              <div class="job-label">ชื่อลูกค้า</div>
-              <div class="job-value">${escapeHtml(repair.customerName || '-')}</div>
-            </div>
-            <div class="job-field">
-              <div class="job-label">เบอร์โทร</div>
-              <div class="job-value">${escapeHtml(repair.phone || '-')}</div>
-            </div>
-            <div class="job-field">
-              <div class="job-label">รุ่นรถ</div>
-              <div class="job-value">${escapeHtml(repair.bikeModel || '-')}</div>
-            </div>
-            <div class="job-field">
-              <div class="job-label">ทะเบียนรถ</div>
-              <div class="job-value">${escapeHtml(repair.plate || '-')}</div>
-            </div>
-            <div class="job-field full">
-              <div class="job-label">อาการ / รายละเอียดงานซ่อม</div>
-              <div class="job-value">${escapeHtml(repair.symptom || '-')}</div>
+            <div class="repair-doc-code">
+              <div class="caption">เลขที่เอกสาร</div>
+              <div class="number">#${escapeHtml(repair.saleId || '-')}</div>
+              <div class="date">วันที่ ${escapeHtml(showDate)}</div>
             </div>
           </div>
-
-          <div class="job-section-title">รายการอะไหล่ที่ใช้</div>
-          <table class="job-parts-table">
-            <thead>
-              <tr>
-                <th style="width:24px">#</th>
-                <th>รายการ</th>
-                <th style="width:44px">จำนวน</th>
-                <th style="width:52px">ราคา</th>
-                <th style="width:56px">รวม</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${items.length ? items.map((item, index) => `
-                <tr>
-                  <td style="text-align:center">${index + 1}</td>
-                  <td>
-                    <div class="name">${escapeHtml(item.name || '-')}</div>
-                    <div class="code">[${escapeHtml(item.barcode || '-')} ] ${escapeHtml(item.priceLabel || '')}</div>
-                  </td>
-                  <td style="text-align:center">${money(item.qty)}</td>
-                  <td style="text-align:right">${money(item.price)}</td>
-                  <td style="text-align:right">${money(item.total)}</td>
-                </tr>
-              `).join('') : `<tr><td colspan="5" style="text-align:center">- ไม่มีรายการอะไหล่ -</td></tr>`}
-            </tbody>
-          </table>
-
-          <div class="job-section-title">สรุปรายการ</div>
-          <div class="summary">
-            <div class="row">
-              <div class="label">ค่าอะไหล่รวม</div>
-              <div class="value">${money(repair.itemsTotal)}</div>
+          <div class="repair-doc-body">
+            <div class="repair-title-row">
+              <div class="repair-title">ใบรับซ่อม</div>
+              <div class="repair-pill">${escapeHtml(repair.repairPriceLabel || '-')}</div>
             </div>
-            <div class="row">
-              <div class="label">ค่าแรง / ค่าบริการ</div>
-              <div class="value">${money(repair.laborCost)}</div>
+            <div class="repair-grid">
+              <div class="repair-card">
+                <h3>ข้อมูลลูกค้า</h3>
+                <div class="repair-fields">
+                  <div class="repair-field"><div class="label">ชื่อลูกค้า</div><div class="value">${escapeHtml(repair.customerName || '-')}</div></div>
+                  <div class="repair-field"><div class="label">เบอร์โทร</div><div class="value">${escapeHtml(repair.phone || '-')}</div></div>
+                </div>
+              </div>
+              <div class="repair-card">
+                <h3>ข้อมูลรถ</h3>
+                <div class="repair-fields">
+                  <div class="repair-field"><div class="label">รุ่นรถ</div><div class="value">${escapeHtml(repair.bikeModel || '-')}</div></div>
+                  <div class="repair-field"><div class="label">ทะเบียนรถ</div><div class="value">${escapeHtml(repair.plate || '-')}</div></div>
+                </div>
+              </div>
             </div>
-            <div class="row grand">
-              <div class="label">รวมทั้งสิ้น</div>
-              <div class="value">${money(repair.total)}</div>
+            <div class="repair-note">
+              <div class="repair-note-title">อาการ / รายละเอียดงานซ่อม</div>
+              <div>${escapeHtml(symptom).replace(/
+/g,'<br>')}</div>
+            </div>
+            <div class="repair-table-wrap">
+              <table class="repair-table">
+                <thead>
+                  <tr>
+                    <th style="width:60px">ลำดับ</th>
+                    <th>รายการอะไหล่</th>
+                    <th style="width:110px">รหัสสินค้า</th>
+                    <th style="width:90px" class="num">จำนวน</th>
+                    <th style="width:120px" class="money">ราคาต่อหน่วย</th>
+                    <th style="width:120px" class="money">รวมเงิน</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${items.length ? items.map((item, index) => `
+                    <tr>
+                      <td>${index + 1}</td>
+                      <td>${escapeHtml(item.name || '-')}</td>
+                      <td>${escapeHtml(item.barcode || '-')}</td>
+                      <td class="num">${money(item.qty)}</td>
+                      <td class="money">${money(item.price)}</td>
+                      <td class="money">${money(item.total)}</td>
+                    </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:#64748b">ยังไม่ได้ระบุรายการอะไหล่</td></tr>`}
+                </tbody>
+              </table>
+            </div>
+            <div class="repair-summary">
+              <div class="repair-box">
+                <h4>หมายเหตุเพิ่มเติม</h4>
+                <div>${escapeHtml(note).replace(/
+/g,'<br>')}</div>
+              </div>
+              <div class="repair-box">
+                <h4>สรุปราคา</h4>
+                <div class="repair-total-row"><span>ค่าอะไหล่</span><strong>${money(repair.itemsTotal)}</strong></div>
+                <div class="repair-total-row"><span>ค่าแรง</span><strong>${money(repair.laborCost)}</strong></div>
+                <div class="repair-total-row grand"><span>รวมทั้งสิ้น</span><span>${money(repair.total)}</span></div>
+              </div>
+            </div>
+            <div class="signature-grid">
+              <div class="signature-box"><div class="signature-line">ลายเซ็นผู้รับซ่อม</div></div>
+              <div class="signature-box"><div class="signature-line">ลายเซ็นลูกค้า</div></div>
             </div>
           </div>
-
-          <div class="job-section-title">หมายเหตุ</div>
-          <div class="job-note-box">${escapeHtml(repair.note || '-')}</div>
-
-          <div class="job-signatures">
-            <div>
-              <div class="line">ผู้รับซ่อม / ผู้บันทึก</div>
-            </div>
-            <div>
-              <div class="line">ลูกค้า</div>
-            </div>
-          </div>
-        </div>
-      `;
+        </div>`;
     }
 
     function renderReceipt(receipt) {
@@ -693,7 +652,9 @@
         return;
       }
 
-      if (normalized.docType === 'repair_form') {
+      const printArea = document.getElementById('printArea');
+      printArea.parentElement.className = '';
+      if (normalized.type === 'repair_form') {
         renderRepairForm(normalized);
       } else {
         renderReceipt(normalized);
