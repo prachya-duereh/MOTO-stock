@@ -198,12 +198,29 @@
     <div class="paper">
       <div id="printArea" class="message">กำลังโหลดใบเสร็จ...</div>
       <div class="actions">
-        <button class="print-btn" onclick="window.print()">พิมพ์บิล</button>
+        <button class="print-btn" onclick="manualPrint()">พิมพ์บิล</button>
       </div>
     </div>
   </div>
 
   <script>
+
+    let hasTriggeredAutoPrint = false;
+
+    function manualPrint() {
+      window.print();
+    }
+
+    function tryAutoPrint() {
+      const params = new URLSearchParams(window.location.search);
+      const shouldAutoPrint = params.get('autoprint') === '1';
+      if (!shouldAutoPrint || hasTriggeredAutoPrint) return;
+      hasTriggeredAutoPrint = true;
+      setTimeout(() => {
+        window.print();
+      }, 250);
+    }
+
     function money(n) {
       return Number(n || 0).toLocaleString('th-TH', {
         minimumFractionDigits: 0,
@@ -364,7 +381,7 @@
       el.innerHTML = `
         <div class="center">
           <img src="/D.jpg" alt="logo" class="logo" onerror="this.style.display='none'">
-          <div class="shop-name">ดี อะไหล่ กรุงปืนัง</div>
+          <div class="shop-name">ดี อะไหล่ กรงปินัง</div>
           <div class="shop-sub">จำหน่ายอะไหล่มอเตอร์ไซค์</div>
           <div class="shop-tel">Tel: 081-766-7549</div>
         </div>
@@ -451,6 +468,7 @@
       }
 
       renderReceipt(normalized);
+      tryAutoPrint();
     }
 
     document.addEventListener('DOMContentLoaded', startup);

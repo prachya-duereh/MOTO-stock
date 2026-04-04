@@ -398,7 +398,7 @@ function storeBillForPrint(bill) {
 function printBillByData(encodedBill) {
   const bill = JSON.parse(decodeURIComponent(encodedBill));
   storeBillForPrint(bill);
-  window.open('/print.html', '_blank');
+  window.open('/print.html?autoprint=1', '_blank');
 }
 function formatThaiDate(dateStr, withSeconds = false) {
   if (!dateStr) return '-';
