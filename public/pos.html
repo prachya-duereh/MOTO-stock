@@ -152,7 +152,8 @@
       border: 1px solid #d9e0e7;
       border-radius: 18px;
       padding: 14px;
-      margin-bottom: 12px;
+      margin-top: 14px;
+      margin-bottom: 14px;
       background: #fbfcfd;
     }
     .cart-total-big {
@@ -344,15 +345,9 @@
       <div class="panel">
         <div class="section-title">เลือกราคาขาย</div>
         <div class="price-type-tabs">
-          <button id="tab-retail" class="price-tab active" onclick="setPriceType('retail')">ลูกค้าทั่วไป</button>
-          <button id="tab-wholesale" class="price-tab" onclick="setPriceType('wholesale')">ลูกค้าส่ง</button>
-          <button id="tab-mechanic" class="price-tab" onclick="setPriceType('mechanic')">ช่าง</button>
-        </div>
-
-        <div class="cart-summary-box">
-          <div class="cart-total-big">รวม <span id="grandTotalText">0</span> บาท</div>
-          <div class="sum-row"><span>ค่าสินค้า</span><strong id="itemsTotalText">0</strong></div>
-          <div class="sum-row"><span>ค่าแรง</span><strong id="laborCostText">0</strong></div>
+          <button id="tab-retail" class="price-tab active" onclick="setPriceType('retail')">ราคาปลีก</button>
+          <button id="tab-wholesale" class="price-tab" onclick="setPriceType('wholesale')">ราคาส่ง</button>
+          <button id="tab-mechanic" class="price-tab" onclick="setPriceType('mechanic')">ราคาช่าง</button>
         </div>
 
         <div class="cart-table-wrap">
@@ -369,6 +364,12 @@
             </thead>
             <tbody id="cartBody"></tbody>
           </table>
+        </div>
+
+        <div class="cart-summary-box">
+          <div class="cart-total-big">รวม <span id="grandTotalText">0</span> บาท</div>
+          <div class="sum-row"><span>ค่าสินค้า</span><strong id="itemsTotalText">0</strong></div>
+          <div class="sum-row"><span>ค่าแรง</span><strong id="laborCostText">0</strong></div>
         </div>
 
         <div class="payment-box">
@@ -747,7 +748,7 @@
             sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
           } catch (error) {}
         }
-        window.open('/print.html', '_blank');
+        window.open('/print.html?autoprint=1', '_blank');
         
         alert(method === 'PUT' ? 'แก้ไขบิลเรียบร้อย' : 'คิดเงินสำเร็จ');
 
@@ -763,8 +764,6 @@
 
         renderCart();
         await loadItems();
-
-        window.open('/print.html', '_blank');
       } catch (error) {
         alert(error.message || 'บันทึกบิลไม่สำเร็จ');
       }

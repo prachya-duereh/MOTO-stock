@@ -109,10 +109,13 @@ create table if not exists public.repairs (
   repair_date date,
   symptom text not null default '',
   parts jsonb not null default '[]'::jsonb,
+  parts_used_text text not null default '',
   repair_price_type text not null default 'mechanic',
+  repair_price_label text not null default '',
   labor_cost numeric(12,2) not null default 0,
   parts_cost numeric(12,2) not null default 0,
   total numeric(12,2) not null default 0,
+  total_cost numeric(12,2) not null default 0,
   note text not null default '',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -126,10 +129,13 @@ alter table public.repairs
   add column if not exists repair_date date,
   add column if not exists symptom text not null default '',
   add column if not exists parts jsonb not null default '[]'::jsonb,
+  add column if not exists parts_used_text text not null default '',
   add column if not exists repair_price_type text not null default 'mechanic',
+  add column if not exists repair_price_label text not null default '',
   add column if not exists labor_cost numeric(12,2) not null default 0,
   add column if not exists parts_cost numeric(12,2) not null default 0,
   add column if not exists total numeric(12,2) not null default 0,
+  add column if not exists total_cost numeric(12,2) not null default 0,
   add column if not exists note text not null default '',
   add column if not exists created_at timestamptz not null default now(),
   add column if not exists updated_at timestamptz not null default now();
@@ -179,6 +185,19 @@ begin
     execute 'update public.repairs set parts_cost = coalesce(parts_cost, partscost, 0)';
   end if;
 end $$;
+
+
+update public.repairs
+set total_cost = coalesce(total_cost, total, 0)
+where coalesce(total_cost, 0) = 0;
+
+update public.repairs
+set repair_price_label = case
+  when repair_price_type = 'retail' then 'ราคาปลีก'
+  when repair_price_type = 'wholesale' then 'ราคาส่ง'
+  else 'ราคาช่าง'
+end
+where coalesce(repair_price_label, '') = '';
 
 create index if not exists idx_repairs_customer_name on public.repairs (customer_name);
 create index if not exists idx_repairs_phone on public.repairs (phone);

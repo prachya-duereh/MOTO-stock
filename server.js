@@ -192,14 +192,14 @@ function sanitizeRepair(record = {}) {
     repairPriceLabel: cleanText(record.repair_price_label ?? record.repairPriceLabel) || repairPriceLabel(record.repair_price_type ?? record.repairPriceType),
     partsCost: asNumber(record.parts_cost ?? record.partsCost, 0),
     laborCost: asNumber(record.labor_cost ?? record.laborCost, 0),
-    totalCost: asNumber(record.total_cost ?? record.totalCost, 0),
+    totalCost: asNumber(record.total_cost ?? record.totalCost ?? record.total, 0),
     note: cleanText(record.note),
     created_at: record.created_at || record.createdAt || null,
   };
 }
 
-function repairToDb(repair) {
-  return {
+function repairToDb(repair, mode = 'full') {
+  const base = {
     id: Number(repair.id),
     customer_name: repair.customerName,
     phone: repair.phone,
@@ -208,15 +208,50 @@ function repairToDb(repair) {
     repair_date: repair.repairDate,
     symptom: repair.symptom,
     parts: repair.parts,
-    parts_used_text: repair.partsUsedText,
     repair_price_type: repair.repairPriceType,
-    repair_price_label: repair.repairPriceLabel,
     parts_cost: repair.partsCost,
     labor_cost: repair.laborCost,
-    total_cost: repair.totalCost,
     note: repair.note,
     created_at: repair.created_at || nowIso(),
   };
+
+  if (mode === 'legacy') {
+    return {
+      ...base,
+      total: repair.totalCost,
+    };
+  }
+
+  return {
+    ...base,
+    parts_used_text: repair.partsUsedText,
+    repair_price_label: repair.repairPriceLabel,
+    total_cost: repair.totalCost,
+  };
+}
+
+function isMissingRepairColumnError(error) {
+  const message = String(error?.message || error || '').toLowerCase();
+  return message.includes("parts_used_text")
+    || message.includes("repair_price_label")
+    || message.includes("total_cost")
+    || message.includes("could not find the '") && message.includes("column of 'repairs'");
+}
+
+async function insertRepairSupabase(repair) {
+  let result = await supabase.from('repairs').insert([repairToDb(repair)]).select('*').single();
+  if (result.error && isMissingRepairColumnError(result.error)) {
+    result = await supabase.from('repairs').insert([repairToDb(repair, 'legacy')]).select('*').single();
+  }
+  return result;
+}
+
+async function updateRepairSupabase(repairId, repair) {
+  let result = await supabase.from('repairs').update(repairToDb(repair)).eq('id', repairId).select('*').single();
+  if (result.error && isMissingRepairColumnError(result.error)) {
+    result = await supabase.from('repairs').update(repairToDb(repair, 'legacy')).eq('id', repairId).select('*').single();
+  }
+  return result;
 }
 
 function sanitizeSaleRow(record = {}) {
@@ -641,7 +676,7 @@ app.post('/api/repairs', async (req, res) => {
     await applyRepairStockDelta(null, repair);
 
     if (supabase) {
-      const { data, error } = await supabase.from('repairs').insert([repairToDb(repair)]).select('*').single();
+      const { data, error } = await insertRepairSupabase(repair);
       if (error) throw error;
       return res.json({ success: true, repair: sanitizeRepair(data) });
     }
@@ -669,7 +704,7 @@ app.put('/api/repairs/:id', async (req, res) => {
     await applyRepairStockDelta(current, nextRepair);
 
     if (supabase) {
-      const { data, error } = await supabase.from('repairs').update(repairToDb(nextRepair)).eq('id', repairId).select('*').single();
+      const { data, error } = await updateRepairSupabase(repairId, nextRepair);
       if (error) throw error;
       return res.json({ success: true, repair: sanitizeRepair(data) });
     }
