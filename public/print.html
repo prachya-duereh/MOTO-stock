@@ -529,9 +529,9 @@
       const queryType = getQueryType();
       const keyOrder = {
         repair_form: ['lastRepairPrint', 'printData'],
-        repair_receipt: ['printData', 'lastRepairPrint', 'printReceipt', 'lastReceipt'],
-        sale: ['lastReceipt', 'printReceipt', 'printData', 'lastRepairPrint'],
-        default: ['printData', 'lastReceipt', 'printReceipt', 'lastRepairPrint']
+        repair_receipt: ['printReceipt', 'lastReceipt', 'printData'],
+        sale: ['lastReceipt', 'printReceipt', 'printData'],
+        default: ['printReceipt', 'lastReceipt', 'printData', 'lastRepairPrint']
       };
       const keys = keyOrder[queryType] || keyOrder.default;
       for (const key of keys) {

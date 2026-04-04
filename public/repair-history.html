@@ -160,13 +160,17 @@
   };
 
   try {
+    ['printData', 'lastRepairPrint'].forEach((key) => {
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
+    });
     localStorage.setItem('lastReceipt', JSON.stringify(receipt));
     sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
     localStorage.setItem('printReceipt', JSON.stringify(receipt));
     sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
   } catch (error) {}
 
-  window.open('/print.html?autoprint=1&type=repair_receipt', '_blank');
+  window.open('/print.html?autoprint=1&type=repair_receipt&v=' + Date.now(), '_blank');
 }
 function formatThaiDate(dateStr, withSeconds = false) {
   if (!dateStr) return '-';
