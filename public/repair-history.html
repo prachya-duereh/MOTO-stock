@@ -124,7 +124,7 @@
       function renderSelectedParts(){ if(!selectedParts.length){ $('partsList').innerHTML='ยังไม่มีอะไหล่'; updateTotals(); return; } $('partsList').innerHTML=selectedParts.map((p,index)=>`<div class="part-row"><b>${p.name}</b> [${p.barcode||'-'}] <span class="tag">${p.priceLabel}</span><div>จำนวน ${money(p.qty)} | หน่วยละ ${money(p.unitPrice)} | รวม ${money(p.total)}</div><button class="danger" style="margin-top:6px;padding:8px 10px" onclick="removePart(${index})">ลบ</button></div>`).join(''); updateTotals(); }
       function updateTotals(){ const partsCost = selectedParts.reduce((sum,p)=>sum+Number(p.total||0),0); const labor = Number($('laborCost').value)||0; $('partsCostText').innerText='ค่าอะไหล่: '+money(partsCost)+' บาท'; $('totalCostText').innerText='รวมเงิน: '+money(partsCost+labor)+' บาท'; }
       function currentRepairPayload(){ const parts = selectedParts.map((p)=>({ id:p.id, barcode:p.barcode, name:p.name, qty:Number(p.qty||0), unitPrice:Number(p.unitPrice||0), total:Number(p.total||0), priceType:p.priceType, priceLabel:p.priceLabel })); const partsCost = parts.reduce((sum,p)=>sum+Number(p.total||0),0); const labor = Number($('laborCost').value)||0; const distinctTypes = [...new Set(parts.map((p)=>p.priceType))]; const effectiveType = distinctTypes.length===1 ? distinctTypes[0] : 'mixed'; return { customerName:$('customerName').value.trim(), phone:$('phone').value.trim(), bikeModel:$('bikeModel').value.trim(), plate:$('plate').value.trim(), repairDate:$('repairDate').value, symptom:$('symptom').value.trim(), parts, partsCost, laborCost:labor, totalCost:partsCost+labor, note:$('note').value.trim(), repairPriceType:effectiveType, repairPriceLabel:getRepairPriceLabel(effectiveType) }; }
-      function openPrint(data){ localStorage.setItem('printData', JSON.stringify(data)); window.open('/print.html?autoprint=1&v='+Date.now()+'&paper='+encodeURIComponent(getPaperSize()), '_blank'); }
+      function openPrint(data){ localStorage.setItem('printData', JSON.stringify(data)); sessionStorage.setItem('printData', JSON.stringify(data)); const type = encodeURIComponent(data?.type || 'sale'); window.open('/print.html?autoprint=1&type='+type+'&v='+Date.now()+'&paper='+encodeURIComponent(getPaperSize()), '_blank'); }
       function printCurrentRepairForm(){ const record=currentRepairPayload(); if(!record.customerName) return alert('กรุณาใส่ชื่อลูกค้า'); openPrint({ type:'repair_form', repair:record, paperSize:getPaperSize() }); }
     
       function resetRepairForm(){ editingRepairId=null; $('formTitle').innerText='บันทึกประวัติใหม่'; ['customerName','phone','bikeModel','plate','repairDate','symptom','laborCost','note','partSearch'].forEach((id)=>$(id).value=''); $('partQty').value=1; selectedParts=[]; setRepairPriceType('mechanic'); renderSelectedParts(); }
@@ -139,6 +139,9 @@
   const extraLabor = Number($('extra-labor-'+id).value) || 0;
 
   const receipt = {
+    type: 'repair_receipt',
+    repair: record,
+    extraLabor,
     saleId: record.id || '-',
     date: record.repairDate || record.created_at || '-',
     customerName: record.customerName || '-',
@@ -163,7 +166,7 @@
     sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
   } catch (error) {}
 
-  window.open('/print.html?autoprint=1', '_blank');
+  window.open('/print.html?autoprint=1&type=repair_receipt', '_blank');
 }
 function formatThaiDate(dateStr, withSeconds = false) {
   if (!dateStr) return '-';

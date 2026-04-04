@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ใบเสร็จรับเงิน</title>
+  <title>พิมพ์เอกสาร</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      background: #f0f0f0;
-      font-family: "Tahoma", "Noto Sans Thai", sans-serif;
+      background: #eef2f7;
       color: #111;
+      font-family: "Tahoma", "Noto Sans Thai", sans-serif;
     }
 
     .page {
@@ -19,14 +21,23 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 10px 0;
+      padding: 16px;
     }
 
     .paper {
       width: 80mm;
-      min-height: 100vh;
+      min-height: auto;
       background: #fff;
       padding: 8px 10px 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      border-radius: 14px;
+    }
+
+    .paper.paper-repair-form {
+      width: min(210mm, 100%);
+      padding: 22px 24px 28px;
+      font-family: 'Prompt', sans-serif;
+      border-radius: 20px;
     }
 
     .center { text-align: center; }
@@ -83,7 +94,7 @@
       min-width: 48px;
     }
 
-    table {
+    table.receipt-table {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
@@ -91,13 +102,13 @@
       line-height: 1.25;
     }
 
-    thead th {
+    .receipt-table thead th {
       font-weight: 800;
       text-align: center;
       padding: 2px 1px;
     }
 
-    tbody td {
+    .receipt-table tbody td {
       padding: 2px 1px;
       vertical-align: top;
     }
@@ -156,14 +167,15 @@
     .actions {
       display: flex;
       justify-content: center;
-      margin-top: 12px;
+      margin-top: 14px;
+      gap: 10px;
     }
 
     .print-btn {
       border: none;
       background: #16a34a;
       color: #fff;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 10px 24px;
       font-size: 18px;
       font-weight: 800;
@@ -181,34 +193,264 @@
       color: #b91c1c;
     }
 
+    /* repair form */
+    .repair-doc {
+      color: #0f172a;
+    }
+
+    .repair-doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      border-bottom: 2px solid #dbe4f0;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+
+    .repair-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .repair-brand-logo {
+      width: 62px;
+      height: 62px;
+      object-fit: contain;
+      border-radius: 16px;
+      background: #f8fafc;
+      padding: 6px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .repair-brand-title {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .repair-brand-sub,
+    .repair-meta small {
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .repair-meta {
+      min-width: 220px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .repair-meta-card {
+      border: 1px solid #dbe4f0;
+      border-radius: 14px;
+      padding: 10px 14px;
+      background: linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%);
+    }
+
+    .repair-meta-label {
+      color: #64748b;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .repair-meta-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .repair-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .repair-box {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: #fff;
+      min-height: 72px;
+    }
+
+    .repair-label {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .repair-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: #0f172a;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .repair-section {
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      background: #fff;
+    }
+
+    .repair-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #0f172a;
+    }
+
+    table.repair-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    .repair-table th {
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-bottom: 1px solid #dbe4f0;
+      text-align: left;
+    }
+
+    .repair-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5edf5;
+      color: #1f2937;
+      vertical-align: top;
+    }
+
+    .repair-table tbody tr:nth-child(even) {
+      background: #fafcff;
+    }
+
+    .repair-table .num {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .repair-table .center-cell {
+      text-align: center;
+    }
+
+    .repair-summary {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 14px;
+      margin-top: 14px;
+      align-items: stretch;
+    }
+
+    .repair-note-box {
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .repair-summary-card {
+      border: 1px solid #dbe4f0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%);
+    }
+
+    .repair-summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 6px 0;
+      font-size: 15px;
+    }
+
+    .repair-summary-row.total {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #94a3b8;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1d4ed8;
+    }
+
+    .signature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 30px;
+      margin-top: 46px;
+    }
+
+    .sign-card {
+      text-align: center;
+      padding-top: 36px;
+    }
+
+    .sign-line {
+      border-top: 1px solid #334155;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 900px) {
+      .page { padding: 10px; }
+      .paper.paper-repair-form { padding: 16px 14px 20px; }
+      .repair-doc-header,
+      .repair-brand { flex-direction: column; align-items: flex-start; }
+      .repair-grid,
+      .repair-summary,
+      .signature-grid { grid-template-columns: 1fr; }
+      .repair-meta { min-width: 0; width: 100%; }
+    }
+
     @media print {
       body { background: #fff; }
       .page { padding: 0; }
       .paper {
-        width: 80mm;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      .paper.paper-repair-form {
+        width: 100%;
+        max-width: none;
         min-height: auto;
-        padding: 6px 8px 10px;
+        padding: 0;
       }
       .actions { display: none; }
+      @page {
+        margin: 8mm;
+      }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <div class="paper">
-      <div id="printArea" class="message">กำลังโหลดใบเสร็จ...</div>
+    <div class="paper" id="paperRoot">
+      <div id="printArea" class="message">กำลังโหลดเอกสาร...</div>
       <div class="actions">
-        <button class="print-btn" onclick="manualPrint()">พิมพ์บิล</button>
+        <button class="print-btn" onclick="manualPrint()">พิมพ์เอกสาร</button>
       </div>
     </div>
   </div>
 
   <script>
-
     let hasTriggeredAutoPrint = false;
 
     function manualPrint() {
       window.print();
+    }
+
+    function getQueryType() {
+      const params = new URLSearchParams(window.location.search);
+      return String(params.get('type') || '').trim();
     }
 
     function tryAutoPrint() {
@@ -216,9 +458,7 @@
       const shouldAutoPrint = params.get('autoprint') === '1';
       if (!shouldAutoPrint || hasTriggeredAutoPrint) return;
       hasTriggeredAutoPrint = true;
-      setTimeout(() => {
-        window.print();
-      }, 250);
+      setTimeout(() => window.print(), 280);
     }
 
     function money(n) {
@@ -273,17 +513,30 @@
       return `${get('year')}-${get('month')}-${get('day')}`;
     }
 
+    function readStorage(key) {
+      try {
+        const a = localStorage.getItem(key);
+        if (a) return JSON.parse(a);
+      } catch (_) {}
+      try {
+        const b = sessionStorage.getItem(key);
+        if (b) return JSON.parse(b);
+      } catch (_) {}
+      return null;
+    }
+
     function getStoredReceipt() {
-      const keys = ['lastReceipt', 'printReceipt', 'printData', 'lastRepairPrint'];
+      const queryType = getQueryType();
+      const keyOrder = {
+        repair_form: ['lastRepairPrint', 'printData'],
+        repair_receipt: ['printData', 'lastRepairPrint', 'printReceipt', 'lastReceipt'],
+        sale: ['lastReceipt', 'printReceipt', 'printData', 'lastRepairPrint'],
+        default: ['printData', 'lastReceipt', 'printReceipt', 'lastRepairPrint']
+      };
+      const keys = keyOrder[queryType] || keyOrder.default;
       for (const key of keys) {
-        try {
-          const a = localStorage.getItem(key);
-          if (a) return JSON.parse(a);
-        } catch (_) {}
-        try {
-          const b = sessionStorage.getItem(key);
-          if (b) return JSON.parse(b);
-        } catch (_) {}
+        const value = readStorage(key);
+        if (value) return value;
       }
       return null;
     }
@@ -294,7 +547,6 @@
       if (data.type === 'repair_receipt' && data.repair) {
         const repair = data.repair;
         const extraLabor = Number(data.extraLabor || 0);
-        const laborCost = Number(repair.laborCost || 0) + extraLabor;
         const items = Array.isArray(repair.parts) ? repair.parts.map(p => ({
           barcode: p.barcode || p.id || '-',
           name: p.name || '-',
@@ -302,9 +554,10 @@
           price: Number(p.unitPrice || 0),
           total: Number(p.total || 0)
         })) : [];
-
         const itemsTotal = Number(repair.partsCost || 0);
+        const laborCost = Number(repair.laborCost || 0) + extraLabor;
         return {
+          kind: 'repair_receipt',
           saleId: repair.id || '-',
           date: repair.repairDate || repair.created_at || '-',
           customerName: repair.customerName || '-',
@@ -320,28 +573,33 @@
 
       if (data.type === 'repair_form' && data.repair) {
         const repair = data.repair;
-        const items = Array.isArray(repair.parts) ? repair.parts.map(p => ({
+        const parts = Array.isArray(repair.parts) ? repair.parts.map(p => ({
           barcode: p.barcode || p.id || '-',
           name: p.name || '-',
           qty: Number(p.qty || 0),
-          price: Number(p.unitPrice || 0),
-          total: Number(p.total || 0)
+          unitPrice: Number(p.unitPrice || 0),
+          total: Number(p.total || 0),
+          priceLabel: p.priceLabel || '',
+          priceType: p.priceType || ''
         })) : [];
-
-        const itemsTotal = Number(repair.partsCost || 0);
+        const partsCost = Number(repair.partsCost || parts.reduce((sum, item) => sum + Number(item.total || 0), 0));
         const laborCost = Number(repair.laborCost || 0);
-
         return {
-          saleId: repair.id || '-',
+          kind: 'repair_form',
+          id: repair.id || '-',
           date: repair.repairDate || repair.created_at || '-',
+          dateOnly: !!repair.repairDate && /^\d{4}-\d{2}-\d{2}$/.test(String(repair.repairDate)),
           customerName: repair.customerName || '-',
-          items,
-          itemsTotal,
+          phone: repair.phone || '-',
+          bikeModel: repair.bikeModel || '-',
+          plate: repair.plate || '-',
+          symptom: repair.symptom || '-',
+          note: repair.note || '-',
+          repairPriceLabel: repair.repairPriceLabel || '-',
+          parts,
+          partsCost,
           laborCost,
-          total: itemsTotal + laborCost,
-          paid: itemsTotal + laborCost,
-          change: 0,
-          dateOnly: !!repair.repairDate && /^\d{4}-\d{2}-\d{2}$/.test(String(repair.repairDate))
+          totalCost: Number(repair.totalCost || (partsCost + laborCost))
         };
       }
 
@@ -352,12 +610,11 @@
         price: Number(item.price || item.unitPrice || 0),
         total: Number(item.total || 0)
       })) : [];
-
       const itemsTotal = data.itemsTotal != null
         ? Number(data.itemsTotal || 0)
         : items.reduce((sum, item) => sum + Number(item.total || 0), 0);
-
       return {
+        kind: 'sale',
         saleId: data.saleId || data.id || data.code || '-',
         date: data.date || data.createdAt || data.repairDate || '-',
         customerName: data.customerName || '-',
@@ -372,6 +629,10 @@
     }
 
     function renderReceipt(receipt) {
+      const paper = document.getElementById('paperRoot');
+      paper.className = 'paper';
+      document.title = 'ใบเสร็จรับเงิน';
+
       const el = document.getElementById('printArea');
       const items = Array.isArray(receipt.items) ? receipt.items : [];
       const itemCount = items.reduce((sum, item) => sum + Number(item.qty || 0), 0);
@@ -395,7 +656,7 @@
 
         <div class="dash"></div>
 
-        <table>
+        <table class="receipt-table">
           <thead>
             <tr>
               <th class="c-no">#</th>
@@ -456,18 +717,138 @@
       `;
     }
 
+    function renderRepairForm(doc) {
+      const paper = document.getElementById('paperRoot');
+      paper.className = 'paper paper-repair-form';
+      document.title = 'ใบรับซ่อม';
+
+      const el = document.getElementById('printArea');
+      const parts = Array.isArray(doc.parts) ? doc.parts : [];
+      const showDate = doc.dateOnly ? formatThaiDateOnly(doc.date) : formatThaiDate(doc.date);
+      const partsRows = parts.length ? parts.map((item, index) => `
+        <tr>
+          <td class="center-cell">${index + 1}</td>
+          <td>
+            <div style="font-weight:600;">${escapeHtml(item.name || '-')}</div>
+            <div style="font-size:12px;color:#64748b;">[${escapeHtml(item.barcode || '-')} ] ${escapeHtml(item.priceLabel || '')}</div>
+          </td>
+          <td class="center-cell">${money(item.qty)}</td>
+          <td class="num">${money(item.unitPrice)}</td>
+          <td class="num">${money(item.total)}</td>
+        </tr>
+      `).join('') : `
+        <tr>
+          <td colspan="5" style="text-align:center;color:#64748b;">ไม่มีรายการอะไหล่</td>
+        </tr>
+      `;
+
+      el.className = '';
+      el.innerHTML = `
+        <div class="repair-doc">
+          <div class="repair-doc-header">
+            <div class="repair-brand">
+              <img src="/D.jpg" alt="logo" class="repair-brand-logo" onerror="this.style.display='none'">
+              <div>
+                <div class="repair-brand-title">ใบรับซ่อม / Repair Order</div>
+                <div class="repair-brand-sub">ดี อะไหล่ กรุงปืนัง • จำหน่ายอะไหล่มอเตอร์ไซค์</div>
+                <div class="repair-brand-sub">เอกสารสำหรับบันทึกรายการซ่อมและประเมินค่าใช้จ่าย</div>
+              </div>
+            </div>
+            <div class="repair-meta">
+              <div class="repair-meta-card">
+                <div class="repair-meta-label">เลขที่เอกสาร</div>
+                <div class="repair-meta-value">#${escapeHtml(doc.id || '-')}</div>
+              </div>
+              <div class="repair-meta-card">
+                <div class="repair-meta-label">วันที่รับงาน</div>
+                <div class="repair-meta-value">${escapeHtml(showDate)}</div>
+              </div>
+              <small>ประเภทงาน: ${escapeHtml(doc.repairPriceLabel || '-')}</small>
+            </div>
+          </div>
+
+          <div class="repair-grid">
+            <div class="repair-box">
+              <div class="repair-label">ชื่อลูกค้า</div>
+              <div class="repair-value">${escapeHtml(doc.customerName || '-')}</div>
+            </div>
+            <div class="repair-box">
+              <div class="repair-label">เบอร์โทรศัพท์</div>
+              <div class="repair-value">${escapeHtml(doc.phone || '-')}</div>
+            </div>
+            <div class="repair-box">
+              <div class="repair-label">รุ่นรถ</div>
+              <div class="repair-value">${escapeHtml(doc.bikeModel || '-')}</div>
+            </div>
+            <div class="repair-box">
+              <div class="repair-label">ทะเบียนรถ</div>
+              <div class="repair-value">${escapeHtml(doc.plate || '-')}</div>
+            </div>
+          </div>
+
+          <div class="repair-section">
+            <div class="repair-section-title">อาการ / รายละเอียดงานซ่อม</div>
+            <div class="repair-value">${escapeHtml(doc.symptom || '-')}</div>
+          </div>
+
+          <div class="repair-section">
+            <div class="repair-section-title">รายการอะไหล่ที่ใช้</div>
+            <table class="repair-table">
+              <thead>
+                <tr>
+                  <th style="width:56px;" class="center-cell">ลำดับ</th>
+                  <th>รายการ</th>
+                  <th style="width:90px;" class="center-cell">จำนวน</th>
+                  <th style="width:120px;" class="num">หน่วยละ</th>
+                  <th style="width:120px;" class="num">รวม</th>
+                </tr>
+              </thead>
+              <tbody>${partsRows}</tbody>
+            </table>
+
+            <div class="repair-summary">
+              <div class="repair-note-box">
+                <div class="repair-section-title" style="margin-bottom:8px;">หมายเหตุเพิ่มเติม</div>
+                <div class="repair-value">${escapeHtml(doc.note || '-')}</div>
+              </div>
+              <div class="repair-summary-card">
+                <div class="repair-summary-row"><span>ค่าอะไหล่</span><strong>${money(doc.partsCost)}</strong></div>
+                <div class="repair-summary-row"><span>ค่าแรง</span><strong>${money(doc.laborCost)}</strong></div>
+                <div class="repair-summary-row total"><span>รวมทั้งสิ้น</span><span>${money(doc.totalCost)}</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="signature-grid">
+            <div class="sign-card">
+              <div class="sign-line"></div>
+              <div>ลายเซ็นลูกค้า</div>
+            </div>
+            <div class="sign-card">
+              <div class="sign-line"></div>
+              <div>ลายเซ็นผู้รับซ่อม</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function startup() {
       const stored = getStoredReceipt();
       const normalized = normalizeData(stored);
+      const el = document.getElementById('printArea');
 
       if (!normalized) {
-        const el = document.getElementById('printArea');
         el.className = 'message error';
-        el.textContent = 'ไม่พบบิลสำหรับพิมพ์';
+        el.textContent = 'ไม่พบเอกสารสำหรับพิมพ์';
         return;
       }
 
-      renderReceipt(normalized);
+      if (normalized.kind === 'repair_form') {
+        renderRepairForm(normalized);
+      } else {
+        renderReceipt(normalized);
+      }
       tryAutoPrint();
     }
 
