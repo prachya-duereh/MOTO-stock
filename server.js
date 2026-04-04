@@ -92,10 +92,31 @@ function cleanText(value) {
   return String(value ?? '').trim();
 }
 
-function dayKey(value) {
+function bangkokDateKey(value) {
   const d = value ? new Date(value) : new Date();
-  if (Number.isNaN(d.getTime())) return nowIso().slice(0, 10);
-  return d.toISOString().slice(0, 10);
+  if (Number.isNaN(d.getTime())) {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(d);
+
+  const year = parts.find((part) => part.type === 'year')?.value || '0000';
+  const month = parts.find((part) => part.type === 'month')?.value || '00';
+  const day = parts.find((part) => part.type === 'day')?.value || '00';
+  return `${year}-${month}-${day}`;
+}
+
+function dayKey(value) {
+  return bangkokDateKey(value);
 }
 
 function monthKey(value) {
