@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>พิมพ์ใบเสร็จ</title>
+  <title>พิมพ์เอกสาร</title>
   <style>
     :root{
       --paper-width: 58mm;
@@ -26,11 +26,11 @@
       justify-content: center;
       padding: 18px 10px 40px;
     }
-    .receipt-wrap {
+    .paper-wrap {
       width: 100%;
       max-width: 300px;
     }
-    .receipt {
+    .paper {
       width: 100%;
       background: var(--card);
       border-radius: 18px;
@@ -38,7 +38,9 @@
       box-shadow: 0 8px 24px rgba(0,0,0,.08);
       margin: 0 auto;
     }
+    .print-area { width: var(--paper-width); margin: 0 auto; }
     .center { text-align: center; }
+    .right { text-align: right; }
     .logo {
       width: 54px;
       height: auto;
@@ -103,7 +105,6 @@
       margin: 3px 0 0;
       font-size: 12px;
     }
-    .r { text-align: right; }
     .item-name {
       font-weight: 700;
       line-height: 1.25;
@@ -151,10 +152,34 @@
       margin: 14px auto 0;
       box-shadow: 0 6px 18px rgba(31,143,58,.25);
     }
-    .print-btn:hover { filter: brightness(.96); }
-    .print-area {
-      width: var(--paper-width);
-      margin: 0 auto;
+    .repair-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .repair-box {
+      border: 1px dashed #666;
+      padding: 8px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+    .repair-line-title {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .repair-text {
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 18px;
+    }
+    .message {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 20px 8px;
     }
     @page {
       size: 58mm auto;
@@ -162,15 +187,9 @@
     }
     @media print {
       body { background: #fff; }
-      .page {
-        padding: 0;
-        min-height: auto;
-      }
-      .receipt-wrap {
-        max-width: none;
-        width: var(--paper-width);
-      }
-      .receipt {
+      .page { padding: 0; min-height: auto; }
+      .paper-wrap { max-width: none; width: var(--paper-width); }
+      .paper {
         width: var(--paper-width);
         border-radius: 0;
         box-shadow: none;
@@ -182,8 +201,8 @@
 </head>
 <body>
   <div class="page">
-    <div class="receipt-wrap">
-      <div class="receipt print-area" id="receiptRoot"></div>
+    <div class="paper-wrap">
+      <div class="paper print-area" id="printRoot"></div>
       <div class="center">
         <button class="print-btn" onclick="window.print()">พิมพ์เอกสาร</button>
       </div>
@@ -212,27 +231,26 @@
         .replace(/'/g, "&#039;");
     }
 
-    function getReceiptData() {
-      const params = new URLSearchParams(window.location.search);
-      const keys = ["printReceiptData", "printReceipt", "lastReceipt", "repairReceipt", "printRepairReceipt"];
-
-      if (params.get("data")) {
-        try { return JSON.parse(decodeURIComponent(params.get("data"))); } catch (_) {}
-      }
-
+    function readStored(keys) {
       for (const key of keys) {
         try {
           const local = localStorage.getItem(key);
           if (local) return JSON.parse(local);
         } catch (_) {}
-
         try {
           const session = sessionStorage.getItem(key);
           if (session) return JSON.parse(session);
         } catch (_) {}
       }
-
       return null;
+    }
+
+    function getPrintData() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("data")) {
+        try { return JSON.parse(decodeURIComponent(params.get("data"))); } catch (_) {}
+      }
+      return readStored(["printReceiptData", "printReceipt", "lastReceipt", "printData", "lastRepairPrint"]);
     }
 
     function normalizeItems(data) {
@@ -245,42 +263,39 @@
           no: index + 1,
           code: item.barcode || item.code || item.sku || item.id || "",
           name: item.name || item.title || item.itemName || "-",
-          qty,
-          price,
-          total
+          qty, price, total
         };
       });
     }
 
     function normalizeReceipt(data) {
-      const items = normalizeItems(data);
-      const laborCost = num(data.laborCost ?? data.serviceCharge ?? data.service_cost ?? 0);
-      const itemsTotal = num(data.itemsTotal ?? data.subtotal ?? items.reduce((sum, i) => sum + i.total, 0));
-      const grandTotal = num(data.grandTotal ?? data.total ?? (itemsTotal + laborCost));
-      const paid = num(data.paid ?? data.cash ?? data.received ?? 0);
-      const change = num(data.change ?? data.changeAmount ?? Math.max(0, paid - grandTotal));
-      const receiptId = data.id || data.saleId || data.receiptId || data.code || "-";
-      const date = data.created_at || data.createdAt || data.date || data.repairDate || "-";
-      const customerName = data.customerName || data.customer || data.name || "-";
-
+      const raw = data && data.repair ? data.repair : data;
+      const items = normalizeItems(raw || {});
+      const laborCost = num(raw?.laborCost ?? raw?.serviceCharge ?? raw?.service_cost ?? 0);
+      const itemsTotal = num(raw?.itemsTotal ?? raw?.subtotal ?? raw?.partsCost ?? items.reduce((sum, i) => sum + i.total, 0));
+      const grandTotal = num(raw?.grandTotal ?? raw?.total ?? raw?.totalCost ?? (itemsTotal + laborCost));
+      const paid = num(raw?.paid ?? raw?.cash ?? raw?.received ?? grandTotal);
+      const change = num(raw?.change ?? raw?.changeAmount ?? Math.max(0, paid - grandTotal));
+      const receiptId = raw?.id || raw?.saleId || raw?.receiptId || raw?.code || "-";
+      const date = raw?.created_at || raw?.createdAt || raw?.date || raw?.repairDate || "-";
+      const customerName = raw?.customerName || raw?.customer || raw?.name || "-";
       return { receiptId, date, customerName, items, itemsTotal, laborCost, grandTotal, paid, change };
     }
 
     function renderReceipt(data) {
-      const logoUrl = data.logo || "/logo.png";
+      const logoUrl = data.logo || "/D.jpg";
       const r = normalizeReceipt(data);
-      const root = document.getElementById("receiptRoot");
-
+      const root = document.getElementById("printRoot");
       const itemRows = r.items.map(item => `
         <div class="trow">
           <div>${item.no}</div>
           <div>
-            <div class="item-code">${esc(item.code ? "[" + item.code + "]" : "")}</div>
+            <div class="item-code">${esc(item.code ? "[" + item.code + " ]" : "")}</div>
             <div class="item-name">${esc(item.name)}</div>
           </div>
-          <div class="r">${fmtMoney(item.qty)}</div>
-          <div class="r">${fmtMoney(item.price)}</div>
-          <div class="r">${fmtMoney(item.total)}</div>
+          <div class="right">${fmtMoney(item.qty)}</div>
+          <div class="right">${fmtMoney(item.price)}</div>
+          <div class="right">${fmtMoney(item.total)}</div>
         </div>
       `).join("");
 
@@ -293,6 +308,7 @@
         </div>
 
         <hr class="dash">
+
         <div class="title">ใบเสร็จรับเงิน</div>
 
         <div class="meta">
@@ -306,12 +322,12 @@
         <div class="thead">
           <div>#</div>
           <div>รายการ</div>
-          <div class="r">จำนวน</div>
-          <div class="r">ราคา</div>
-          <div class="r">รวม</div>
+          <div class="right">จำนวน</div>
+          <div class="right">ราคา</div>
+          <div class="right">รวม</div>
         </div>
 
-        ${itemRows || `<div class="trow"><div>-</div><div>ไม่มีรายการ</div><div class="r">0</div><div class="r">0</div><div class="r">0</div></div>`}
+        ${itemRows || `<div class="trow"><div>-</div><div>ไม่มีรายการ</div><div class="right">0</div><div class="right">0</div><div class="right">0</div></div>`}
 
         <hr class="dash">
 
@@ -349,11 +365,62 @@
       `;
     }
 
-    const data = getReceiptData();
-    if (data) {
-      renderReceipt(data);
+    function renderRepairForm(data) {
+      const repair = data.repair || data;
+      const parts = Array.isArray(repair.parts) ? repair.parts : [];
+      const logoUrl = repair.logo || "/D.jpg";
+      const root = document.getElementById("printRoot");
+      root.innerHTML = `
+        <div class="center">
+          <img class="logo" src="${logoUrl}" alt="logo" onerror="this.style.display='none'">
+          <div class="shop-name" style="font-size:24px;">ดี อะไหล่ กรุงปัง</div>
+          <div class="shop-sub">จำหน่ายอะไหล่มอเตอร์ไซค์</div>
+          <div class="shop-tel">Tel: 081-766-7549</div>
+        </div>
+
+        <hr class="dash">
+        <div class="title">ใบรับซ่อม</div>
+
+        <div class="repair-grid">
+          <div><strong>วันที่:</strong> ${esc(repair.repairDate || repair.created_at || "-")}</div>
+          <div><strong>ลูกค้า:</strong> ${esc(repair.customerName || "-")}</div>
+          <div><strong>เบอร์โทร:</strong> ${esc(repair.phone || "-")}</div>
+          <div><strong>รุ่นรถ:</strong> ${esc(repair.bikeModel || "-")}</div>
+          <div><strong>ทะเบียน:</strong> ${esc(repair.plate || "-")}</div>
+        </div>
+
+        <div class="repair-box">
+          <div class="repair-line-title">อาการ / งานซ่อม</div>
+          <div class="repair-text">${esc(repair.symptom || "-")}</div>
+        </div>
+
+        <div class="repair-box">
+          <div class="repair-line-title">อะไหล่ที่ใช้</div>
+          <div class="repair-text">
+            ${parts.length ? parts.map((p, i) => `${i + 1}. [${esc(p.barcode || p.id || "-")}] ${esc(p.name || "-")} x${fmtMoney(p.qty || 0)} = ${fmtMoney(p.total || 0)}`).join("<br>") : "-"}
+          </div>
+        </div>
+
+        <div class="repair-box">
+          <div class="sum-row"><div><strong>ค่าอะไหล่</strong></div><div><strong>${fmtMoney(repair.partsCost || 0)}</strong></div></div>
+          <div class="sum-row"><div><strong>ค่าแรง</strong></div><div><strong>${fmtMoney(repair.laborCost || 0)}</strong></div></div>
+          <div class="sum-row"><div><strong>รวมเงิน</strong></div><div><strong class="big">${fmtMoney(repair.totalCost || ((repair.partsCost || 0) + (repair.laborCost || 0)) )}</strong></div></div>
+        </div>
+
+        <div class="repair-box">
+          <div class="repair-line-title">หมายเหตุ</div>
+          <div class="repair-text">${esc(repair.note || "-")}</div>
+        </div>
+      `;
+    }
+
+    const data = getPrintData();
+    if (!data) {
+      document.getElementById("printRoot").innerHTML = '<div class="message">ไม่พบข้อมูลสำหรับพิมพ์</div>';
+    } else if (data.type === "repair_form" || (data.repair && !String(new URLSearchParams(window.location.search).get("type") || "").includes("sale") && !("items" in data))) {
+      renderRepairForm(data);
     } else {
-      renderReceipt({ id: "-", date: "-", customerName: "-", items: [], laborCost: 0, total: 0, paid: 0, change: 0 });
+      renderReceipt(data);
     }
 
     const params = new URLSearchParams(window.location.search);

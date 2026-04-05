@@ -4,40 +4,25 @@
     <link rel="icon" type="image/jpg" href="D.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ประวัติการซ่อม</title>
     <style>
-      *{box-sizing:border-box;font-family:"Prompt",sans-serif}
+      *{box-sizing:border-box;font-family:"Kanit",sans-serif}
       body{margin:0;background:#eef2f7;color:#1f2937}
       .page{padding:16px}.topbar,.panel{background:#fff;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
       .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;margin-bottom:16px}
       .nav{display:flex;gap:10px;flex-wrap:wrap}.nav button,button{border:none;border-radius:12px;cursor:pointer}.nav button{background:#2563eb;color:#fff;padding:11px 14px}
       .grid{display:grid;grid-template-columns:40% 60%;gap:16px}.panel{padding:16px}
       input,textarea,select{width:100%;padding:13px;border:1px solid #d5dbe4;border-radius:12px;font-size:15px} textarea{min-height:110px;resize:vertical}
-      .title{font-size:20px;font-weight:700;margin-bottom:10px}.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-      .parts-box,.record{border:1px solid #e2e8f0;border-radius:18px;background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%)}
-      .parts-box{padding:12px;margin-top:8px}.part-row{border-bottom:1px solid #e5e7eb;padding:10px 0}.part-row:last-child{border-bottom:none}
-      .record{padding:16px;margin-bottom:12px;box-shadow:0 10px 30px rgba(15,23,42,.04)}
-      .record-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px}
-      .record-name{font-size:19px;font-weight:700;color:#0f172a}
-      .record-badge{padding:6px 10px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:12px;font-weight:700}
-      .record-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
-      .record-box{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px}
-      .record-box .label{font-size:12px;color:#64748b;margin-bottom:4px;font-weight:600}
-      .record-box .value{font-size:15px;font-weight:600;word-break:break-word}
-      .record-section{margin-top:10px;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px}
-      .record-section-title{font-size:14px;font-weight:700;margin-bottom:8px;color:#0f172a}
-      .price-mode{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 10px}.price-mode button{padding:12px;background:#dbeafe;color:#1d4ed8;font-weight:700}.price-mode .active{background:#2563eb;color:#fff}
+      .title{font-size:20px;font-weight:700;margin-bottom:10px}.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.parts-box,.record{border:1px solid #e5e7eb;border-radius:14px;background:#fbfdff}
+      .parts-box{padding:10px;margin-top:8px}.part-row{border-bottom:1px solid #e5e7eb;padding:8px 0}.part-row:last-child{border-bottom:none}
+      .price-mode{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:8px 0 10px}.price-mode button{padding:12px;background:#dbeafe;color:#1d4ed8;font-weight:700}.price-mode .active{background:#2563eb;color:#fff}
       .tool-row,.record-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.record-actions{grid-template-columns:repeat(4,1fr)}
       .save{background:#2563eb;color:#fff;padding:13px;font-weight:700;width:100%;margin-top:10px}.print{background:#16a34a;color:#fff;padding:12px;font-weight:700}.print2{background:#0f766e;color:#fff;padding:12px;font-weight:700}.edit{background:#f59e0b;color:#fff;padding:12px;font-weight:700}.danger{background:#dc2626;color:#fff;padding:12px;font-weight:700}.small{background:#16a34a;color:#fff;padding:12px;font-weight:700;width:100%}
       .muted{color:#6b7280}.tag{display:inline-block;padding:2px 8px;border-radius:999px;background:#e5e7eb;font-size:11px}.total-box{font-weight:700;font-size:18px;margin-top:10px}
-      .record-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
-      .record-summary .sum{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px}
-      .record-summary .sum .label{font-size:12px;color:#64748b;font-weight:600}
-      .record-summary .sum .value{font-size:18px;font-weight:800;margin-top:3px}
-      @media (max-width:1100px){.grid,.split,.tool-row,.record-actions,.price-mode,.record-grid,.record-summary{grid-template-columns:1fr}}
+      @media (max-width:1100px){.grid,.split,.tool-row,.record-actions,.price-mode{grid-template-columns:1fr}}
     </style>
   </head>
   <body>
@@ -61,15 +46,14 @@
           </div>
           <div class="split">
             <input id="bikeModel" placeholder="รุ่นรถ" />
-            <input id="repairDate" type="date" />
+            <input id="repairDate" type="date" disabled />
           </div>
           <textarea id="symptom" placeholder="อาการ / งานซ่อม"></textarea>
 
           <div class="title" style="font-size:18px">เลือกประเภทราคาอะไหล่</div>
           <div class="price-mode">
             <button id="repair-price-retail" onclick="setRepairPriceType('retail')">ราคาปลีก</button>
-            <button id="repair-price-wholesale" onclick="setRepairPriceType('wholesale')">ราคาส่ง</button>
-            <button id="repair-price-mechanic" class="active" onclick="setRepairPriceType('mechanic')">ราคาช่าง</button>
+            <button id="repair-price-mechanic" class="active" onclick="setRepairPriceType('mechanic')">ราคาซ่อม</button>
           </div>
 
           <div class="split">
@@ -114,22 +98,23 @@
       async function api(url, options){ const res=await fetch(url,options); const text=await res.text(); let data={}; try{ data=text?JSON.parse(text):{}; }catch{ throw new Error(text||'server ส่งข้อมูลไม่ถูกต้อง'); } if(!res.ok||data.success===false) throw new Error(data.message||'เกิดข้อผิดพลาด'); return data; }
       function savePaperSize(){ localStorage.setItem('paperSize',$('paperSize').value); }
       function getPaperSize(){ return localStorage.getItem('paperSize') || '58'; }
-      function getRepairPriceLabel(type=repairPriceType){ return type==='retail'?'ราคาปลีก':type==='wholesale'?'ราคาส่ง':type==='mechanic'?'ราคาช่าง':'หลายราคา'; }
-      function getRepairUnitPrice(item,type=repairPriceType){ if(type==='retail') return Number(item.retailPrice||0); if(type==='wholesale') return Number(item.wholesalePrice||0); return Number(item.mechanicPrice||item.retailPrice||0); }
-      function setRepairPriceType(type){ repairPriceType=type; ['retail','wholesale','mechanic'].forEach((t)=>$('repair-price-'+t).classList.remove('active')); $('repair-price-'+type).classList.add('active'); renderPartOptions(); }
+      function getRepairPriceLabel(type=repairPriceType){ return type==='retail'?'ราคาปลีก':type==='mechanic'?'ราคาซ่อม':'หลายราคา'; }
+      function getRepairUnitPrice(item,type=repairPriceType){ if(type==='retail') return Number(item.retailPrice||0); return Number(item.mechanicPrice||item.retailPrice||0); }
+      function setRepairPriceType(type){ repairPriceType=type; ['retail','mechanic'].forEach((t)=>{ const el=$('repair-price-'+t); if(el) el.classList.remove('active'); }); const active=$('repair-price-'+type); if(active) active.classList.add('active'); renderPartOptions(); }
       async function loadItems(){ items = await api('/api/items'); renderPartOptions(); }
       function renderPartOptions(){ const keyword=$('partSearch').value.trim().toLowerCase(); const filtered=items.filter((item)=>[item.name,item.barcode,item.category,item.model,item.year,item.note].join(' ').toLowerCase().includes(keyword)); $('partSelect').innerHTML = filtered.length ? filtered.map((item)=>`<option value="${item.id}">${item.name} [${item.barcode || '-'}] | ${getRepairPriceLabel(repairPriceType)} ${money(getRepairUnitPrice(item,repairPriceType))} | คงเหลือ ${money(item.quantity)}</option>`).join('') : '<option value="">ไม่พบสินค้า</option>'; }
       function addPart(){ const id=Number($('partSelect').value); const qty=Number($('partQty').value)||0; const item=items.find((i)=>i.id===id); if(!item) return alert('ไม่พบสินค้า'); if(qty<=0) return alert('จำนวนไม่ถูกต้อง'); const usedQty=selectedParts.filter((p)=>p.id===id).reduce((sum,p)=>sum+Number(p.qty||0),0); if(usedQty+qty>Number(item.quantity||0)) return alert('จำนวนเกินสต๊อก'); selectedParts.push({ id:Number(item.id), barcode:item.barcode||'', name:item.name||'', qty, priceType:repairPriceType, priceLabel:getRepairPriceLabel(repairPriceType), unitPrice:getRepairUnitPrice(item,repairPriceType), total:getRepairUnitPrice(item,repairPriceType)*qty }); $('partQty').value=1; renderSelectedParts(); }
       function removePart(index){ selectedParts.splice(index,1); renderSelectedParts(); }
       function renderSelectedParts(){ if(!selectedParts.length){ $('partsList').innerHTML='ยังไม่มีอะไหล่'; updateTotals(); return; } $('partsList').innerHTML=selectedParts.map((p,index)=>`<div class="part-row"><b>${p.name}</b> [${p.barcode||'-'}] <span class="tag">${p.priceLabel}</span><div>จำนวน ${money(p.qty)} | หน่วยละ ${money(p.unitPrice)} | รวม ${money(p.total)}</div><button class="danger" style="margin-top:6px;padding:8px 10px" onclick="removePart(${index})">ลบ</button></div>`).join(''); updateTotals(); }
       function updateTotals(){ const partsCost = selectedParts.reduce((sum,p)=>sum+Number(p.total||0),0); const labor = Number($('laborCost').value)||0; $('partsCostText').innerText='ค่าอะไหล่: '+money(partsCost)+' บาท'; $('totalCostText').innerText='รวมเงิน: '+money(partsCost+labor)+' บาท'; }
-      function currentRepairPayload(){ const parts = selectedParts.map((p)=>({ id:p.id, barcode:p.barcode, name:p.name, qty:Number(p.qty||0), unitPrice:Number(p.unitPrice||0), total:Number(p.total||0), priceType:p.priceType, priceLabel:p.priceLabel })); const partsCost = parts.reduce((sum,p)=>sum+Number(p.total||0),0); const labor = Number($('laborCost').value)||0; const distinctTypes = [...new Set(parts.map((p)=>p.priceType))]; const effectiveType = distinctTypes.length===1 ? distinctTypes[0] : 'mixed'; return { customerName:$('customerName').value.trim(), phone:$('phone').value.trim(), bikeModel:$('bikeModel').value.trim(), plate:$('plate').value.trim(), repairDate:$('repairDate').value, symptom:$('symptom').value.trim(), parts, partsCost, laborCost:labor, totalCost:partsCost+labor, note:$('note').value.trim(), repairPriceType:effectiveType, repairPriceLabel:getRepairPriceLabel(effectiveType) }; }
-      function openPrint(data){ localStorage.setItem('printData', JSON.stringify(data)); sessionStorage.setItem('printData', JSON.stringify(data)); const type = encodeURIComponent(data?.type || 'sale'); window.open('/print.html?autoprint=1&type='+type+'&v='+Date.now()+'&paper='+encodeURIComponent(getPaperSize()), '_blank'); }
+      function currentRepairPayload(){ const parts = selectedParts.map((p)=>({ id:p.id, barcode:p.barcode, name:p.name, qty:Number(p.qty||0), unitPrice:Number(p.unitPrice||0), total:Number(p.total||0), priceType:p.priceType, priceLabel:p.priceLabel })); const partsCost = parts.reduce((sum,p)=>sum+Number(p.total||0),0); const labor = Number($('laborCost').value)||0; const distinctTypes = [...new Set(parts.map((p)=>p.priceType))]; const effectiveType = distinctTypes.length===1 ? distinctTypes[0] : (parts.length ? 'mixed' : repairPriceType); return { customerName:$('customerName').value.trim(), phone:$('phone').value.trim(), bikeModel:$('bikeModel').value.trim(), plate:$('plate').value.trim(), repairDate:$('repairDate').value, symptom:$('symptom').value.trim(), parts, partsCost, laborCost:labor, totalCost:partsCost+labor, note:$('note').value.trim(), repairPriceType:effectiveType, repairPriceLabel:getRepairPriceLabel(effectiveType) }; }
+      function openPrint(data){ localStorage.setItem('printData', JSON.stringify(data)); window.open('/print.html?v='+Date.now()+'&paper='+encodeURIComponent(getPaperSize()), '_blank'); }
       function printCurrentRepairForm(){ const record=currentRepairPayload(); if(!record.customerName) return alert('กรุณาใส่ชื่อลูกค้า'); openPrint({ type:'repair_form', repair:record, paperSize:getPaperSize() }); }
     
-      function resetRepairForm(){ editingRepairId=null; $('formTitle').innerText='บันทึกประวัติใหม่'; ['customerName','phone','bikeModel','plate','repairDate','symptom','laborCost','note','partSearch'].forEach((id)=>$(id).value=''); $('partQty').value=1; selectedParts=[]; setRepairPriceType('mechanic'); renderSelectedParts(); }
-      async function saveRepair(){ try{ const payload = currentRepairPayload(); if(!payload.customerName) return alert('กรุณาใส่ชื่อลูกค้า'); if(!payload.parts.length) return alert('กรุณาเลือกอะไหล่'); const url = editingRepairId ? '/api/repairs/'+editingRepairId : '/api/repairs'; const method = editingRepairId ? 'PUT' : 'POST'; await api(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); resetRepairForm(); await loadItems(); await loadRepairs(); }catch(err){ alert(err.message); } }
-      async function loadRepairs(){ try{ const q = $('searchRepair').value.trim(); repairsCache = await api(q ? '/api/repairs?q='+encodeURIComponent(q) : '/api/repairs'); $('repairList').innerHTML = repairsCache.length ? repairsCache.map((r)=>{ const partsHtml = Array.isArray(r.parts)&&r.parts.length ? r.parts.map((p)=>`<div style="padding:8px 0;border-bottom:1px solid #eef2f7"><div style="font-weight:700">${p.name}</div><div class="muted">[${p.barcode || '-'}] จำนวน ${money(p.qty)} <span class="tag">${p.priceLabel || getRepairPriceLabel(p.priceType)}</span></div><div class="muted">หน่วยละ ${money(p.unitPrice)} รวม ${money(p.total)}</div></div>`).join('') : `<div class="muted">${r.partsUsedText || '-'}</div>`; return `<div class="record"><div class="record-head"><div><div class="record-name">${r.customerName || '-'}</div><div class="muted">เลขที่เอกสาร #${r.id || '-'} • วันที่ ${formatThaiDate(r.repairDate)}</div></div><div class="record-badge">${r.repairPriceLabel || getRepairPriceLabel(r.repairPriceType)}</div></div><div class="record-grid"><div class="record-box"><div class="label">เบอร์โทร</div><div class="value">${r.phone || '-'}</div></div><div class="record-box"><div class="label">ทะเบียนรถ</div><div class="value">${r.plate || '-'}</div></div><div class="record-box"><div class="label">รุ่นรถ</div><div class="value">${r.bikeModel || '-'}</div></div><div class="record-box"><div class="label">หมายเหตุ</div><div class="value">${r.note || '-'}</div></div></div><div class="record-section"><div class="record-section-title">อาการ / งานซ่อม</div><div>${r.symptom || '-'}</div></div><div class="record-section"><div class="record-section-title">อะไหล่ที่ใช้</div>${partsHtml}</div><div class="record-summary"><div class="sum"><div class="label">ค่าอะไหล่</div><div class="value">${money(r.partsCost)}</div></div><div class="sum"><div class="label">ค่าแรง</div><div class="value">${money(r.laborCost)}</div></div><div class="sum"><div class="label">รวมทั้งสิ้น</div><div class="value">${money(r.totalCost)}</div></div></div><input id="extra-labor-${r.id}" type="number" placeholder="ค่าแรงเพิ่มก่อนพิมพ์ใบเสร็จ (ถ้ามี)" style="margin-top:12px" /><div class="record-actions"><button class="print" onclick="printRepairForm(${r.id})">พิมพ์ใบรับซ่อม</button><button class="print2" onclick="printRepairReceipt(${r.id})">พิมพ์ใบเสร็จ</button><button class="edit" onclick="editRepair(${r.id})">แก้ไข</button><button class="danger" onclick="deleteRepair(${r.id})">ลบ</button></div></div>`; }).join('') : '<div class="muted">ยังไม่มีประวัติการซ่อม</div>'; }catch(err){ $('repairList').innerHTML='<div class="muted">'+err.message+'</div>'; } }
+      function getTodayValue(){ const d=new Date(); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
+      function resetRepairForm(){ editingRepairId=null; $('formTitle').innerText='บันทึกประวัติใหม่'; ['customerName','phone','bikeModel','plate','symptom','laborCost','note','partSearch'].forEach((id)=>$(id).value=''); $('repairDate').value=getTodayValue(); $('partQty').value=1; selectedParts=[]; setRepairPriceType('mechanic'); renderSelectedParts(); }
+      async function saveRepair(){ try{ const payload = currentRepairPayload(); if(!payload.customerName) return alert('กรุณาใส่ชื่อลูกค้า'); const url = editingRepairId ? '/api/repairs/'+editingRepairId : '/api/repairs'; const method = editingRepairId ? 'PUT' : 'POST'; await api(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); resetRepairForm(); await loadItems(); await loadRepairs(); }catch(err){ alert(err.message); } }
+      async function loadRepairs(){ try{ const q = $('searchRepair').value.trim(); repairsCache = await api(q ? '/api/repairs?q='+encodeURIComponent(q) : '/api/repairs'); $('repairList').innerHTML = repairsCache.length ? repairsCache.map((r)=>{ const partsHtml = Array.isArray(r.parts)&&r.parts.length ? r.parts.map((p)=>`<div>[${p.barcode || '-'}] ${p.name} x${money(p.qty)} <span class="tag">${p.priceLabel || getRepairPriceLabel(p.priceType)}</span> หน่วยละ ${money(p.unitPrice)} รวม ${money(p.total)}</div>`).join('') : (r.partsUsedText || '-'); return `<div class="record" style="padding:12px;margin-bottom:10px"><div style="font-size:18px;font-weight:700">${r.customerName || '-'}</div><div>เบอร์โทร: ${r.phone || '-'} | ทะเบียน: ${r.plate || '-'}</div><div>รุ่นรถ: ${r.bikeModel || '-'} | วันที่: ${formatThaiDate(r.repairDate)}</div><div style="margin-top:6px"><b>อาการ / งานซ่อม</b><br>${r.symptom || '-'}</div><div style="margin-top:6px"><b>อะไหล่ที่ใช้</b><br>${partsHtml}</div><div style="margin-top:6px">ค่าอะไหล่ ${money(r.partsCost)} | ค่าแรง ${money(r.laborCost)} | <b>รวม ${money(r.totalCost)}</b></div><div>หมายเหตุ: ${r.note || '-'}</div><input id="extra-labor-${r.id}" type="number" placeholder="ค่าแรงเพิ่มก่อนพิมพ์ใบเสร็จ (ถ้ามี)" style="margin-top:8px" /><div class="record-actions"><button class="print" onclick="printRepairForm(${r.id})">พิมพ์ใบรับซ่อม</button><button class="print2" onclick="printRepairReceipt(${r.id})">พิมพ์ใบเสร็จ</button><button class="edit" onclick="editRepair(${r.id})">แก้ไข</button><button class="danger" onclick="deleteRepair(${r.id})">ลบ</button></div></div>`; }).join('') : '<div class="muted">ยังไม่มีประวัติการซ่อม</div>'; }catch(err){ $('repairList').innerHTML='<div class="muted">'+err.message+'</div>'; } }
       function findRepair(id){ return repairsCache.find((r)=>r.id===Number(id)); }
       function printRepairForm(id){ const record=findRepair(id); if(!record) return; localStorage.setItem('lastRepairPrint', JSON.stringify({ type:'repair_form', repair:record, paperSize:getPaperSize() })); openPrint({ type:'repair_form', repair:record, paperSize:getPaperSize() }); }
       function printRepairReceipt(id){
@@ -139,9 +124,6 @@
   const extraLabor = Number($('extra-labor-'+id).value) || 0;
 
   const receipt = {
-    type: 'repair_receipt',
-    repair: record,
-    extraLabor,
     saleId: record.id || '-',
     date: record.repairDate || record.created_at || '-',
     customerName: record.customerName || '-',
@@ -160,17 +142,15 @@
   };
 
   try {
-    ['printData', 'lastRepairPrint'].forEach((key) => {
-      localStorage.removeItem(key);
-      sessionStorage.removeItem(key);
-    });
     localStorage.setItem('lastReceipt', JSON.stringify(receipt));
     sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
     localStorage.setItem('printReceipt', JSON.stringify(receipt));
     sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
+    localStorage.setItem('printReceiptData', JSON.stringify(receipt));
+    sessionStorage.setItem('printReceiptData', JSON.stringify(receipt));
   } catch (error) {}
 
-  window.open('/print.html?autoprint=1&type=repair_receipt&v=' + Date.now(), '_blank');
+  window.open('/print.html?autoprint=1&type=repair_receipt', '_blank');
 }
 function formatThaiDate(dateStr, withSeconds = false) {
   if (!dateStr) return '-';

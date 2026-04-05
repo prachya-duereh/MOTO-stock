@@ -16,6 +16,7 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const DB_FILE = path.join(__dirname, 'data.json');
 const REPAIR_FILE = path.join(__dirname, 'repair-history.json');
 const SALES_FILE = path.join(__dirname, 'sales.json');
+const CUSTOMERS_FILE = path.join(__dirname, 'customers.json');
 
 app.use(express.json({ limit: '4mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -52,16 +53,19 @@ function ensureLocalDB() {
   if (!fs.existsSync(DB_FILE)) writeJSON(DB_FILE, []);
   if (!fs.existsSync(REPAIR_FILE)) writeJSON(REPAIR_FILE, []);
   if (!fs.existsSync(SALES_FILE)) writeJSON(SALES_FILE, []);
+  if (!fs.existsSync(CUSTOMERS_FILE)) writeJSON(CUSTOMERS_FILE, []);
 
   const itemsRaw = readJSON(DB_FILE, []);
   const repairsRaw = readJSON(REPAIR_FILE, []);
   const salesRaw = readJSON(SALES_FILE, []);
+  const customersRaw = readJSON(CUSTOMERS_FILE, []);
 
   if (!Array.isArray(itemsRaw) && !Array.isArray(itemsRaw.items)) {
     writeJSON(DB_FILE, []);
   }
   if (!Array.isArray(repairsRaw)) writeJSON(REPAIR_FILE, []);
   if (!Array.isArray(salesRaw)) writeJSON(SALES_FILE, []);
+  if (!Array.isArray(customersRaw)) writeJSON(CUSTOMERS_FILE, []);
 }
 ensureLocalDB();
 
@@ -69,11 +73,13 @@ function getLocalDB() {
   const itemsRaw = readJSON(DB_FILE, []);
   const repairsRaw = readJSON(REPAIR_FILE, []);
   const salesRaw = readJSON(SALES_FILE, []);
+  const customersRaw = readJSON(CUSTOMERS_FILE, []);
 
   return {
     items: Array.isArray(itemsRaw) ? itemsRaw : (Array.isArray(itemsRaw.items) ? itemsRaw.items : []),
     repairs: Array.isArray(repairsRaw) ? repairsRaw : [],
     sales: Array.isArray(salesRaw) ? salesRaw : [],
+    customers: Array.isArray(customersRaw) ? customersRaw : [],
   };
 }
 
@@ -81,6 +87,7 @@ function saveLocalDB(db) {
   writeJSON(DB_FILE, Array.isArray(db.items) ? db.items : []);
   writeJSON(REPAIR_FILE, Array.isArray(db.repairs) ? db.repairs : []);
   writeJSON(SALES_FILE, Array.isArray(db.sales) ? db.sales : []);
+  writeJSON(CUSTOMERS_FILE, Array.isArray(db.customers) ? db.customers : []);
 }
 
 function asNumber(value, fallback = 0) {
@@ -92,31 +99,10 @@ function cleanText(value) {
   return String(value ?? '').trim();
 }
 
-function bangkokDateKey(value) {
-  const d = value ? new Date(value) : new Date();
-  if (Number.isNaN(d.getTime())) {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  }
-
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Bangkok',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(d);
-
-  const year = parts.find((part) => part.type === 'year')?.value || '0000';
-  const month = parts.find((part) => part.type === 'month')?.value || '00';
-  const day = parts.find((part) => part.type === 'day')?.value || '00';
-  return `${year}-${month}-${day}`;
-}
-
 function dayKey(value) {
-  return bangkokDateKey(value);
+  const d = value ? new Date(value) : new Date();
+  if (Number.isNaN(d.getTime())) return nowIso().slice(0, 10);
+  return d.toISOString().slice(0, 10);
 }
 
 function monthKey(value) {
@@ -213,14 +199,14 @@ function sanitizeRepair(record = {}) {
     repairPriceLabel: cleanText(record.repair_price_label ?? record.repairPriceLabel) || repairPriceLabel(record.repair_price_type ?? record.repairPriceType),
     partsCost: asNumber(record.parts_cost ?? record.partsCost, 0),
     laborCost: asNumber(record.labor_cost ?? record.laborCost, 0),
-    totalCost: asNumber(record.total_cost ?? record.totalCost ?? record.total, 0),
+    totalCost: asNumber(record.total_cost ?? record.totalCost, 0),
     note: cleanText(record.note),
     created_at: record.created_at || record.createdAt || null,
   };
 }
 
-function repairToDb(repair, mode = 'full') {
-  const base = {
+function repairToDb(repair) {
+  return {
     id: Number(repair.id),
     customer_name: repair.customerName,
     phone: repair.phone,
@@ -229,50 +215,15 @@ function repairToDb(repair, mode = 'full') {
     repair_date: repair.repairDate,
     symptom: repair.symptom,
     parts: repair.parts,
+    parts_used_text: repair.partsUsedText,
     repair_price_type: repair.repairPriceType,
+    repair_price_label: repair.repairPriceLabel,
     parts_cost: repair.partsCost,
     labor_cost: repair.laborCost,
+    total_cost: repair.totalCost,
     note: repair.note,
     created_at: repair.created_at || nowIso(),
   };
-
-  if (mode === 'legacy') {
-    return {
-      ...base,
-      total: repair.totalCost,
-    };
-  }
-
-  return {
-    ...base,
-    parts_used_text: repair.partsUsedText,
-    repair_price_label: repair.repairPriceLabel,
-    total_cost: repair.totalCost,
-  };
-}
-
-function isMissingRepairColumnError(error) {
-  const message = String(error?.message || error || '').toLowerCase();
-  return message.includes("parts_used_text")
-    || message.includes("repair_price_label")
-    || message.includes("total_cost")
-    || message.includes("could not find the '") && message.includes("column of 'repairs'");
-}
-
-async function insertRepairSupabase(repair) {
-  let result = await supabase.from('repairs').insert([repairToDb(repair)]).select('*').single();
-  if (result.error && isMissingRepairColumnError(result.error)) {
-    result = await supabase.from('repairs').insert([repairToDb(repair, 'legacy')]).select('*').single();
-  }
-  return result;
-}
-
-async function updateRepairSupabase(repairId, repair) {
-  let result = await supabase.from('repairs').update(repairToDb(repair)).eq('id', repairId).select('*').single();
-  if (result.error && isMissingRepairColumnError(result.error)) {
-    result = await supabase.from('repairs').update(repairToDb(repair, 'legacy')).eq('id', repairId).select('*').single();
-  }
-  return result;
 }
 
 function sanitizeSaleRow(record = {}) {
@@ -299,6 +250,27 @@ function sanitizeSaleRow(record = {}) {
     paid: asNumber(record.paid, 0),
     change: asNumber(record.change, 0),
     created_at: record.created_at || record.createdAt || null,
+  };
+}
+
+
+function sanitizeCustomer(record = {}) {
+  return {
+    id: Number(record.id),
+    name: cleanText(record.name),
+    phone: cleanText(record.phone),
+    note: cleanText(record.note),
+    created_at: record.created_at || record.createdAt || null,
+  };
+}
+
+function customerToDb(customer) {
+  return {
+    id: Number(customer.id),
+    name: customer.name,
+    phone: customer.phone,
+    note: customer.note,
+    created_at: customer.created_at || nowIso(),
   };
 }
 
@@ -330,7 +302,8 @@ function saleToDb(sale) {
 }
 
 function makeRepairFromPayload(body, itemMap) {
-  const priceType = cleanText(body.repairPriceType) || 'mechanic';
+  const rawRepairType = cleanText(body.repairPriceType) || 'mechanic';
+  const priceType = rawRepairType === 'wholesale' ? 'mechanic' : rawRepairType;
   const partsInput = Array.isArray(body.parts) ? body.parts : [];
   const parts = [];
   let partsCost = 0;
@@ -373,7 +346,7 @@ function makeRepairFromPayload(body, itemMap) {
     parts,
     partsUsedText: parts.map((p) => `${p.name} x${p.qty}`).join(', '),
     repairPriceType: priceType,
-    repairPriceLabel: repairPriceLabel(priceType),
+    repairPriceLabel: priceType === 'mechanic' ? 'ราคาซ่อม' : repairPriceLabel(priceType),
     partsCost,
     laborCost,
     totalCost: partsCost + laborCost,
@@ -439,6 +412,51 @@ async function getSalesRows() {
   }
   return getLocalDB().sales.map(sanitizeSaleRow).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
 }
+
+async function getCustomers() {
+  if (supabase) {
+    const { data, error } = await supabase.from('customers').select('*').order('name', { ascending: true });
+    if (!error) return (data || []).map(sanitizeCustomer);
+    const message = String(error.message || '').toLowerCase();
+    if (String(error.code) !== '42P01' && !message.includes('customers')) {
+      throw error;
+    }
+  }
+  return getLocalDB().customers.map(sanitizeCustomer).sort((a, b) => String(a.name).localeCompare(String(b.name), 'th'));
+}
+
+async function saveCustomer(customer) {
+  if (supabase) {
+    const { data, error } = await supabase.from('customers').upsert([customerToDb(customer)], { onConflict: 'id' }).select('*').single();
+    if (!error) return sanitizeCustomer(data);
+    const message = String(error.message || '').toLowerCase();
+    if (String(error.code) !== '42P01' && !message.includes('customers')) {
+      throw error;
+    }
+  }
+  const db = getLocalDB();
+  db.customers = Array.isArray(db.customers) ? db.customers : [];
+  const idx = db.customers.findIndex((row) => Number(row.id) === Number(customer.id));
+  if (idx >= 0) db.customers[idx] = customer;
+  else db.customers.unshift(customer);
+  saveLocalDB(db);
+  return sanitizeCustomer(customer);
+}
+
+async function deleteCustomerById(customerId) {
+  if (supabase) {
+    const { error } = await supabase.from('customers').delete().eq('id', customerId);
+    if (!error) return;
+    const message = String(error.message || '').toLowerCase();
+    if (String(error.code) !== '42P01' && !message.includes('customers')) {
+      throw error;
+    }
+  }
+  const db = getLocalDB();
+  db.customers = (db.customers || []).filter((row) => Number(row.id) !== Number(customerId));
+  saveLocalDB(db);
+}
+
 
 async function setItemQuantity(itemId, nextQty) {
   if (supabase) {
@@ -632,6 +650,66 @@ app.delete('/api/items/:id', async (req, res) => {
   }
 });
 
+
+// customers
+app.get('/api/customers', async (req, res) => {
+  try {
+    const q = cleanText(req.query.q).toLowerCase();
+    let customers = await getCustomers();
+    if (q) {
+      customers = customers.filter((customer) => [customer.name, customer.phone, customer.note].join(' ').toLowerCase().includes(q));
+    }
+    res.json(customers);
+  } catch (error) {
+    console.error('GET /api/customers', error);
+    res.status(500).json({ success: false, message: error.message || 'โหลดรายชื่อลูกค้าไม่สำเร็จ' });
+  }
+});
+
+app.post('/api/customers', async (req, res) => {
+  try {
+    const customer = {
+      id: req.body?.id ? Number(req.body.id) : newId(),
+      name: cleanText(req.body?.name),
+      phone: cleanText(req.body?.phone),
+      note: cleanText(req.body?.note),
+      created_at: cleanText(req.body?.created_at) || nowIso(),
+    };
+
+    if (!customer.name) {
+      return res.status(400).json({ success: false, message: 'กรุณาใส่ชื่อลูกค้า' });
+    }
+
+    const existing = (await getCustomers()).find((row) =>
+      cleanText(row.name).toLowerCase() === customer.name.toLowerCase() &&
+      cleanText(row.phone).toLowerCase() === customer.phone.toLowerCase()
+    );
+    if (existing && Number(existing.id) !== Number(customer.id)) {
+      return res.status(400).json({ success: false, message: 'มีชื่อลูกค้านี้อยู่แล้ว' });
+    }
+
+    const saved = await saveCustomer(customer);
+    res.json({ success: true, customer: saved });
+  } catch (error) {
+    console.error('POST /api/customers', error);
+    res.status(500).json({ success: false, message: error.message || 'บันทึกลูกค้าไม่สำเร็จ' });
+  }
+});
+
+app.delete('/api/customers/:id', async (req, res) => {
+  try {
+    const customerId = Number(req.params.id);
+    if (!customerId) {
+      return res.status(400).json({ success: false, message: 'ไม่พบรหัสลูกค้า' });
+    }
+    await deleteCustomerById(customerId);
+    res.json({ success: true, message: 'ลบลูกค้าเรียบร้อย' });
+  } catch (error) {
+    console.error('DELETE /api/customers/:id', error);
+    res.status(500).json({ success: false, message: error.message || 'ลบลูกค้าไม่สำเร็จ' });
+  }
+});
+
 // repairs
 app.get('/api/repairs', async (req, res) => {
   try {
@@ -692,12 +770,10 @@ app.post('/api/repairs', async (req, res) => {
     const itemMap = new Map(items.map((item) => [Number(item.id), item]));
     const repair = makeRepairFromPayload(req.body, itemMap);
     if (!repair.customerName) return res.status(400).json({ success: false, message: 'กรุณาใส่ชื่อลูกค้า' });
-    if (!repair.parts.length) return res.status(400).json({ success: false, message: 'กรุณาเลือกอะไหล่' });
-
     await applyRepairStockDelta(null, repair);
 
     if (supabase) {
-      const { data, error } = await insertRepairSupabase(repair);
+      const { data, error } = await supabase.from('repairs').insert([repairToDb(repair)]).select('*').single();
       if (error) throw error;
       return res.json({ success: true, repair: sanitizeRepair(data) });
     }
@@ -725,7 +801,7 @@ app.put('/api/repairs/:id', async (req, res) => {
     await applyRepairStockDelta(current, nextRepair);
 
     if (supabase) {
-      const { data, error } = await updateRepairSupabase(repairId, nextRepair);
+      const { data, error } = await supabase.from('repairs').update(repairToDb(nextRepair)).eq('id', repairId).select('*').single();
       if (error) throw error;
       return res.json({ success: true, repair: sanitizeRepair(data) });
     }
@@ -1143,6 +1219,7 @@ app.get('/api/report', async (req, res) => {
     const startDate = cleanText(req.query.startDate);
     const endDate = cleanText(req.query.endDate);
     const salesRows = await getSalesRows();
+    const repairs = await getRepairs();
     const items = await getItems();
     const bills = aggregateBills(salesRows);
 
@@ -1157,6 +1234,7 @@ app.get('/api/report', async (req, res) => {
     const month = monthKey();
     const rowsInRange = salesRows.filter((row) => inRange(row.created_at));
     const billsInRange = bills.filter((bill) => inRange(bill.createdAt));
+    const repairsInRange = repairs.filter((repair) => inRange(repair.created_at || repair.repairDate));
 
     const todaySales = aggregateBills(salesRows.filter((row) => dayKey(row.created_at) === today)).reduce((sum, bill) => sum + asNumber(bill.grandTotal, 0), 0);
     const monthSales = aggregateBills(salesRows.filter((row) => monthKey(row.created_at) === month)).reduce((sum, bill) => sum + asNumber(bill.grandTotal, 0), 0);
@@ -1198,10 +1276,13 @@ app.get('/api/report', async (req, res) => {
         laborTotal,
         billCount: billsInRange.length,
         profitTotal,
+        salesIncome: rangeSales,
+        repairIncome: repairsInRange.reduce((sum, repair) => sum + asNumber(repair.totalCost, 0), 0),
       },
       itemProfits: Array.from(itemProfitMap.values()).sort((a, b) => b.profit - a.profit),
       lowStock,
       bills: billsInRange,
+      repairs: repairsInRange,
     });
   } catch (error) {
     console.error('GET /api/report', error);

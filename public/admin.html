@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -26,7 +26,7 @@
       }
       body {
         margin: 0;
-        font-family: "Prompt", sans-serif;
+        font-family: "Kanit", sans-serif;
         background: var(--bg);
         color: var(--text);
       }
@@ -83,7 +83,7 @@
         background: #fff;
         border-radius: 12px;
         padding: 12px 14px;
-        font-family: "Prompt", sans-serif;
+        font-family: "Kanit", sans-serif;
         font-size: 16px;
         outline: none;
       }
@@ -101,7 +101,7 @@
         border: 0;
         border-radius: 12px;
         padding: 12px 16px;
-        font-family: "Prompt", sans-serif;
+        font-family: "Kanit", sans-serif;
         font-size: 16px;
         font-weight: 700;
         cursor: pointer;
@@ -190,6 +190,10 @@
         color: var(--muted);
         padding: 30px 10px;
       }
+      .customer-list { display:flex; flex-direction:column; gap:10px; margin-top:12px; max-height:320px; overflow:auto; }
+      .customer-item { border:1px solid var(--line); border-radius:14px; padding:12px; background:#fbfdff; display:flex; justify-content:space-between; gap:12px; align-items:start; }
+      .customer-item-name { font-weight:800; font-size:18px; }
+      .customer-item-meta { color: var(--muted); font-size:14px; margin-top:4px; }
       @media (max-width: 1000px) {
         .grid-2 { grid-template-columns: 1fr; }
         .summary { grid-template-columns: repeat(2, 1fr); }
@@ -324,6 +328,30 @@
             <button type="button" class="btn-light" onclick="clearBarcodeStockForm()">ล้าง</button>
           </div>
         </div>
+
+        <div class="card" style="margin-top:14px;">
+          <h2>รายชื่อลูกค้าหน้าร้าน</h2>
+          <div class="form-grid">
+            <div>
+              <label>ชื่อลูกค้า</label>
+              <input id="customerEntryName" placeholder="เช่น คุณปิด" />
+            </div>
+            <div>
+              <label>เบอร์โทร (ถ้ามี)</label>
+              <input id="customerEntryPhone" placeholder="เช่น 0812345678" />
+            </div>
+            <div class="full">
+              <label>หมายเหตุ</label>
+              <input id="customerEntryNote" placeholder="เช่น ลูกค้าประจำ / บริษัท / ร้านซ่อม" />
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn-primary" onclick="saveCustomerEntry()">บันทึกลูกค้า</button>
+            <button type="button" class="btn-light" onclick="clearCustomerEntry()">ล้าง</button>
+          </div>
+          <div id="customerList" class="customer-list"></div>
+        </div>
+
         </div>
 
         <div>
@@ -345,6 +373,7 @@
 
     <script>
       let items = [];
+      let customers = [];
 
       function money(n) {
         const num = Number(n || 0);
@@ -376,6 +405,79 @@
         document.getElementById("sumLow").textContent = low.toLocaleString("th-TH");
         const cost = list.reduce((sum, i) => sum + Number(i.quantity || 0) * Number(i.costPrice || 0), 0);
         document.getElementById("sumCost").textContent = money(cost);
+      }
+
+
+      async function loadCustomers() {
+        try {
+          const res = await fetch('/api/customers');
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'โหลดลูกค้าไม่สำเร็จ');
+          customers = Array.isArray(data) ? data : [];
+          renderCustomers();
+        } catch (err) {
+          console.error(err);
+          document.getElementById('customerList').innerHTML = '<div class="empty">ยังไม่มีรายชื่อลูกค้า</div>';
+        }
+      }
+
+      function renderCustomers() {
+        const box = document.getElementById('customerList');
+        if (!customers.length) {
+          box.innerHTML = '<div class="empty">ยังไม่มีรายชื่อลูกค้า</div>';
+          return;
+        }
+        box.innerHTML = customers.map(customer => `
+          <div class="customer-item">
+            <div>
+              <div class="customer-item-name">${escapeHtml(customer.name || '-')}</div>
+              <div class="customer-item-meta">เบอร์โทร: ${escapeHtml(customer.phone || '-')}</div>
+              <div class="customer-item-meta">หมายเหตุ: ${escapeHtml(customer.note || '-')}</div>
+            </div>
+            <div>
+              <button type="button" class="btn-red" style="padding:10px 14px" onclick="deleteCustomerEntry('${customer.id}')">ลบ</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function clearCustomerEntry() {
+        document.getElementById('customerEntryName').value = '';
+        document.getElementById('customerEntryPhone').value = '';
+        document.getElementById('customerEntryNote').value = '';
+      }
+
+      async function saveCustomerEntry() {
+        try {
+          const payload = {
+            name: document.getElementById('customerEntryName').value.trim(),
+            phone: document.getElementById('customerEntryPhone').value.trim(),
+            note: document.getElementById('customerEntryNote').value.trim()
+          };
+          const res = await fetch('/api/customers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const result = await res.json();
+          if (!res.ok || !result.success) throw new Error(result.message || 'บันทึกลูกค้าไม่สำเร็จ');
+          clearCustomerEntry();
+          await loadCustomers();
+        } catch (err) {
+          alert(err.message || 'บันทึกลูกค้าไม่สำเร็จ');
+        }
+      }
+
+      async function deleteCustomerEntry(id) {
+        if (!confirm('ต้องการลบรายชื่อลูกค้านี้ใช่ไหม')) return;
+        try {
+          const res = await fetch('/api/customers/' + encodeURIComponent(id), { method: 'DELETE' });
+          const result = await res.json();
+          if (!res.ok || !result.success) throw new Error(result.message || 'ลบลูกค้าไม่สำเร็จ');
+          await loadCustomers();
+        } catch (err) {
+          alert(err.message || 'ลบลูกค้าไม่สำเร็จ');
+        }
       }
 
       async function loadItems() {
@@ -687,6 +789,7 @@
       });
 
       loadItems();
+      loadCustomers();
     </script>
   </body>
 </html>

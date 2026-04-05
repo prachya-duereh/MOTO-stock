@@ -3,345 +3,170 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>แดชบอร์ดรายงานยอดขาย</title>
-  <link rel="icon" href="/logo.jpg" />
+  <title>Dashboard รายงาน</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
+    * { box-sizing: border-box; }
     :root {
-      --bg: #eef3f8;
-      --panel: #ffffff;
-      --line: #d9e0e7;
+      --bg: #eef4fb;
+      --card: rgba(255,255,255,.92);
       --text: #0f172a;
       --muted: #64748b;
-      --blue: #2563eb;
+      --line: #d6e2f0;
+      --primary: #2563eb;
       --teal: #0f766e;
       --green: #16a34a;
       --orange: #f59e0b;
-      --shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+      --danger: #dc2626;
+      --shadow: 0 12px 30px rgba(15, 23, 42, .08);
     }
-    * { box-sizing: border-box; }
+    body.dark {
+      --bg: #0f172a;
+      --card: rgba(15,23,42,.86);
+      --text: #e5edf8;
+      --muted: #93a4bb;
+      --line: rgba(148,163,184,.22);
+      --primary: #4f8cff;
+      --teal: #14b8a6;
+      --green: #22c55e;
+      --orange: #fbbf24;
+      --danger: #f87171;
+      --shadow: 0 16px 42px rgba(2, 6, 23, .38);
+    }
     body {
       margin: 0;
-      font-family: "Prompt", sans-serif;
+      font-family: "Kanit", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 28%),
-        radial-gradient(circle at top right, rgba(15,118,110,0.10), transparent 24%),
+        radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 32%),
+        radial-gradient(circle at top right, rgba(15,118,110,.10), transparent 28%),
         var(--bg);
       color: var(--text);
+      min-height: 100vh;
     }
-    .container {
-      max-width: 1800px;
-      margin: 0 auto;
-      padding: 18px;
+    .container { max-width: 1700px; margin: 0 auto; padding: 18px; }
+    .topbar, .panel, .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
     }
     .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
+      display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+      padding: 14px 18px; border-radius: 22px; margin-bottom: 18px;
     }
-    .nav { display: flex; gap: 10px; flex-wrap: wrap; }
-    .nav a {
-      text-decoration: none;
-      color: #fff;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      padding: 12px 18px;
-      border-radius: 14px;
-      font-weight: 700;
-      box-shadow: var(--shadow);
+    .brand h1 { margin:0; font-size: 30px; }
+    .brand p { margin:4px 0 0; color:var(--muted); }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; }
+    .nav a, .btn {
+      text-decoration:none; border:none; cursor:pointer; border-radius:14px; font:inherit; font-weight:700;
+      padding: 12px 16px;
     }
-    .hero {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-    .hero-card, .filters, .card, .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-    }
-    .hero-card {
-      border-radius: 24px;
-      padding: 20px 22px;
-      min-height: 148px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-    }
-    .hero-title {
-      font-size: 30px;
-      font-weight: 800;
-      margin: 0 0 8px;
-    }
-    .hero-sub {
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.65;
-      margin: 0;
-    }
-    .hero-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 14px;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: #eff6ff;
-      color: #1d4ed8;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .hero-highlight {
-      min-width: 220px;
-      background: linear-gradient(135deg, #0f766e, #115e59);
-      color: #fff;
-      border-radius: 22px;
-      padding: 18px;
-    }
-    .hero-highlight .kicker { font-size: 13px; opacity: 0.85; }
-    .hero-highlight .big { font-size: 36px; font-weight: 800; margin: 8px 0; }
-    .hero-highlight .small { font-size: 14px; opacity: 0.9; }
+    .nav a { background: var(--primary); color:#fff; }
     .filters {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: end;
-      border-radius: 20px;
-      padding: 14px;
-      margin-bottom: 18px;
+      display:grid; grid-template-columns: repeat(4, minmax(150px, 1fr)) auto auto; gap:12px;
+      margin-bottom:18px; align-items:end;
     }
-    .field { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
-    .field label { font-size: 14px; color: #475569; font-weight: 600; }
+    .panel { border-radius: 24px; padding: 18px; }
+    .field label { display:block; font-size:14px; color:var(--muted); margin-bottom:6px; }
     .field input {
-      height: 50px;
-      border: 1px solid #cfd8e3;
-      border-radius: 14px;
-      padding: 0 14px;
-      font-family: inherit;
-      font-size: 16px;
-      background: #f8fafc;
+      width:100%; height:50px; border-radius:14px; border:1px solid var(--line); background: rgba(255,255,255,.72);
+      color:var(--text); font:inherit; padding:0 14px;
     }
-    .btn {
-      height: 50px;
-      border: none;
-      border-radius: 14px;
-      padding: 0 18px;
-      font-family: inherit;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-    }
-    .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
-    .btn-secondary { background: linear-gradient(135deg, #0f766e, #0d9488); color: #fff; }
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(180px, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
-    }
+    body.dark .field input { background: rgba(15,23,42,.55); }
+    .btn-primary { background: var(--primary); color:#fff; height:50px; }
+    .btn-secondary { background: var(--teal); color:#fff; height:50px; }
+    .btn-light { background: rgba(148,163,184,.16); color: var(--text); height:50px; }
+    .cards { display:grid; grid-template-columns: repeat(4, minmax(220px, 1fr)); gap:14px; margin-bottom:18px; }
     .card {
-      border-radius: 22px;
-      padding: 18px;
-      min-height: 132px;
-      position: relative;
-      overflow: hidden;
+      border-radius: 24px; padding: 18px; min-height: 120px; position:relative; overflow:hidden;
     }
-    .card::after {
-      content: "";
-      position: absolute;
-      width: 92px;
-      height: 92px;
-      right: -22px;
-      top: -22px;
-      border-radius: 50%;
-      background: rgba(37, 99, 235, 0.08);
+    .card:after {
+      content:""; position:absolute; right:-18px; top:-18px; width:96px; height:96px; border-radius:999px;
+      background: rgba(59,130,246,.09);
     }
-    .card .title { color: #475569; font-size: 16px; font-weight: 600; margin-bottom: 8px; }
-    .card .value { font-size: 34px; font-weight: 800; color: #0f172a; line-height: 1.15; }
-    .card .hint { font-size: 13px; color: var(--muted); margin-top: 10px; }
-    .card.sales::after { background: rgba(37, 99, 235, 0.10); }
-    .card.labor::after { background: rgba(15, 118, 110, 0.12); }
-    .card.bills::after { background: rgba(245, 158, 11, 0.13); }
-    .card.profit::after { background: rgba(22, 163, 74, 0.12); }
-    .analytics-grid {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
-    .panel {
-      border-radius: 24px;
-      padding: 18px;
-    }
-    .panel h2 { margin: 0 0 8px; font-size: 24px; }
-    .panel-sub { color: var(--muted); margin: 0 0 16px; font-size: 15px; }
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
+    .card.teal:after { background: rgba(20,184,166,.12); }
+    .card.orange:after { background: rgba(245,158,11,.12); }
+    .card.green:after { background: rgba(34,197,94,.12); }
+    .card .title { position:relative; z-index:1; color:var(--muted); font-weight:600; margin-bottom:6px; }
+    .card .value { position:relative; z-index:1; font-size: 34px; font-weight:800; line-height:1.1; }
+    .card .sub { position:relative; z-index:1; color:var(--muted); margin-top:6px; font-size:14px; }
+    .grid-2 { display:grid; grid-template-columns: 1.4fr 1fr; gap:18px; margin-bottom:18px; }
+    .section-head { display:flex; justify-content:space-between; gap:14px; align-items:flex-start; margin-bottom:16px; }
+    .section-head h2 { margin:0; font-size:22px; }
+    .section-head p { margin:4px 0 0; color:var(--muted); }
     .mini-stat {
-      background: #f8fafc;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 10px 12px;
-      min-width: 132px;
-      text-align: right;
+      min-width:160px; border:1px solid var(--line); border-radius:18px; padding:12px 14px; text-align:right;
+      background: rgba(255,255,255,.55);
     }
-    .mini-stat .label { display:block; color: var(--muted); font-size: 12px; margin-bottom: 2px; }
-    .mini-stat .num { font-size: 22px; font-weight: 800; }
-    .profit-item, .bill-item, .stock-item, .insight-card {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 14px;
-      background: #fbfcfd;
+    body.dark .mini-stat { background: rgba(15,23,42,.42); }
+    .mini-stat .label { color:var(--muted); font-size:14px; }
+    .mini-stat .value { font-size:22px; font-weight:800; }
+    .chart-wrap { min-height: 430px; display:flex; align-items:flex-end; gap:32px; padding: 20px 10px 4px; }
+    .day-column { flex:1; min-width:110px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:8px; }
+    .bar-stack { width:100%; max-width:110px; min-height: 260px; display:flex; align-items:flex-end; gap:12px; justify-content:center; }
+    .bar { width:44px; border-radius: 16px 16px 10px 10px; position:relative; min-height:8px; box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+    .bar.sales { background: linear-gradient(180deg, #67a4ff 0%, #2563eb 100%); }
+    .bar.repair { background: linear-gradient(180deg, #2dd4bf 0%, #0f766e 100%); }
+    .bar-label { font-weight:800; font-size:22px; }
+    .bar-row-label { color:var(--muted); font-size:14px; display:flex; gap:10px; }
+    .legend { display:flex; gap:16px; color:var(--muted); font-size:14px; flex-wrap:wrap; }
+    .legend span::before { content:""; display:inline-block; width:12px; height:12px; border-radius:999px; margin-right:6px; vertical-align:middle; }
+    .legend .sales::before { background:#2563eb; }
+    .legend .repair::before { background:#0f766e; }
+    .rank-list, .quick-grid, .bill-list, .stock-list { display:flex; flex-direction:column; gap:12px; }
+    .rank-item, .quick-card, .bill-item, .stock-item {
+      border:1px solid var(--line); border-radius:18px; padding:14px; background: rgba(255,255,255,.46);
     }
-    .profit-item:last-child, .bill-item:last-child, .stock-item:last-child, .insight-card:last-child { margin-bottom: 0; }
-    .stock-item.warning { border-color: rgba(245, 158, 11, 0.35); background: #fffaf0; }
-    .stock-item.critical { border-color: rgba(220, 38, 38, 0.35); background: #fff5f5; }
-    .bill-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
-    .bill-lines { font-size: 15px; line-height: 1.8; }
-    .bill-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-    .bill-actions .action-btn {
-      border: none;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      color: #fff;
+    body.dark .rank-item, body.dark .quick-card, body.dark .bill-item, body.dark .stock-item { background: rgba(15,23,42,.35); }
+    .rank-item-top { display:flex; justify-content:space-between; gap:12px; font-weight:800; font-size:18px; }
+    .rank-meta { color:var(--muted); margin-top:2px; }
+    .progress { height:12px; background: rgba(148,163,184,.18); border-radius:999px; overflow:hidden; margin-top:10px; }
+    .progress > div { height:100%; background: linear-gradient(90deg, var(--teal), #14b8a6); border-radius:999px; }
+    .quick-grid { display:grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap:14px; }
+    .quick-card .label { color:var(--muted); }
+    .quick-card .value { font-size:30px; font-weight:800; margin-top:8px; }
+    .bill-grid { display:grid; grid-template-columns: 1fr 1fr; gap:18px; }
+    .bill-head { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .bill-title { font-size:18px; font-weight:800; }
+    .bill-meta { color:var(--muted); line-height:1.8; margin-top:6px; }
+    .bill-table { width:100%; border-collapse:collapse; margin-top:12px; }
+    .bill-table th, .bill-table td { border-bottom:1px solid var(--line); padding:8px 6px; text-align:left; font-size:14px; }
+    .bill-table th { color:var(--muted); }
+    .action-btn { background: var(--green); color:#fff; border:none; border-radius:12px; padding:10px 14px; font:inherit; font-weight:700; cursor:pointer; }
+    .empty { color:var(--muted); font-size:18px; padding:16px 0; }
+    @media (max-width: 1200px) {
+      .filters { grid-template-columns: 1fr 1fr; }
+      .cards { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+      .grid-2, .bill-grid { grid-template-columns: 1fr; }
+      .quick-grid { grid-template-columns: 1fr; }
     }
-    .print-btn { background: #16a34a; }
-    .copy-btn { background: #2563eb; }
-    .edit-btn { background: #f59e0b; }
-    .delete-btn { background: #dc2626; }
-    .empty { color: #64748b; font-size: 18px; }
-    .bill-item-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    .bill-item-table th, .bill-item-table td {
-      border-bottom: 1px solid #e5e7eb;
-      text-align: left;
-      padding: 8px 6px;
-      font-size: 14px;
-    }
-    .bill-item-table th { color: #475569; font-weight: 700; }
-    .trend-chart {
-      display: flex;
-      align-items: end;
-      gap: 10px;
-      min-height: 260px;
-      padding: 20px 6px 4px;
-      overflow-x: auto;
-    }
-    .trend-bar-wrap {
-      flex: 1 0 82px;
-      min-width: 82px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-    .trend-bar-value { font-size: 13px; color: var(--muted); font-weight: 700; }
-    .trend-bar {
-      width: 100%;
-      max-width: 66px;
-      border-radius: 16px 16px 8px 8px;
-      background: linear-gradient(180deg, #60a5fa, #2563eb);
-      min-height: 8px;
-      box-shadow: inset 0 -8px 14px rgba(0,0,0,0.08);
-    }
-    .trend-label { font-size: 13px; color: var(--muted); text-align: center; }
-    .top-item {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-    .top-item:last-child { margin-bottom: 0; }
-    .top-meta strong { font-size: 16px; }
-    .top-meta div { font-size: 13px; color: var(--muted); margin-top: 4px; }
-    .bar-track {
-      grid-column: 1 / -1;
-      height: 12px;
-      background: #e8eef5;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #0f766e, #14b8a6); }
-    .insights { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .insight-card .label { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
-    .insight-card .big { font-size: 26px; font-weight: 800; }
-    .insight-card .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
-    @media (max-width: 1400px) {
-      .hero { grid-template-columns: 1fr; }
-      .cards { grid-template-columns: repeat(3, minmax(180px, 1fr)); }
-      .analytics-grid { grid-template-columns: 1fr; }
-      .insights { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 900px) {
-      .cards { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
-      .grid-2 { grid-template-columns: 1fr; }
-      .container { padding: 12px; }
-      .hero-title { font-size: 26px; }
-      .card .value { font-size: 28px; }
-    }
-    @media (max-width: 560px) {
+    @media (max-width: 720px) {
+      .filters { grid-template-columns: 1fr; }
       .cards { grid-template-columns: 1fr; }
-      .filters { flex-direction: column; align-items: stretch; }
-      .field { min-width: 100%; }
-      .btn { width: 100%; }
-      .hero-card { padding: 16px; }
-      .hero-highlight { min-width: 100%; }
+      .chart-wrap { gap:14px; overflow:auto; padding-bottom:10px; }
+      .day-column { min-width: 130px; }
+      .brand h1 { font-size:24px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="topbar">
+      <div class="brand">
+        <h1>Dashboard รายงานยอดขาย</h1>
+        <p>ดูภาพรวมยอดขาย งานซ่อม กำไร และบิลล่าสุดในช่วงวันที่ที่เลือก</p>
+      </div>
       <div class="nav">
         <a href="/admin.html">⚙️ หลังบ้าน</a>
         <a href="/pos.html">🛒 หน้าร้าน</a>
-        <a href="/repair-history.html">🛠️ ประวัติซ่อม</a>
+        <a href="/repair-history.html">🔧 ประวัติซ่อม</a>
+        <button class="btn btn-light" id="themeToggle" type="button">🌙 Dark mode</button>
       </div>
     </div>
 
-    <div class="hero">
-      <div class="hero-card">
-        <div>
-          <div class="hero-title">แดชบอร์ดรายงานยอดขาย</div>
-          <p class="hero-sub">ดูยอดขาย กำไร ค่าแรง บิลขาย สินค้าใกล้หมด และสรุปสินค้าขายดีในหน้าเดียว ใช้งานง่ายขึ้น อ่านตัวเลขไวขึ้น และเหมาะกับการเปิดดูทั้งบนคอมและแท็บเล็ต</p>
-          <div class="hero-badges">
-            <span class="badge">📈 ดูยอดแบบวันต่อวัน</span>
-            <span class="badge">💸 แยกกำไรชัดเจน</span>
-            <span class="badge">📦 เช็กของใกล้หมดไว</span>
-          </div>
-        </div>
-        <div class="hero-highlight">
-          <div class="kicker">ยอดขายช่วงที่เลือก</div>
-          <div class="big" id="heroRangeSales">0</div>
-          <div class="small">จำนวนบิล <span id="heroBillCount">0</span> บิล • กำไร <span id="heroProfitTotal">0</span> บาท</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="filters">
+    <div class="filters panel">
       <div class="field">
         <label for="startDate">วันที่เริ่ม</label>
         <input type="date" id="startDate" />
@@ -350,199 +175,135 @@
         <label for="endDate">วันที่สิ้นสุด</label>
         <input type="date" id="endDate" />
       </div>
-      <button class="btn btn-primary" onclick="loadReport()">ดูรายงาน</button>
-      <button class="btn btn-secondary" onclick="setToday()">วันนี้</button>
+      <button class="btn btn-primary" type="button" onclick="loadReport()">ดูรายงาน</button>
+      <button class="btn btn-secondary" type="button" onclick="setToday()">วันนี้</button>
+      <button class="btn btn-light" type="button" onclick="setThisMonth()">เดือนนี้</button>
+      <button class="btn btn-light" type="button" onclick="setLast7Days()">7 วันล่าสุด</button>
     </div>
 
     <div class="cards">
-      <div class="card sales">
+      <div class="card">
         <div class="title">ยอดขายวันนี้</div>
         <div class="value" id="todaySales">0</div>
-        <div class="hint">ยอดรวมเฉพาะวันปัจจุบัน</div>
+        <div class="sub">ยอดรวมเฉพาะวันนี้</div>
       </div>
-      <div class="card sales">
+      <div class="card">
         <div class="title">ยอดขายเดือนนี้</div>
         <div class="value" id="monthSales">0</div>
-        <div class="hint">รวมตั้งแต่ต้นเดือนถึงวันนี้</div>
+        <div class="sub">รวมตั้งแต่ต้นเดือนถึงวันนี้</div>
       </div>
-      <div class="card sales">
-        <div class="title">ยอดขายช่วงที่เลือก</div>
-        <div class="value" id="rangeSales">0</div>
-        <div class="hint">เปลี่ยนตามวันที่ที่กรอง</div>
+      <div class="card teal">
+        <div class="title">รายได้ขายในช่วงที่เลือก</div>
+        <div class="value" id="salesIncome">0</div>
+        <div class="sub">รวมจากบิลขายหน้าร้าน</div>
       </div>
-      <div class="card labor">
+      <div class="card green">
+        <div class="title">รายได้ซ่อมในช่วงที่เลือก</div>
+        <div class="value" id="repairIncome">0</div>
+        <div class="sub">รวมจากประวัติการซ่อม</div>
+      </div>
+      <div class="card orange">
         <div class="title">ค่าแรงรวม</div>
         <div class="value" id="laborTotal">0</div>
-        <div class="hint">รวมค่าแรงจากทุกบิล</div>
+        <div class="sub">รวมค่าแรงทุกบิลขาย</div>
       </div>
-      <div class="card bills">
+      <div class="card">
         <div class="title">จำนวนบิล</div>
         <div class="value" id="billCount">0</div>
-        <div class="hint">นับจากบิลที่อยู่ในช่วงเลือก</div>
+        <div class="sub">เฉพาะบิลขายในช่วงที่เลือก</div>
       </div>
-      <div class="card profit">
+      <div class="card">
         <div class="title">กำไรรวม</div>
         <div class="value" id="profitTotal">0</div>
-        <div class="hint">ยอดขายหักต้นทุนสินค้าแล้ว</div>
+        <div class="sub">ยอดขายหักต้นทุนสินค้าแล้ว</div>
       </div>
-    </div>
-
-    <div class="analytics-grid">
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <h2>แนวโน้มยอดขายตามวัน</h2>
-            <p class="panel-sub">สรุปจากบิลในช่วงวันที่ที่เลือก ช่วยดูว่าวันไหนขายดีและวันไหนยอดตก</p>
-          </div>
-          <div class="mini-stat">
-            <span class="label">เฉลี่ยต่อบิล</span>
-            <span class="num" id="avgPerBill">0</span>
-          </div>
-        </div>
-        <div id="trendChart" class="trend-chart"></div>
+      <div class="card teal">
+        <div class="title">ยอดรวมขาย + ซ่อม</div>
+        <div class="value" id="rangeSales">0</div>
+        <div class="sub">รวมรายได้ทั้งสองฝั่ง</div>
       </div>
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <h2>สินค้าทำเงินสูงสุด</h2>
-            <p class="panel-sub">เรียงตามกำไรในช่วงวันที่ที่เลือก</p>
-          </div>
-          <div class="mini-stat">
-            <span class="label">ขายดีที่สุด</span>
-            <span class="num" id="topItemProfit">0</span>
-          </div>
-        </div>
-        <div id="topProducts"></div>
-      </div>
-    </div>
-
-    <div class="panel" style="margin-bottom:18px;">
-      <div class="panel-header">
-        <div>
-          <h2>ภาพรวมเร็ว</h2>
-          <p class="panel-sub">ดูตัวเลขสำคัญแบบสรุปสั้นก่อนลงลึกในรายละเอียด</p>
-        </div>
-      </div>
-      <div class="insights" id="quickInsights"></div>
     </div>
 
     <div class="grid-2">
       <div class="panel">
-        <h2>กำไรต่อสินค้า</h2>
-        <div id="itemProfitList"></div>
+        <div class="section-head">
+          <div>
+            <h2>แนวโน้มรายได้รายวัน</h2>
+            <p>แยกให้ดูชัดว่าแต่ละวันมาจากงานขายและงานซ่อมเท่าไร</p>
+          </div>
+          <div class="mini-stat">
+            <div class="label">เฉลี่ยต่อวัน</div>
+            <div class="value" id="avgPerDay">0</div>
+          </div>
+        </div>
+        <div class="legend">
+          <span class="sales">ขายหน้าร้าน</span>
+          <span class="repair">งานซ่อม</span>
+        </div>
+        <div id="chartArea" class="chart-wrap"></div>
       </div>
+
       <div class="panel">
-        <h2>สต๊อกใกล้หมด</h2>
-        <div id="lowStockList"></div>
+        <div class="section-head">
+          <div>
+            <h2>สินค้าทำเงินสูงสุด</h2>
+            <p>เรียงจากกำไรในช่วงวันที่ที่เลือก</p>
+          </div>
+          <div class="mini-stat">
+            <div class="label">กำไรสูงสุด</div>
+            <div class="value" id="topProfitValue">0</div>
+          </div>
+        </div>
+        <div id="itemProfitList" class="rank-list"></div>
       </div>
     </div>
 
-    <div class="panel">
-      <h2>บิลในช่วงที่เลือก</h2>
-      <div id="billList"></div>
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="section-head">
+        <div>
+          <h2>ภาพรวมเร็ว</h2>
+          <p>สรุปตัวเลขสำคัญแบบย่อยก่อนลงรายละเอียด</p>
+        </div>
+      </div>
+      <div class="quick-grid" id="quickGrid"></div>
+    </div>
+
+    <div class="bill-grid">
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>สต๊อกใกล้หมด</h2>
+            <p>สินค้าเหลือน้อยกว่าหรือเท่าจุดเตือน</p>
+          </div>
+        </div>
+        <div id="lowStockList" class="stock-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>บิลล่าสุดในช่วงที่เลือก</h2>
+            <p>กดพิมพ์ซ้ำได้จากตรงนี้</p>
+          </div>
+        </div>
+        <div id="billList" class="bill-list"></div>
+      </div>
     </div>
   </div>
 
   <script>
+    let currentTheme = localStorage.getItem('reportTheme') || 'light';
+    let latestReport = { bills: [], repairs: [], itemProfits: [], lowStock: [], summary: {} };
+
+    function applyTheme(theme) {
+      currentTheme = theme === 'dark' ? 'dark' : 'light';
+      document.body.classList.toggle('dark', currentTheme === 'dark');
+      localStorage.setItem('reportTheme', currentTheme);
+      document.getElementById('themeToggle').textContent = currentTheme === 'dark' ? '☀️ Light mode' : '🌙 Dark mode';
+    }
+
     function formatNumber(value) {
       return Number(value || 0).toLocaleString('th-TH');
-    }
-    function formatCurrency(value) {
-      return `${formatNumber(value)} บาท`;
-    }
-
-    function shortThaiDate(dateStr) {
-      if (!dateStr) return '-';
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return String(dateStr);
-      return d.toLocaleDateString('th-TH', {
-        timeZone: 'Asia/Bangkok',
-        day: '2-digit',
-        month: '2-digit'
-      });
-    }
-
-    function summarizeDailySales(bills) {
-      const map = new Map();
-      for (const bill of bills || []) {
-        const key = String(bill.createdAt || '').slice(0, 10) || '-';
-        if (!key || key === '-') continue;
-        const current = map.get(key) || 0;
-        map.set(key, current + Number(bill.grandTotal || 0));
-      }
-      return Array.from(map.entries())
-        .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([date, total]) => ({ date, total }));
-    }
-
-    function renderTrendChart(bills) {
-      const box = document.getElementById('trendChart');
-      const daily = summarizeDailySales(bills);
-      if (!daily.length) {
-        box.innerHTML = '<div class="empty">ยังไม่มีข้อมูลยอดขายในช่วงที่เลือก</div>';
-        return;
-      }
-      const max = Math.max(...daily.map(d => Number(d.total || 0)), 1);
-      box.innerHTML = daily.map(d => {
-        const height = Math.max(12, Math.round((Number(d.total || 0) / max) * 180));
-        return `
-          <div class="trend-bar-wrap">
-            <div class="trend-bar-value">${formatNumber(d.total)}</div>
-            <div class="trend-bar" style="height:${height}px"></div>
-            <div class="trend-label">${escapeHtml(shortThaiDate(d.date))}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderTopProducts(list) {
-      const box = document.getElementById('topProducts');
-      const best = (list || []).slice().sort((a, b) => Number(b.profit || 0) - Number(a.profit || 0)).slice(0, 5);
-      document.getElementById('topItemProfit').textContent = formatNumber(best[0]?.profit || 0);
-      if (!best.length) {
-        box.innerHTML = '<div class="empty">ยังไม่มีข้อมูลสินค้าทำเงิน</div>';
-        return;
-      }
-      const max = Math.max(...best.map(item => Number(item.profit || 0)), 1);
-      box.innerHTML = best.map((item, index) => {
-        const width = Math.max(8, Math.round((Number(item.profit || 0) / max) * 100));
-        return `
-          <div class="top-item">
-            <div class="top-meta">
-              <strong>${index + 1}. ${escapeHtml(item.name || '-')}</strong>
-              <div>กำไร ${formatNumber(item.profit)} • ขาย ${formatNumber(item.qty)} ชิ้น • ยอดขาย ${formatNumber(item.sales)}</div>
-            </div>
-            <strong>${formatNumber(item.profit)}</strong>
-            <div class="bar-track"><div class="bar-fill" style="width:${width}%"></div></div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderQuickInsights(summary, bills, lowStock, itemProfits) {
-      const box = document.getElementById('quickInsights');
-      const avgBill = Number(summary.billCount || 0) > 0 ? Number(summary.rangeSales || 0) / Number(summary.billCount || 1) : 0;
-      const laborShare = Number(summary.rangeSales || 0) > 0 ? (Number(summary.laborTotal || 0) / Number(summary.rangeSales || 0)) * 100 : 0;
-      const lowStockCount = Array.isArray(lowStock) ? lowStock.length : 0;
-      const topName = (itemProfits || []).slice().sort((a, b) => Number(b.profit || 0) - Number(a.profit || 0))[0]?.name || '-';
-      box.innerHTML = `
-        <div class="insight-card">
-          <div class="label">ยอดเฉลี่ยต่อบิล</div>
-          <div class="big">${formatNumber(avgBill)}</div>
-          <div class="sub">คำนวณจากยอดขายช่วงที่เลือกหารด้วยจำนวนบิล</div>
-        </div>
-        <div class="insight-card">
-          <div class="label">สัดส่วนค่าแรง</div>
-          <div class="big">${laborShare.toFixed(1)}%</div>
-          <div class="sub">เทียบค่าแรงรวมกับยอดขายทั้งหมดในช่วงที่เลือก</div>
-        </div>
-        <div class="insight-card">
-          <div class="label">สินค้าทำกำไรสูงสุด</div>
-          <div class="big" style="font-size:22px;">${escapeHtml(topName)}</div>
-          <div class="sub">มีสินค้าใกล้หมด ${formatNumber(lowStockCount)} รายการ</div>
-        </div>
-      `;
-      document.getElementById('avgPerBill').textContent = formatNumber(avgBill);
     }
 
     function escapeHtml(text) {
@@ -554,72 +315,184 @@
         .replace(/'/g, '&#039;');
     }
 
+    function getDateValue(offsetDays = 0) {
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
     function setToday() {
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const dd = String(now.getDate()).padStart(2, '0');
-      const day = `${yyyy}-${mm}-${dd}`;
+      const day = getDateValue(0);
       document.getElementById('startDate').value = day;
       document.getElementById('endDate').value = day;
       loadReport();
     }
 
-    async function loadReport() {
+    function setThisMonth() {
+      const now = new Date();
+      const first = new Date(now.getFullYear(), now.getMonth(), 1);
+      const s = `${first.getFullYear()}-${String(first.getMonth() + 1).padStart(2, '0')}-${String(first.getDate()).padStart(2, '0')}`;
+      document.getElementById('startDate').value = s;
+      document.getElementById('endDate').value = getDateValue(0);
+      loadReport();
+    }
+
+    function setLast7Days() {
+      document.getElementById('startDate').value = getDateValue(-6);
+      document.getElementById('endDate').value = getDateValue(0);
+      loadReport();
+    }
+
+    function toDayKey(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return String(dateStr).slice(0, 10);
+      return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' });
+    }
+
+    function shortDay(dateStr) {
+      const key = toDayKey(dateStr);
+      const [y, m, d] = key.split('-');
+      return `${d}/${m}`;
+    }
+
+    function formatThaiDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return String(dateStr);
+      return d.toLocaleString('th-TH', {
+        timeZone: 'Asia/Bangkok',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function storeBillForPrint(bill) {
+      const receipt = {
+        saleId: bill.saleId || '-',
+        date: bill.createdAt || '-',
+        customerName: bill.customerName || '-',
+        items: Array.isArray(bill.items) ? bill.items.map(item => ({
+          barcode: item.barcode || item.id || '-',
+          name: item.name || '-',
+          qty: Number(item.qty || 0),
+          price: Number(item.price || 0),
+          total: Number(item.total || 0),
+          priceType: item.priceType || 'retail',
+          priceLabel: item.priceLabel || '-'
+        })) : [],
+        itemsTotal: Number(bill.itemsTotal || 0),
+        laborCost: Number(bill.laborCost || 0),
+        total: Number(bill.grandTotal || 0),
+        paid: Number(bill.paid || 0),
+        change: Number(bill.change || 0)
+      };
+
       try {
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
+        localStorage.setItem('lastReceipt', JSON.stringify(receipt));
+        sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
+        localStorage.setItem('printReceipt', JSON.stringify(receipt));
+        sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
+        localStorage.setItem('printReceiptData', JSON.stringify(receipt));
+        sessionStorage.setItem('printReceiptData', JSON.stringify(receipt));
+      } catch (error) {}
+    }
 
-        const params = new URLSearchParams();
-        if (startDate) params.set('startDate', startDate);
-        if (endDate) params.set('endDate', endDate);
+    function printBillByData(encodedBill) {
+      const bill = JSON.parse(decodeURIComponent(encodedBill));
+      storeBillForPrint(bill);
+      window.open('/print.html?autoprint=1&type=sale&t=' + Date.now(), '_blank');
+    }
 
-        const res = await fetch(`/api/report?${params.toString()}`);
-        const data = await res.json();
+    function renderChart(bills, repairs) {
+      const box = document.getElementById('chartArea');
+      const daily = new Map();
 
-        if (!res.ok || !data.success) {
-          throw new Error(data.message || 'โหลดรายงานไม่สำเร็จ');
-        }
-
-        document.getElementById('todaySales').textContent = formatNumber(data.summary?.todaySales || 0);
-        document.getElementById('monthSales').textContent = formatNumber(data.summary?.monthSales || 0);
-        document.getElementById('rangeSales').textContent = formatNumber(data.summary?.rangeSales || 0);
-        document.getElementById('laborTotal').textContent = formatNumber(data.summary?.laborTotal || 0);
-        document.getElementById('billCount').textContent = formatNumber(data.summary?.billCount || 0);
-        document.getElementById('profitTotal').textContent = formatNumber(data.summary?.profitTotal || 0);
-        document.getElementById('heroRangeSales').textContent = formatNumber(data.summary?.rangeSales || 0);
-        document.getElementById('heroBillCount').textContent = formatNumber(data.summary?.billCount || 0);
-        document.getElementById('heroProfitTotal').textContent = formatNumber(data.summary?.profitTotal || 0);
-
-        renderTrendChart(data.bills || []);
-        renderTopProducts(data.itemProfits || []);
-        renderQuickInsights(data.summary || {}, data.bills || [], data.lowStock || [], data.itemProfits || []);
-        renderItemProfits(data.itemProfits || []);
-        renderLowStock(data.lowStock || []);
-        renderBills(data.bills || []);
-      } catch (error) {
-        alert(error.message || 'โหลดรายงานไม่สำเร็จ');
+      for (const bill of bills) {
+        const key = toDayKey(bill.createdAt);
+        if (!daily.has(key)) daily.set(key, { sales: 0, repair: 0 });
+        daily.get(key).sales += Number(bill.grandTotal || 0);
       }
+      for (const repair of repairs) {
+        const key = toDayKey(repair.created_at || repair.repairDate);
+        if (!daily.has(key)) daily.set(key, { sales: 0, repair: 0 });
+        daily.get(key).repair += Number(repair.totalCost || 0);
+      }
+
+      const rows = Array.from(daily.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+      if (!rows.length) {
+        box.innerHTML = '<div class="empty">ยังไม่มีข้อมูลในช่วงนี้</div>';
+        document.getElementById('avgPerDay').textContent = '0';
+        return;
+      }
+
+      const maxValue = Math.max(...rows.map(([, value]) => Math.max(Number(value.sales || 0), Number(value.repair || 0), 1)));
+      const totalPerDay = rows.reduce((sum, [, value]) => sum + Number(value.sales || 0) + Number(value.repair || 0), 0);
+      document.getElementById('avgPerDay').textContent = formatNumber(totalPerDay / rows.length);
+
+      box.innerHTML = rows.map(([day, value]) => {
+        const sales = Number(value.sales || 0);
+        const repair = Number(value.repair || 0);
+        const salesHeight = Math.max(8, Math.round((sales / maxValue) * 220));
+        const repairHeight = Math.max(8, Math.round((repair / maxValue) * 220));
+        return `
+          <div class="day-column">
+            <div class="bar-row-label"><span>ขาย ${formatNumber(sales)}</span><span>ซ่อม ${formatNumber(repair)}</span></div>
+            <div class="bar-stack">
+              <div class="bar sales" style="height:${sales ? salesHeight : 8}px" title="รายได้ขาย ${formatNumber(sales)}"></div>
+              <div class="bar repair" style="height:${repair ? repairHeight : 8}px" title="รายได้ซ่อม ${formatNumber(repair)}"></div>
+            </div>
+            <div class="bar-label">${formatNumber(sales + repair)}</div>
+            <div class="bar-row-label">${shortDay(day)}</div>
+          </div>
+        `;
+      }).join('');
     }
 
     function renderItemProfits(list) {
       const box = document.getElementById('itemProfitList');
+      document.getElementById('topProfitValue').textContent = formatNumber(list[0]?.profit || 0);
       if (!list.length) {
         box.innerHTML = '<div class="empty">ยังไม่มีข้อมูลกำไรสินค้า</div>';
         return;
       }
-
-      box.innerHTML = list.map(item => `
-        <div class="profit-item">
-          <div style="font-size:20px;font-weight:800;">${escapeHtml(item.name || '-')} [${escapeHtml(item.barcode || '-')} ]</div>
-          <div style="font-size:18px;margin-top:6px;">
-            จำนวนขาย ${formatNumber(item.qty)} |
-            ยอดขาย ${formatNumber(item.sales)} |
-            ต้นทุนรวม ${formatNumber(item.cost)} |
-            <strong>กำไร ${formatNumber(item.profit)}</strong>
+      const max = Math.max(...list.map(item => Number(item.profit || 0)), 1);
+      box.innerHTML = list.slice(0, 5).map((item, index) => `
+        <div class="rank-item">
+          <div class="rank-item-top">
+            <div>${index + 1}. ${escapeHtml(item.name || '-')}</div>
+            <div>${formatNumber(item.profit)}</div>
           </div>
+          <div class="rank-meta">กำไร ${formatNumber(item.profit)} · ขาย ${formatNumber(item.qty)} ชิ้น · ยอดขาย ${formatNumber(item.sales)}</div>
+          <div class="progress"><div style="width:${Math.max(8, Math.round((Number(item.profit || 0) / max) * 100))}%"></div></div>
         </div>
       `).join('');
+    }
+
+    function renderQuickCards(summary, itemProfits) {
+      const avgBill = Number(summary.billCount || 0) ? Number(summary.salesIncome || 0) / Number(summary.billCount || 0) : 0;
+      const laborRatio = Number(summary.salesIncome || 0) ? (Number(summary.laborTotal || 0) / Number(summary.salesIncome || 0)) * 100 : 0;
+      const topItem = itemProfits[0] || null;
+      document.getElementById('quickGrid').innerHTML = `
+        <div class="quick-card">
+          <div class="label">ยอดเฉลี่ยต่อบิล</div>
+          <div class="value">${formatNumber(avgBill)}</div>
+        </div>
+        <div class="quick-card">
+          <div class="label">สัดส่วนค่าแรงต่อรายได้ขาย</div>
+          <div class="value">${formatNumber(laborRatio)}%</div>
+        </div>
+        <div class="quick-card">
+          <div class="label">สินค้ากำไรสูงสุด</div>
+          <div class="value">${escapeHtml(topItem ? topItem.name : '-')}</div>
+        </div>
+      `;
     }
 
     function renderLowStock(list) {
@@ -628,73 +501,13 @@
         box.innerHTML = '<div class="empty">ยังไม่มีสินค้าที่ต่ำกว่าจุดเตือน</div>';
         return;
       }
-
-      box.innerHTML = list.map(item => {
-        const qty = Number(item.quantity || 0);
-        const min = Number(item.minStock || 0);
-        const levelClass = qty <= Math.max(1, min * 0.5) ? 'critical' : 'warning';
-        return `
-          <div class="stock-item ${levelClass}">
-            <div style="font-size:20px;font-weight:800;">${escapeHtml(item.name || '-')}</div>
-            <div style="font-size:18px;margin-top:6px;">
-              รหัสสินค้า: ${escapeHtml(item.barcode || '-')} |
-              คงเหลือ ${formatNumber(qty)} |
-              จุดเตือน ${formatNumber(min)}
-            </div>
-          </div>
-        `;
-      }).join('');
+      box.innerHTML = list.slice(0, 12).map(item => `
+        <div class="stock-item">
+          <div style="font-size:18px;font-weight:800;">${escapeHtml(item.name || '-')}</div>
+          <div class="rank-meta">รหัสสินค้า: ${escapeHtml(item.barcode || '-')} · คงเหลือ ${formatNumber(item.quantity)} · จุดเตือน ${formatNumber(item.minStock)}</div>
+        </div>
+      `).join('');
     }
-
-
-function storeBillForPrint(bill) {
-  const receipt = {
-    saleId: bill.saleId || '-',
-    date: bill.createdAt || '-',
-    customerName: bill.customerName || '-',
-    items: Array.isArray(bill.items) ? bill.items.map(item => ({
-      barcode: item.barcode || item.id || '-',
-      name: item.name || '-',
-      qty: Number(item.qty || 0),
-      price: Number(item.price || 0),
-      total: Number(item.total || 0)
-    })) : [],
-    itemsTotal: Number(bill.itemsTotal || 0),
-    laborCost: Number(bill.laborCost || 0),
-    total: Number(bill.grandTotal || 0),
-    paid: Number(bill.paid || 0),
-    change: Number(bill.change || 0)
-  };
-
-  try {
-    localStorage.setItem('lastReceipt', JSON.stringify(receipt));
-    sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
-    localStorage.setItem('printReceipt', JSON.stringify(receipt));
-    sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
-  } catch (error) {}
-}
-
-function printBillByData(encodedBill) {
-  const bill = JSON.parse(decodeURIComponent(encodedBill));
-  storeBillForPrint(bill);
-  window.open('/print.html?autoprint=1&type=sale', '_blank');
-}
-function formatThaiDate(dateStr, withSeconds = false) {
-  if (!dateStr) return '-';
-
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return String(dateStr);
-
-  return d.toLocaleString('th-TH', {
-    timeZone: 'Asia/Bangkok',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    ...(withSeconds ? { second: '2-digit' } : {})
-  });
-}
 
     function renderBills(list) {
       const box = document.getElementById('billList');
@@ -702,50 +515,85 @@ function formatThaiDate(dateStr, withSeconds = false) {
         box.innerHTML = '<div class="empty">ไม่พบบิลในช่วงที่เลือก</div>';
         return;
       }
-
-      box.innerHTML = list.map(bill => {
+      box.innerHTML = list.slice(0, 8).map(bill => {
         const encodedBill = encodeURIComponent(JSON.stringify(bill));
         return `
           <div class="bill-item">
-            <div class="bill-title">${escapeHtml(bill.saleId || '-')}</div>
-            <div class="bill-lines">
-              วันที่: ${escapeHtml(formatThaiDate(bill.createdAt))} | ลูกค้า: ${escapeHtml(bill.customerName || '-')}<br>
-              ค่าสินค้า ${formatNumber(bill.itemsTotal)} | ค่าแรง ${formatNumber(bill.laborCost)} | <strong>รวม ${formatNumber(bill.grandTotal)}</strong>
+            <div class="bill-head">
+              <div>
+                <div class="bill-title">${escapeHtml(bill.saleId || '-')}</div>
+                <div class="bill-meta">วันที่: ${escapeHtml(formatThaiDate(bill.createdAt))}<br>ลูกค้า: ${escapeHtml(bill.customerName || '-')}</div>
+              </div>
+              <div style="text-align:right;font-weight:800;">รวม ${formatNumber(bill.grandTotal)}</div>
             </div>
-
-            <table class="bill-item-table">
+            <table class="bill-table">
               <thead>
                 <tr>
-                  <th>รหัสสินค้า</th>
                   <th>รายการ</th>
                   <th>จำนวน</th>
                   <th>ราคา</th>
-                  <th>เป็นเงิน</th>
-                  <th>ประเภทราคา</th>
+                  <th>รวม</th>
                 </tr>
               </thead>
               <tbody>
                 ${(bill.items || []).map(item => `
                   <tr>
-                    <td>${escapeHtml(item.barcode || '-')}</td>
-                    <td>${escapeHtml(item.name || '-')}</td>
+                    <td>${escapeHtml(item.name || '-')}<div style="color:var(--muted);font-size:12px;">${escapeHtml(item.priceLabel || '-')}</div></td>
                     <td>${formatNumber(item.qty)}</td>
                     <td>${formatNumber(item.price)}</td>
                     <td>${formatNumber(item.total)}</td>
-                    <td>${escapeHtml(item.priceLabel || '-')}</td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
-
-            <div class="bill-actions">
-              <button class="action-btn print-btn" onclick="printBillByData('${encodedBill}')">พิมพ์บิล</button>
+            <div style="margin-top:12px;">
+              <button class="action-btn" onclick="printBillByData('${encodedBill}')">พิมพ์บิล</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
+    async function loadReport() {
+      try {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const params = new URLSearchParams();
+        if (startDate) params.set('startDate', startDate);
+        if (endDate) params.set('endDate', endDate);
+
+        const res = await fetch('/api/report?' + params.toString());
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || 'โหลดรายงานไม่สำเร็จ');
+
+        latestReport = data;
+        const summary = data.summary || {};
+        const combinedIncome = Number(summary.salesIncome || summary.rangeSales || 0) + Number(summary.repairIncome || 0);
+
+        document.getElementById('todaySales').textContent = formatNumber(summary.todaySales || 0);
+        document.getElementById('monthSales').textContent = formatNumber(summary.monthSales || 0);
+        document.getElementById('salesIncome').textContent = formatNumber(summary.salesIncome || summary.rangeSales || 0);
+        document.getElementById('repairIncome').textContent = formatNumber(summary.repairIncome || 0);
+        document.getElementById('rangeSales').textContent = formatNumber(combinedIncome);
+        document.getElementById('laborTotal').textContent = formatNumber(summary.laborTotal || 0);
+        document.getElementById('billCount').textContent = formatNumber(summary.billCount || 0);
+        document.getElementById('profitTotal').textContent = formatNumber(summary.profitTotal || 0);
+
+        renderChart(data.bills || [], data.repairs || []);
+        renderItemProfits(data.itemProfits || []);
+        renderQuickCards(summary, data.itemProfits || []);
+        renderLowStock(data.lowStock || []);
+        renderBills(data.bills || []);
+      } catch (error) {
+        alert(error.message || 'โหลดรายงานไม่สำเร็จ');
+      }
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+
+    applyTheme(currentTheme);
     setToday();
   </script>
 </body>

@@ -6,12 +6,12 @@
   <title>หน้าร้าน POS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: "Prompt", sans-serif;
+      font-family: "Kanit", sans-serif;
       background: #f3f5f7;
       color: #0f172a;
     }
@@ -152,8 +152,7 @@
       border: 1px solid #d9e0e7;
       border-radius: 18px;
       padding: 14px;
-      margin-top: 14px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       background: #fbfcfd;
     }
     .cart-total-big {
@@ -345,9 +344,15 @@
       <div class="panel">
         <div class="section-title">เลือกราคาขาย</div>
         <div class="price-type-tabs">
-          <button id="tab-retail" class="price-tab active" onclick="setPriceType('retail')">ราคาปลีก</button>
-          <button id="tab-wholesale" class="price-tab" onclick="setPriceType('wholesale')">ราคาส่ง</button>
-          <button id="tab-mechanic" class="price-tab" onclick="setPriceType('mechanic')">ราคาช่าง</button>
+          <button id="tab-retail" class="price-tab active" onclick="setPriceType('retail')">ลูกค้าทั่วไป</button>
+          <button id="tab-wholesale" class="price-tab" onclick="setPriceType('wholesale')">ลูกค้าส่ง</button>
+          <button id="tab-mechanic" class="price-tab" onclick="setPriceType('mechanic')">ช่าง</button>
+        </div>
+
+        <div class="cart-summary-box">
+          <div class="cart-total-big">รวม <span id="grandTotalText">0</span> บาท</div>
+          <div class="sum-row"><span>ค่าสินค้า</span><strong id="itemsTotalText">0</strong></div>
+          <div class="sum-row"><span>ค่าแรง</span><strong id="laborCostText">0</strong></div>
         </div>
 
         <div class="cart-table-wrap">
@@ -366,18 +371,13 @@
           </table>
         </div>
 
-        <div class="cart-summary-box">
-          <div class="cart-total-big">รวม <span id="grandTotalText">0</span> บาท</div>
-          <div class="sum-row"><span>ค่าสินค้า</span><strong id="itemsTotalText">0</strong></div>
-          <div class="sum-row"><span>ค่าแรง</span><strong id="laborCostText">0</strong></div>
-        </div>
-
         <div class="payment-box">
           <div class="section-title" style="margin-top:0;">ข้อมูลชำระเงิน</div>
 
           <div class="field">
             <label for="customerName">ชื่อลูกค้า</label>
-            <input type="text" id="customerName" placeholder="ชื่อลูกค้า" />
+            <input type="text" id="customerName" list="customerOptions" placeholder="เลือกลูกค้า หรือพิมพ์ใหม่" />
+            <datalist id="customerOptions"></datalist>
           </div>
 
           <div class="field">
@@ -412,6 +412,7 @@
 
   <script>
     let allItems = [];
+    let customers = [];
     let cart = [];
     let currentPriceType = 'retail';
     let editingSaleId = null;
@@ -484,6 +485,26 @@
       } catch (error) {
         alert(error.message || 'โหลดสินค้าไม่สำเร็จ');
       }
+    }
+
+
+    async function loadCustomers() {
+      try {
+        const res = await fetch('/api/customers');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'โหลดลูกค้าไม่สำเร็จ');
+        customers = Array.isArray(data) ? data : [];
+        renderCustomerOptions();
+      } catch (error) {
+        customers = [];
+        renderCustomerOptions();
+      }
+    }
+
+    function renderCustomerOptions() {
+      const box = document.getElementById('customerOptions');
+      if (!box) return;
+      box.innerHTML = customers.map(customer => `<option value="${escapeHtml(customer.name || '')}">${escapeHtml(customer.phone || '')}</option>`).join('');
     }
 
     function setPriceType(type) {
@@ -705,6 +726,12 @@
         const laborCost = asNumber(document.getElementById('laborCost')?.value, 0);
         const paid = asNumber(document.getElementById('paid')?.value, 0);
 
+        if (customerName) {
+          try {
+            await fetch('/api/customers', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name: customerName }) });
+          } catch (error) {}
+        }
+
         const payload = {
           customerName,
           laborCost,
@@ -738,29 +765,18 @@
           throw new Error(result.message || 'บันทึกบิลไม่สำเร็จ');
         }
 
-    const receipt = result.receipt || null;
+        const receipt = result.receipt || null;
 
-if (receipt) {
-  try {
-    localStorage.setItem('lastReceipt', JSON.stringify(receipt));
-    sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
-    localStorage.setItem('printReceipt', JSON.stringify(receipt));
-    sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
-
-    localStorage.setItem('printReceiptData', JSON.stringify({
-      id: receipt.id,
-      date: receipt.created_at || receipt.date,
-      customerName: receipt.customerName,
-      items: receipt.items,
-      total: receipt.total,
-      paid: receipt.paid,
-      change: receipt.change,
-      laborCost: receipt.laborCost
-    }));
-  } catch (error) {}
-}
-
-
+        if (receipt) {
+          try {
+            localStorage.setItem('lastReceipt', JSON.stringify(receipt));
+            sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
+            localStorage.setItem('printReceipt', JSON.stringify(receipt));
+            sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
+            localStorage.setItem('printReceiptData', JSON.stringify(receipt));
+            sessionStorage.setItem('printReceiptData', JSON.stringify(receipt));
+          } catch (error) {}
+        }
         window.open('/print.html?autoprint=1&type=sale', '_blank');
         
         alert(method === 'PUT' ? 'แก้ไขบิลเรียบร้อย' : 'คิดเงินสำเร็จ');
@@ -777,6 +793,7 @@ if (receipt) {
 
         renderCart();
         await loadItems();
+
       } catch (error) {
         alert(error.message || 'บันทึกบิลไม่สำเร็จ');
       }
@@ -856,6 +873,7 @@ if (receipt) {
       updateDraftStatus();
       renderCart();
       await loadItems();
+      await loadCustomers();
       loadDraftSaleFromStorage();
       await hydrateDraftItemNames();
       renderItems();
