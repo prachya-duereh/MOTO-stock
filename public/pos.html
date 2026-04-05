@@ -738,16 +738,29 @@
           throw new Error(result.message || 'บันทึกบิลไม่สำเร็จ');
         }
 
-        const receipt = result.receipt || null;
+    const receipt = result.receipt || null;
 
-        if (receipt) {
-          try {
-            localStorage.setItem('lastReceipt', JSON.stringify(receipt));
-            sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
-            localStorage.setItem('printReceipt', JSON.stringify(receipt));
-            sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
-          } catch (error) {}
-        }
+if (receipt) {
+  try {
+    localStorage.setItem('lastReceipt', JSON.stringify(receipt));
+    sessionStorage.setItem('lastReceipt', JSON.stringify(receipt));
+    localStorage.setItem('printReceipt', JSON.stringify(receipt));
+    sessionStorage.setItem('printReceipt', JSON.stringify(receipt));
+
+    localStorage.setItem('printReceiptData', JSON.stringify({
+      id: receipt.id,
+      date: receipt.created_at || receipt.date,
+      customerName: receipt.customerName,
+      items: receipt.items,
+      total: receipt.total,
+      paid: receipt.paid,
+      change: receipt.change,
+      laborCost: receipt.laborCost
+    }));
+  } catch (error) {}
+}
+
+window.open('/print.html', '_blank');
         window.open('/print.html?autoprint=1&type=sale', '_blank');
         
         alert(method === 'PUT' ? 'แก้ไขบิลเรียบร้อย' : 'คิดเงินสำเร็จ');
