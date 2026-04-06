@@ -431,3 +431,9 @@ on public.customers
 for all
 using (true)
 with check (true);
+
+
+-- เพิ่มส่วนลด / ช่องทางชำระเงิน
+alter table if exists sales add column if not exists discount numeric default 0;
+alter table if exists repairs add column if not exists discount numeric default 0;
+alter table if exists repairs add column if not exists payment_method text default 'cash';

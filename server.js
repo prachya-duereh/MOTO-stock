@@ -199,6 +199,8 @@ function sanitizeRepair(record = {}) {
     repairPriceLabel: cleanText(record.repair_price_label ?? record.repairPriceLabel) || repairPriceLabel(record.repair_price_type ?? record.repairPriceType),
     partsCost: asNumber(record.parts_cost ?? record.partsCost, 0),
     laborCost: asNumber(record.labor_cost ?? record.laborCost, 0),
+    discount: asNumber(record.discount ?? record.discount_amount, 0),
+    paymentMethod: cleanText(record.payment_method ?? record.paymentMethod) || 'cash',
     totalCost: asNumber(record.total_cost ?? record.totalCost, 0),
     note: cleanText(record.note),
     created_at: record.created_at || record.createdAt || null,
@@ -220,6 +222,8 @@ function repairToDb(repair) {
     repair_price_label: repair.repairPriceLabel,
     parts_cost: repair.partsCost,
     labor_cost: repair.laborCost,
+    discount: repair.discount || 0,
+    payment_method: repair.paymentMethod || 'cash',
     total_cost: repair.totalCost,
     note: repair.note,
     created_at: repair.created_at || nowIso(),
@@ -244,6 +248,7 @@ function sanitizeSaleRow(record = {}) {
     costPrice: asNumber(record.cost_price ?? record.costPrice, 0),
     profit: asNumber(record.profit, 0),
     laborCost: asNumber(record.labor_cost ?? record.laborCost, 0),
+    discount: asNumber(record.discount ?? record.discount_amount, 0),
     itemsTotal: asNumber(record.items_total ?? record.itemsTotal, 0),
     grandTotal: asNumber(record.grand_total ?? record.grandTotal, 0),
     customerName: cleanText(record.customer_name ?? record.customerName),
@@ -293,6 +298,7 @@ function saleToDb(sale) {
     cost_price: sale.costPrice,
     profit: sale.profit,
     labor_cost: sale.laborCost,
+    discount: sale.discount || 0,
     items_total: sale.itemsTotal,
     grand_total: sale.grandTotal,
     customer_name: sale.customerName,
@@ -337,6 +343,7 @@ function makeRepairFromPayload(body, itemMap) {
   }
 
   const laborCost = asNumber(body.laborCost, 0);
+  const discount = Math.max(0, Math.min(asNumber(body.discount, 0), partsCost + laborCost));
   return {
     id: body.id ? Number(body.id) : newId(),
     customerName: cleanText(body.customerName),
@@ -351,7 +358,9 @@ function makeRepairFromPayload(body, itemMap) {
     repairPriceLabel: priceType === 'mechanic' ? 'ราคาซ่อม' : repairPriceLabel(priceType),
     partsCost,
     laborCost,
-    totalCost: partsCost + laborCost,
+    discount,
+    paymentMethod: cleanText(body.paymentMethod) || 'cash',
+    totalCost: Math.max(0, partsCost + laborCost - discount),
     note: cleanText(body.note),
     created_at: cleanText(body.created_at) || nowIso(),
   };
@@ -369,6 +378,7 @@ function aggregateBills(salesRows = []) {
         laborCost: row.laborCost,
         itemsTotal: row.itemsTotal,
         grandTotal: row.grandTotal,
+        discount: row.discount || 0,
         paid: row.paid,
         change: row.change,
         items: [],
@@ -855,6 +865,7 @@ app.post('/api/checkout', async (req, res) => {
 
     const customerName = cleanText(req.body?.customerName);
     const laborCost = asNumber(req.body?.laborCost, 0);
+    const discount = asNumber(req.body?.discount, 0);
     const paymentMethod = cleanText(req.body?.paymentMethod) || 'cash';
     const paid = asNumber(req.body?.paid, 0);
     const saleId = `S${Date.now()}`;
@@ -894,6 +905,7 @@ app.post('/api/checkout', async (req, res) => {
         costPrice,
         profit,
         laborCost,
+        discount: 0,
         itemsTotal: 0,
         grandTotal: 0,
         customerName,
@@ -903,12 +915,14 @@ app.post('/api/checkout', async (req, res) => {
       });
     }
 
-    const grandTotal = itemsTotal + laborCost;
+    const appliedDiscount = Math.max(0, Math.min(discount, itemsTotal + laborCost));
+    const grandTotal = Math.max(0, itemsTotal + laborCost - appliedDiscount);
     const change = paid - grandTotal;
     if (paid < grandTotal) return res.status(400).json({ success: false, message: 'จำนวนเงินที่รับมาไม่พอ' });
 
     for (const row of saleRows) {
       row.itemsTotal = itemsTotal;
+      row.discount = appliedDiscount;
       row.grandTotal = grandTotal;
       row.change = change;
     }
@@ -948,6 +962,7 @@ app.post('/api/checkout', async (req, res) => {
           priceLabel: row.priceLabel,
         })),
         laborCost,
+        discount: appliedDiscount,
         total: grandTotal,
         paid,
         change,
@@ -1115,6 +1130,7 @@ app.put('/api/sales/:saleId', async (req, res) => {
 
     const customerName = cleanText(req.body?.customerName);
     const laborCost = asNumber(req.body?.laborCost, 0);
+    const discount = asNumber(req.body?.discount, asNumber(oldRows[0]?.discount, 0));
     const paymentMethod = cleanText(req.body?.paymentMethod) || cleanText(oldRows[0]?.paymentMethod) || 'cash';
     const paid = asNumber(req.body?.paid, 0);
     const createdAt = cleanText(req.body?.createdAt) || oldRows[0]?.created_at || nowIso();
@@ -1154,6 +1170,7 @@ app.put('/api/sales/:saleId', async (req, res) => {
         costPrice,
         profit,
         laborCost,
+        discount: 0,
         itemsTotal: 0,
         grandTotal: 0,
         customerName,
@@ -1164,7 +1181,8 @@ app.put('/api/sales/:saleId', async (req, res) => {
       });
     }
 
-    const grandTotal = itemsTotal + laborCost;
+    const appliedDiscount = Math.max(0, Math.min(discount, itemsTotal + laborCost));
+    const grandTotal = Math.max(0, itemsTotal + laborCost - appliedDiscount);
     const change = paid - grandTotal;
     if (paid < grandTotal) {
       return res.status(400).json({ success: false, message: 'จำนวนเงินที่รับมาไม่พอ' });
@@ -1172,6 +1190,7 @@ app.put('/api/sales/:saleId', async (req, res) => {
 
     for (const row of saleRows) {
       row.itemsTotal = itemsTotal;
+      row.discount = appliedDiscount;
       row.grandTotal = grandTotal;
       row.change = change;
     }
@@ -1212,6 +1231,7 @@ app.put('/api/sales/:saleId', async (req, res) => {
           priceLabel: row.priceLabel
         })),
         laborCost,
+        discount: appliedDiscount,
         total: grandTotal,
         paid,
         change

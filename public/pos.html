@@ -509,6 +509,7 @@
         <div class="cart-summary-box">
           <div class="sum-row"><span>ค่าสินค้า</span><strong id="itemsTotalText">0</strong></div>
           <div class="sum-row"><span>ค่าแรง</span><strong id="laborCostText">0</strong></div>
+          <div class="sum-row"><span>ส่วนลด</span><strong id="discountText">0</strong></div>
           <div class="cart-total-big"><span>ยอดรวม</span><strong><span id="grandTotalText">0</span> บาท</strong></div>
         </div>
 
@@ -532,6 +533,11 @@
           <div class="field">
             <label for="laborCost">ค่าแรง</label>
             <input type="number" id="laborCost" placeholder="0" value="0" oninput="renderCart()" />
+          </div>
+
+          <div class="field">
+            <label for="discount">ส่วนลด</label>
+            <input type="number" id="discount" placeholder="0" value="0" oninput="renderCart()" />
           </div>
 
           <div class="field">
@@ -925,6 +931,10 @@
       return asNumber(document.getElementById('paid').value, 0);
     }
 
+    function getDiscount() {
+      return asNumber(document.getElementById('discount')?.value, 0);
+    }
+
     function setPaymentMethod(method) {
       paymentMethod = method === 'transfer' ? 'transfer' : 'cash';
       document.getElementById('payment-cash')?.classList.toggle('active', paymentMethod === 'cash');
@@ -945,8 +955,14 @@
       const tbody = document.getElementById('cartBody');
       const itemsTotal = getItemsTotal();
       const laborCost = getLaborCost();
-      const grandTotal = itemsTotal + laborCost;
+      const rawDiscount = getDiscount();
+      const discount = Math.max(0, Math.min(rawDiscount, itemsTotal + laborCost));
+      const grandTotal = Math.max(0, itemsTotal + laborCost - discount);
       const paidInput = document.getElementById('paid');
+      const discountInput = document.getElementById('discount');
+      if (discountInput && Number(discountInput.value || 0) !== discount) {
+        discountInput.value = discount;
+      }
       let paid = getPaid();
       if (paymentMethod === 'transfer') {
         paid = grandTotal;
@@ -987,6 +1003,7 @@
 
       document.getElementById('itemsTotalText').textContent = formatNumber(itemsTotal);
       document.getElementById('laborCostText').textContent = formatNumber(laborCost);
+      document.getElementById('discountText').textContent = formatNumber(discount);
       document.getElementById('grandTotalText').textContent = formatNumber(grandTotal);
       document.getElementById('changeText').textContent = formatNumber(change > 0 ? change : 0);
     }
@@ -1016,6 +1033,7 @@
 
       document.getElementById('customerName').value = '';
       document.getElementById('laborCost').value = 0;
+      document.getElementById('discount').value = 0;
       document.getElementById('paid').value = 0;
       setPaymentMethod('cash');
 
@@ -1031,6 +1049,7 @@
 
         const customerName = document.getElementById('customerName')?.value?.trim() || '';
         const laborCost = asNumber(document.getElementById('laborCost')?.value, 0);
+        const discount = asNumber(document.getElementById('discount')?.value, 0);
         const paid = asNumber(document.getElementById('paid')?.value, 0);
         const selectedPaymentMethod = paymentMethod;
 
@@ -1043,6 +1062,7 @@
         const payload = {
           customerName,
           laborCost,
+          discount,
           paymentMethod: selectedPaymentMethod,
           paid,
           createdAt: editingCreatedAt,
@@ -1098,6 +1118,7 @@
         cart = [];
         document.getElementById('customerName').value = '';
         document.getElementById('laborCost').value = 0;
+        document.getElementById('discount').value = 0;
         document.getElementById('paid').value = 0;
         setPaymentMethod('cash');
 
@@ -1135,6 +1156,7 @@
 
         document.getElementById('customerName').value = draft.customerName || '';
         document.getElementById('laborCost').value = asNumber(draft.laborCost, 0);
+        document.getElementById('discount').value = asNumber(draft.discount, 0);
         document.getElementById('paid').value = asNumber(draft.paid, 0);
         setPaymentMethod(draft.paymentMethod || 'cash');
 

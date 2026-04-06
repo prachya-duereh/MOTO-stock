@@ -376,10 +376,11 @@
         data?.subtotal ??
         items.reduce((sum, i) => sum + i.total, 0)
       );
+      const discount = num(data?.discount ?? data?.discountAmount ?? data?.discount_amount ?? 0);
       const grandTotal = num(
         data?.grandTotal ??
         data?.total ??
-        (itemsTotal + laborCost)
+        Math.max(0, itemsTotal + laborCost - discount)
       );
       const paid = num(data?.paid ?? data?.cash ?? data?.received ?? grandTotal);
       const change = num(data?.change ?? data?.changeAmount ?? Math.max(0, paid - grandTotal));
@@ -396,6 +397,7 @@
         items,
         itemsTotal,
         laborCost,
+        discount,
         grandTotal,
         paid,
         change
@@ -470,6 +472,10 @@
           <div class="sum-row">
             <div><strong>ค่าบริการ</strong></div>
             <div><strong>${fmtMoney(r.laborCost)}</strong></div>
+          </div>
+          <div class="sum-row">
+            <div><strong>ส่วนลด</strong></div>
+            <div><strong>${fmtMoney(r.discount)}</strong></div>
           </div>
           <div class="sum-row">
             <div><strong>ยอดรวม</strong></div>
