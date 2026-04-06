@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -10,6 +11,8 @@ const PORT = Number(process.env.PORT || 3000);
 const USE_SUPABASE = String(process.env.USE_SUPABASE || 'false').toLowerCase() === 'true';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '1234';
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '';
+const SESSION_SECRET = process.env.SESSION_SECRET || '';
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
@@ -17,10 +20,13 @@ const DB_FILE = path.join(__dirname, 'data.json');
 const REPAIR_FILE = path.join(__dirname, 'repair-history.json');
 const SALES_FILE = path.join(__dirname, 'sales.json');
 const CUSTOMERS_FILE = path.join(__dirname, 'customers.json');
+const LOGIN_LOG_FILE = path.join(__dirname, 'login-logs.json');
+const PUBLIC_DIR = path.join(__dirname, 'public');
+const COOKIE_NAME = 'moto.sid';
+const sessions = new Map();
 
 app.use(express.json({ limit: '4mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 const supabase = USE_SUPABASE && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } })
@@ -28,6 +34,137 @@ const supabase = USE_SUPABASE && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
 
 function nowIso() {
   return new Date().toISOString();
+}
+
+function hmac(value) {
+  return crypto.createHmac('sha256', SESSION_SECRET || 'moto-stock-dev-secret-change-me').update(String(value)).digest('hex');
+}
+
+function makeScryptHash(password, salt) {
+  return crypto.scryptSync(String(password), String(salt), 64).toString('hex');
+}
+
+function verifyAdminPassword(password) {
+  if (ADMIN_PASSWORD_HASH) {
+    const [scheme, salt, savedHash] = String(ADMIN_PASSWORD_HASH).split('$');
+    if (scheme === 'scrypt' && salt && savedHash) {
+      const testHash = makeScryptHash(password, salt);
+      return crypto.timingSafeEqual(Buffer.from(testHash, 'hex'), Buffer.from(savedHash, 'hex'));
+    }
+  }
+  return String(password) === String(ADMIN_PASSWORD);
+}
+
+function parseCookies(req) {
+  const raw = String(req.headers.cookie || '');
+  const out = {};
+  for (const part of raw.split(';')) {
+    const idx = part.indexOf('=');
+    if (idx === -1) continue;
+    const key = decodeURIComponent(part.slice(0, idx).trim());
+    const value = decodeURIComponent(part.slice(idx + 1).trim());
+    if (key) out[key] = value;
+  }
+  return out;
+}
+
+function getSessionFromRequest(req) {
+  const cookies = parseCookies(req);
+  const raw = cookies[COOKIE_NAME];
+  if (!raw) return null;
+  const lastDot = raw.lastIndexOf('.');
+  if (lastDot <= 0) return null;
+  const sid = raw.slice(0, lastDot);
+  const sig = raw.slice(lastDot + 1);
+  if (!sid || !sig) return null;
+  const expected = hmac(sid);
+  const sigOk = sig.length === expected.length && crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
+  if (!sigOk) return null;
+  const session = sessions.get(sid);
+  if (!session) return null;
+  return { sid, ...session };
+}
+
+function setSessionCookie(res, sid) {
+  const value = `${sid}.${hmac(sid)}`;
+  const parts = [
+    `${COOKIE_NAME}=${encodeURIComponent(value)}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax'
+  ];
+  if (process.env.NODE_ENV === 'production') parts.push('Secure');
+  res.setHeader('Set-Cookie', parts.join('; '));
+}
+
+function clearSessionCookie(res) {
+  const parts = [
+    `${COOKIE_NAME}=`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+    'Max-Age=0'
+  ];
+  if (process.env.NODE_ENV === 'production') parts.push('Secure');
+  res.setHeader('Set-Cookie', parts.join('; '));
+}
+
+function createSession(req, res, user) {
+  const sid = crypto.randomBytes(24).toString('hex');
+  sessions.set(sid, {
+    user,
+    createdAt: nowIso(),
+    ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || '',
+    userAgent: req.headers['user-agent'] || '',
+    logId: null,
+  });
+  setSessionCookie(res, sid);
+  return sid;
+}
+
+function requireApiAuth(req, res, next) {
+  const session = getSessionFromRequest(req);
+  if (!session?.user) {
+    return res.status(401).json({ success: false, message: 'กรุณาเข้าสู่ระบบก่อน' });
+  }
+  req.session = session;
+  next();
+}
+
+function requirePageAuth(req, res, next) {
+  const session = getSessionFromRequest(req);
+  if (!session?.user) {
+    return res.redirect('/login.html');
+  }
+  req.session = session;
+  res.setHeader('Cache-Control', 'no-store');
+  next();
+}
+
+function appendLoginLog(entry) {
+  const rows = readJSON(LOGIN_LOG_FILE, []);
+  const list = Array.isArray(rows) ? rows : [];
+  const logEntry = {
+    id: newId(),
+    username: cleanText(entry.username),
+    loginAt: nowIso(),
+    logoutAt: '',
+    ip: cleanText(entry.ip),
+    userAgent: cleanText(entry.userAgent),
+  };
+  list.unshift(logEntry);
+  writeJSON(LOGIN_LOG_FILE, list.slice(0, 1000));
+  return logEntry.id;
+}
+
+function markLogoutLog(logId) {
+  if (!logId) return;
+  const rows = readJSON(LOGIN_LOG_FILE, []);
+  if (!Array.isArray(rows)) return;
+  const idx = rows.findIndex((row) => String(row.id) === String(logId));
+  if (idx === -1) return;
+  rows[idx].logoutAt = nowIso();
+  writeJSON(LOGIN_LOG_FILE, rows);
 }
 
 function newId() {
@@ -54,6 +191,7 @@ function ensureLocalDB() {
   if (!fs.existsSync(REPAIR_FILE)) writeJSON(REPAIR_FILE, []);
   if (!fs.existsSync(SALES_FILE)) writeJSON(SALES_FILE, []);
   if (!fs.existsSync(CUSTOMERS_FILE)) writeJSON(CUSTOMERS_FILE, []);
+  if (!fs.existsSync(LOGIN_LOG_FILE)) writeJSON(LOGIN_LOG_FILE, []);
 
   const itemsRaw = readJSON(DB_FILE, []);
   const repairsRaw = readJSON(REPAIR_FILE, []);
@@ -508,20 +646,53 @@ app.get('/api/health', (req, res) => {
 
 // auth
 app.get('/api/auth/me', (req, res) => {
-  res.json({ success: true, user: { username: ADMIN_USERNAME } });
+  const session = getSessionFromRequest(req);
+  if (!session?.user) {
+    return res.status(401).json({ success: false, message: 'ยังไม่ได้เข้าสู่ระบบ' });
+  }
+  return res.json({ success: true, user: session.user });
 });
 
 app.post('/api/auth/login', (req, res) => {
   const username = cleanText(req.body?.username);
   const password = cleanText(req.body?.password);
-  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    return res.json({ success: true, redirectTo: '/admin.html' });
+
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน' });
   }
+
+  if (username === ADMIN_USERNAME && verifyAdminPassword(password)) {
+    const user = { username: ADMIN_USERNAME, role: 'admin' };
+    const sid = createSession(req, res, user);
+    const session = sessions.get(sid);
+    if (session) {
+      session.logId = appendLoginLog({
+        username: user.username,
+        ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || '',
+        userAgent: req.headers['user-agent'] || '',
+      });
+      sessions.set(sid, session);
+    }
+    return res.json({ success: true, redirectTo: '/admin.html', user });
+  }
+
   return res.status(401).json({ success: false, message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
 });
 
 app.post('/api/logout', (req, res) => {
+  const session = getSessionFromRequest(req);
+  if (session?.sid) {
+    markLogoutLog(session.logId);
+    sessions.delete(session.sid);
+  }
+  clearSessionCookie(res);
   res.json({ success: true });
+});
+
+app.use('/api', (req, res, next) => {
+  const publicPaths = new Set(['/api/health', '/api/auth/login', '/api/auth/me', '/api/logout']);
+  if (publicPaths.has(req.path)) return next();
+  return requireApiAuth(req, res, next);
 });
 
 // items
@@ -1320,13 +1491,25 @@ app.get('/api/report', async (req, res) => {
 });
 
 // static pages
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/admin.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
-app.get('/pos.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'pos.html')));
-app.get('/repair-history.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'repair-history.html')));
-app.get('/report.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'report.html')));
-app.get('/print.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'print.html')));
+app.get('/', (req, res) => {
+  const session = getSessionFromRequest(req);
+  return res.redirect(session?.user ? '/admin.html' : '/login.html');
+});
+
+app.get('/login.html', (req, res) => {
+  const session = getSessionFromRequest(req);
+  if (session?.user) return res.redirect('/admin.html');
+  res.setHeader('Cache-Control', 'no-store');
+  return res.sendFile(path.join(PUBLIC_DIR, 'login.html'));
+});
+
+app.get('/admin.html', requirePageAuth, (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'admin.html')));
+app.get('/pos.html', requirePageAuth, (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'pos.html')));
+app.get('/repair-history.html', requirePageAuth, (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'repair-history.html')));
+app.get('/report.html', requirePageAuth, (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'report.html')));
+app.get('/print.html', requirePageAuth, (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'print.html')));
+
+app.use(express.static(PUBLIC_DIR, { index: false, redirect: false }));
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

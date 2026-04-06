@@ -109,10 +109,10 @@
 
       <form id="loginForm">
         <label>ชื่อผู้ใช้</label>
-        <input id="username" autocomplete="username" value="admin" />
+        <input id="username" autocomplete="username" placeholder="ชื่อผู้ใช้" />
 
         <label>รหัสผ่าน</label>
-        <input id="password" type="password" autocomplete="current-password" value="1234" />
+        <input id="password" type="password" autocomplete="current-password" placeholder="รหัสผ่าน" />
 
         <button type="submit">เข้าสู่ระบบ</button>
       </form>
@@ -150,7 +150,7 @@
         try {
           const res = await fetch("/api/auth/me");
           if (res.ok) {
-            // ไม่ redirect อัตโนมัติ เพื่อให้ login ใช้งานได้ปกติ
+            location.href = '/admin.html';
           }
         } catch (err) {}
       }
