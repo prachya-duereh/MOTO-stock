@@ -175,24 +175,7 @@
       margin-top: 4px;
     }
 
-    .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:180px;min-height:44px;border:0;border-radius:14px;background:#1e293b;color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin:14px auto 0;}
-    body.dark{--preview-bg:#0f172a;--preview-card:#111c2f;--preview-text:#e5edf8;}
-    .print-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 180px;
-      min-height: 48px;
-      border: 0;
-      border-radius: 14px;
-      background: var(--green);
-      color: #fff;
-      font-size: 18px;
-      font-weight: 800;
-      cursor: pointer;
-      margin: 14px auto 0;
-      box-shadow: 0 6px 18px rgba(31,143,58,.25);
-    }
+  
 
     @page {
       size: 58mm auto;
@@ -225,11 +208,7 @@
         width: 50mm;
       }
 
-      .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:180px;min-height:44px;border:0;border-radius:14px;background:#1e293b;color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin:14px auto 0;}
-    body.dark{--preview-bg:#0f172a;--preview-card:#111c2f;--preview-text:#e5edf8;}
-    .print-btn {
-        display: none !important;
-      }
+    
     }
   </style>
 </head>
@@ -443,25 +422,7 @@
     const THEME_KEY = 'motoTheme';
     let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
 
-    function updateThemeToggleText() {
-      const toggle = document.getElementById('themeToggle');
-      if (!toggle) return;
-      toggle.textContent = currentTheme === 'dark' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
-    }
-
-    function applyTheme(theme) {
-      currentTheme = theme === 'dark' ? 'dark' : 'light';
-      document.body.classList.toggle('dark', currentTheme === 'dark');
-      localStorage.setItem(THEME_KEY, currentTheme);
-      updateThemeToggleText();
-    }
-
-    function toggleTheme() {
-      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-    }
-
-    applyTheme(currentTheme);
-    document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+  
 
     const data = getReceiptData();
     renderReceipt(data || {
