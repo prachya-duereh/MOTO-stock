@@ -297,14 +297,15 @@
   </div>
 
   <script>
-    let currentTheme = localStorage.getItem('reportTheme') || 'light';
+    const THEME_KEY = 'motoTheme';
+    let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
     let latestReport = { bills: [], repairs: [], itemProfits: [], lowStock: [], summary: {} };
 
     function applyTheme(theme) {
       currentTheme = theme === 'dark' ? 'dark' : 'light';
       document.body.classList.toggle('dark', currentTheme === 'dark');
-      localStorage.setItem('reportTheme', currentTheme);
-      document.getElementById('themeToggle').textContent = currentTheme === 'dark' ? '☀️ Light mode' : '🌙 Dark mode';
+      localStorage.setItem(THEME_KEY, currentTheme);
+      document.getElementById('themeToggle').textContent = currentTheme === 'dark' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
     }
 
     function formatNumber(value) {
@@ -395,6 +396,7 @@
         itemsTotal: Number(bill.itemsTotal || 0),
         laborCost: Number(bill.laborCost || 0),
         total: Number(bill.grandTotal || 0),
+        paymentMethod: bill.paymentMethod || 'cash',
         paid: Number(bill.paid || 0),
         change: Number(bill.change || 0)
       };
@@ -527,7 +529,7 @@
             <div class="bill-head">
               <div>
                 <div class="bill-title">${escapeHtml(bill.saleId || '-')}</div>
-                <div class="bill-meta">วันที่: ${escapeHtml(formatThaiDate(bill.createdAt))}<br>ลูกค้า: ${escapeHtml(bill.customerName || '-')}</div>
+                <div class="bill-meta">วันที่: ${escapeHtml(formatThaiDate(bill.createdAt))}<br>ลูกค้า: ${escapeHtml(bill.customerName || '-')}<br>ชำระ: ${escapeHtml(bill.paymentMethod === 'transfer' ? 'เงินโอน' : 'เงินสด')}</div>
               </div>
               <div style="text-align:right;font-weight:800;">รวม ${formatNumber(bill.grandTotal)}</div>
             </div>

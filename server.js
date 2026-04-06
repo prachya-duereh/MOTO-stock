@@ -247,6 +247,7 @@ function sanitizeSaleRow(record = {}) {
     itemsTotal: asNumber(record.items_total ?? record.itemsTotal, 0),
     grandTotal: asNumber(record.grand_total ?? record.grandTotal, 0),
     customerName: cleanText(record.customer_name ?? record.customerName),
+    paymentMethod: cleanText(record.payment_method ?? record.paymentMethod) || 'cash',
     paid: asNumber(record.paid, 0),
     change: asNumber(record.change, 0),
     created_at: record.created_at || record.createdAt || null,
@@ -295,6 +296,7 @@ function saleToDb(sale) {
     items_total: sale.itemsTotal,
     grand_total: sale.grandTotal,
     customer_name: sale.customerName,
+    payment_method: sale.paymentMethod || 'cash',
     paid: sale.paid,
     change: sale.change,
     created_at: sale.created_at || nowIso(),
@@ -363,6 +365,7 @@ function aggregateBills(salesRows = []) {
         saleId: row.saleId,
         createdAt: row.created_at,
         customerName: row.customerName,
+        paymentMethod: row.paymentMethod || 'cash',
         laborCost: row.laborCost,
         itemsTotal: row.itemsTotal,
         grandTotal: row.grandTotal,
@@ -852,6 +855,7 @@ app.post('/api/checkout', async (req, res) => {
 
     const customerName = cleanText(req.body?.customerName);
     const laborCost = asNumber(req.body?.laborCost, 0);
+    const paymentMethod = cleanText(req.body?.paymentMethod) || 'cash';
     const paid = asNumber(req.body?.paid, 0);
     const saleId = `S${Date.now()}`;
     const createdAt = nowIso();
@@ -932,6 +936,7 @@ app.post('/api/checkout', async (req, res) => {
         id: saleId,
         date: createdAt,
         customerName,
+        paymentMethod,
         items: saleRows.map((row) => ({
           id: row.itemId,
           barcode: row.barcode,
@@ -1048,6 +1053,7 @@ app.post('/api/sales/:saleId/duplicate', async (req, res) => {
       draft: {
         saleId,
         customerName: bill.customerName || '',
+        paymentMethod: cleanText(bill.paymentMethod) || 'cash',
         laborCost: asNumber(bill.laborCost, 0),
         paid: 0,
         items: (bill.items || []).map((item) => ({
@@ -1109,6 +1115,7 @@ app.put('/api/sales/:saleId', async (req, res) => {
 
     const customerName = cleanText(req.body?.customerName);
     const laborCost = asNumber(req.body?.laborCost, 0);
+    const paymentMethod = cleanText(req.body?.paymentMethod) || cleanText(oldRows[0]?.paymentMethod) || 'cash';
     const paid = asNumber(req.body?.paid, 0);
     const createdAt = cleanText(req.body?.createdAt) || oldRows[0]?.created_at || nowIso();
     const saleRows = [];
@@ -1150,6 +1157,7 @@ app.put('/api/sales/:saleId', async (req, res) => {
         itemsTotal: 0,
         grandTotal: 0,
         customerName,
+        paymentMethod,
         paid,
         change: 0,
         created_at: createdAt
@@ -1192,6 +1200,7 @@ app.put('/api/sales/:saleId', async (req, res) => {
         id: saleId,
         date: createdAt,
         customerName,
+        paymentMethod,
         items: saleRows.map((row) => ({
           id: row.itemId,
           barcode: row.barcode,

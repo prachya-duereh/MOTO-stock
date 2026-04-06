@@ -10,23 +10,23 @@
     <title>ประวัติการซ่อม</title>
     <style>
       *{box-sizing:border-box;font-family:"Google Sans",sans-serif}
-      body{margin:0;background:#eef2f7;color:#1f2937}
-      .page{padding:16px}.topbar,.panel{background:#fff;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+      :root{--bg:#eef2f7;--card:#fff;--line:#d5dbe4;--text:#1f2937;--muted:#6b7280;--input:#fff;--soft:#fbfdff;} body.dark{--bg:#0f172a;--card:#111c2f;--line:rgba(148,163,184,.24);--text:#e5edf8;--muted:#93a4bb;--input:#162338;--soft:#122033;} body{margin:0;background:var(--bg);color:var(--text)}
+      .page{padding:16px}.topbar,.panel{background:var(--card);border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
       .topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;margin-bottom:16px}
       .topbar-main{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-      .topbar-logo{width:68px;height:68px;object-fit:contain;border-radius:18px;background:#fff;padding:6px;box-shadow:0 8px 24px rgba(15,23,42,.08)}
+      .topbar-logo{width:68px;height:68px;object-fit:contain;border-radius:18px;background:var(--card);padding:6px;box-shadow:0 8px 24px rgba(15,23,42,.08)} .nav-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap} .theme-toggle{border:none;border-radius:12px;padding:11px 14px;cursor:pointer;font-weight:700;background:#e9eef6;color:var(--text)} body.dark .theme-toggle{background:#1e293b;color:#e5edf8}
       .nav{display:flex;gap:10px;flex-wrap:wrap}.nav button,button{border:none;border-radius:12px;cursor:pointer}.nav button{background:#2563eb;color:#fff;padding:11px 14px}
       .grid{display:grid;grid-template-columns:40% 60%;gap:16px}.panel{padding:16px}
-      input,textarea,select{width:100%;padding:13px;border:1px solid #d5dbe4;border-radius:12px;font-size:15px} textarea{min-height:110px;resize:vertical}
+      input,textarea,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font-size:15px;background:var(--input);color:var(--text)} textarea{min-height:110px;resize:vertical}
       .date-field{display:grid;grid-template-columns:1fr 54px;gap:8px;align-items:center}
-      .date-picker-btn{height:48px;border:1px solid #d5dbe4;border-radius:12px;background:#fff;color:#2563eb;font-size:22px;font-weight:700;cursor:pointer}
-      .date-hint{margin-top:6px;font-size:12px;color:#64748b}
-      .title{font-size:20px;font-weight:700;margin-bottom:10px}.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.parts-box,.record{border:1px solid #e5e7eb;border-radius:14px;background:#fbfdff}
-      .parts-box{padding:10px;margin-top:8px}.part-row{border-bottom:1px solid #e5e7eb;padding:8px 0}.part-row:last-child{border-bottom:none}
+      .date-picker-btn{height:48px;border:1px solid var(--line);border-radius:12px;background:var(--input);color:#2563eb;font-size:22px;font-weight:700;cursor:pointer}
+      .date-hint{margin-top:6px;font-size:12px;color:var(--muted)}
+      .title{font-size:20px;font-weight:700;margin-bottom:10px}.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.parts-box,.record{border:1px solid var(--line);border-radius:14px;background:var(--soft)}
+      .parts-box{padding:10px;margin-top:8px}.part-row{border-bottom:1px solid var(--line);padding:8px 0}.part-row:last-child{border-bottom:none}
       .price-mode{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:8px 0 10px}.price-mode button{padding:12px;background:#dbeafe;color:#1d4ed8;font-weight:700}.price-mode .active{background:#2563eb;color:#fff}
       .tool-row,.record-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.record-actions{grid-template-columns:repeat(4,1fr)}
       .save{background:#2563eb;color:#fff;padding:13px;font-weight:700;width:100%;margin-top:10px}.print{background:#16a34a;color:#fff;padding:12px;font-weight:700}.print2{background:#0f766e;color:#fff;padding:12px;font-weight:700}.edit{background:#f59e0b;color:#fff;padding:12px;font-weight:700}.danger{background:#dc2626;color:#fff;padding:12px;font-weight:700}.small{background:#16a34a;color:#fff;padding:12px;font-weight:700;width:100%}
-      .muted{color:#6b7280}.tag{display:inline-block;padding:2px 8px;border-radius:999px;background:#e5e7eb;font-size:11px}.total-box{font-weight:700;font-size:18px;margin-top:10px}
+      .muted{color:var(--muted)}.tag{display:inline-block;padding:2px 8px;border-radius:999px;background:#e5e7eb;font-size:11px}.total-box{font-weight:700;font-size:18px;margin-top:10px}
       @media (max-width:1100px){.grid,.split,.tool-row,.record-actions,.price-mode{grid-template-columns:1fr}}
     </style>
   </head>
@@ -42,7 +42,7 @@
             <button onclick="logout()" style="background:#dc2626">ออกจากระบบ</button>
           </div>
         </div>
-        <img src="/D.jpg" class="topbar-logo" alt="โลโก้ร้าน" onerror="this.style.display='none'" />
+        <div class="nav-actions"><button type="button" class="theme-toggle" id="themeToggle">🌙 โหมดมืด</button><img src="/D.jpg" class="topbar-logo" alt="โลโก้ร้าน" onerror="this.style.display='none'" /></div>
       </div>
       <div class="grid">
         <div class="panel">
@@ -104,6 +104,30 @@
     </div>
 
     <script>
+
+    const THEME_KEY = 'motoTheme';
+    let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
+
+    function updateThemeToggleText() {
+      const toggle = document.getElementById('themeToggle');
+      if (!toggle) return;
+      toggle.textContent = currentTheme === 'dark' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme === 'dark' ? 'dark' : 'light';
+      document.body.classList.toggle('dark', currentTheme === 'dark');
+      localStorage.setItem(THEME_KEY, currentTheme);
+      updateThemeToggleText();
+    }
+
+    function toggleTheme() {
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+      applyTheme(currentTheme);
+      document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+
       let items = []; let selectedParts = []; let repairPriceType = 'mechanic'; let repairsCache = []; let editingRepairId = null;
       function $(id){ return document.getElementById(id); }
       function money(n){ return Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:2}); }

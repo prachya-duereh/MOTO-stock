@@ -9,11 +9,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
+
+    :root {
+      --bg: #f3f5f7;
+      --text: #0f172a;
+      --card: #ffffff;
+      --line: #d9e0e7;
+      --input-bg: #f8fafc;
+      --muted: #64748b;
+      --soft: #fbfcfd;
+      --shadow-soft: 0 8px 24px rgba(15,23,42,.08);
+    }
+    body.dark {
+      --bg: #0f172a;
+      --text: #e5edf8;
+      --card: #111c2f;
+      --line: rgba(148,163,184,.25);
+      --input-bg: #162338;
+      --muted: #93a4bb;
+      --soft: #122033;
+      --shadow-soft: 0 12px 32px rgba(2,6,23,.35);
+    }
+
     body {
       margin: 0;
       font-family: "Google Sans", sans-serif;
-      background: #f3f5f7;
-      color: #0f172a;
+      background: var(--bg);
+      color: var(--text);
     }
     .container {
       max-width: 1800px;
@@ -29,7 +51,10 @@
       margin-bottom: 16px;
     }
     .topbar-main { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-    .topbar-logo { width: 68px; height: 68px; object-fit: contain; border-radius: 18px; background:#fff; padding:6px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
+    .topbar-logo { width: 68px; height: 68px; object-fit: contain; border-radius: 18px; background:var(--card); padding:6px; box-shadow:var(--shadow-soft); }
+    .nav-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .theme-toggle { border:none; border-radius:12px; padding:10px 16px; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; background:#e9eef6; color:#0f172a; }
+    body.dark .theme-toggle { background:#1e293b; color:#e5edf8; }
     .brand {
       font-size: 28px;
       font-weight: 800;
@@ -71,8 +96,8 @@
     }
 
     .panel {
-      background: #fff;
-      border: 1px solid #d9e0e7;
+      background: var(--card);
+      border: 1px solid var(--line);
       border-radius: 22px;
       padding: 16px;
     }
@@ -87,12 +112,13 @@
     .field input {
       width: 100%;
       height: 52px;
-      border: 1px solid #cfd8e3;
+      border: 1px solid var(--line);
       border-radius: 14px;
       padding: 0 14px;
       font-family: inherit;
       font-size: 17px;
-      background: #f8fafc;
+      background: var(--input-bg);
+      color: var(--text);
     }
 
     .section-title {
@@ -115,9 +141,9 @@
 }
 
 .product-card {
-  border: 1px solid #d9e0e7;
+  border: 1px solid var(--line);
   border-radius: 18px;
-  background: #fbfcfd;
+  background: var(--soft);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -149,7 +175,7 @@
     }
     .product-line {
       font-size: 15px;
-      color: #334155;
+      color: var(--muted);
       line-height: 1.6;
     }
     .product-footer {
@@ -191,11 +217,11 @@
     }
 
     .cart-summary-box {
-      border: 1px solid #d9e0e7;
+      border: 1px solid var(--line);
       border-radius: 18px;
       padding: 14px;
       margin-bottom: 12px;
-      background: #fbfcfd;
+      background: var(--soft);
     }
     .cart-total-big {
       font-size: 28px;
@@ -212,9 +238,9 @@
 
     .cart-table-wrap {
       overflow-x: auto;
-      border: 1px solid #d9e0e7;
+      border: 1px solid var(--line);
       border-radius: 18px;
-      background: #fff;
+      background: var(--card);
       margin-bottom: 14px;
     }
     table {
@@ -223,7 +249,7 @@
       min-width: 760px;
     }
     th, td {
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--line);
       padding: 12px 10px;
       text-align: left;
       font-size: 15px;
@@ -232,7 +258,7 @@
     th {
       background: #f8fafc;
       font-weight: 800;
-      color: #334155;
+      color: var(--muted);
     }
 
     .qty-controls {
@@ -265,10 +291,10 @@
     }
 
     .payment-box {
-      border: 1px solid #d9e0e7;
+      border: 1px solid var(--line);
       border-radius: 18px;
       padding: 14px;
-      background: #fbfcfd;
+      background: var(--soft);
       margin-top: 14px;
     }
     .field {
@@ -288,11 +314,34 @@
       gap: 10px;
       margin: 10px 0 14px;
     }
+    .payment-methods {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .pay-method-btn {
+      height:48px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:var(--input-bg);
+      color:var(--text);
+      font-family:inherit;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .pay-method-btn.active {
+      background:#2563eb;
+      color:#fff;
+      border-color:#2563eb;
+    }
     .quick-money button {
       height: 56px;
       border: none;
       border-radius: 14px;
-      background: #e5e7eb;
+      background: var(--line);
+      color: var(--text);
       font-family: inherit;
       font-size: 16px;
       font-weight: 800;
@@ -352,12 +401,12 @@
     .status-duplicate { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
 
     .empty-box {
-      border: 1px dashed #cbd5e1;
+      border: 1px dashed var(--line);
       border-radius: 16px;
       padding: 20px;
       text-align: center;
-      color: #64748b;
-      background: #f8fafc;
+      color: var(--muted);
+      background: var(--input-bg);
     }
 
     @media (max-width: 1200px) {
@@ -391,7 +440,10 @@
           <a href="/repair-history.html">🛠️ ประวัติซ่อม</a>
         </div>
       </div>
-      <img src="/D.jpg" class="topbar-logo" alt="โลโก้ร้าน" onerror="this.style.display='none'" />
+      <div class="nav-actions">
+        <button type="button" class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 โหมดมืด</button>
+        <img src="/D.jpg" class="topbar-logo" alt="โลโก้ร้าน" onerror="this.style.display='none'" />
+      </div>
     </div>
 
     <div id="draftStatus" class="status-bar"></div>
@@ -460,6 +512,14 @@
           </div>
 
           <div class="field">
+            <label>ช่องทางชำระเงิน</label>
+            <div class="payment-methods">
+              <button type="button" id="payment-cash" class="pay-method-btn active" onclick="setPaymentMethod('cash')">💵 เงินสด</button>
+              <button type="button" id="payment-transfer" class="pay-method-btn" onclick="setPaymentMethod('transfer')">📱 เงินโอน</button>
+            </div>
+          </div>
+
+          <div class="field">
             <label for="laborCost">ค่าแรง</label>
             <input type="number" id="laborCost" placeholder="0" value="0" oninput="renderCart()" />
           </div>
@@ -502,6 +562,28 @@
     let cartHighlightTimer = null;
     let lastHighlightedCartKey = '';
     let beepAudioContext = null;
+    let paymentMethod = 'cash';
+
+
+    const THEME_KEY = 'motoTheme';
+    let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
+
+    function updateThemeToggleText() {
+      const toggle = document.getElementById('themeToggle');
+      if (!toggle) return;
+      toggle.textContent = currentTheme === 'dark' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme === 'dark' ? 'dark' : 'light';
+      document.body.classList.toggle('dark', currentTheme === 'dark');
+      localStorage.setItem(THEME_KEY, currentTheme);
+      updateThemeToggleText();
+    }
+
+    function toggleTheme() {
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    }
 
     function formatNumber(value) {
       return Number(value || 0).toLocaleString('th-TH');
@@ -833,13 +915,34 @@
       return asNumber(document.getElementById('paid').value, 0);
     }
 
+    function setPaymentMethod(method) {
+      paymentMethod = method === 'transfer' ? 'transfer' : 'cash';
+      document.getElementById('payment-cash')?.classList.toggle('active', paymentMethod === 'cash');
+      document.getElementById('payment-transfer')?.classList.toggle('active', paymentMethod === 'transfer');
+      const paidInput = document.getElementById('paid');
+      if (paidInput) {
+        paidInput.readOnly = paymentMethod === 'transfer';
+        paidInput.placeholder = paymentMethod === 'transfer' ? 'ระบบจะบันทึกเป็นยอดโอนเต็มจำนวน' : '0';
+      }
+      renderCart();
+    }
+
+    function getPaymentMethodLabel(method = paymentMethod) {
+      return method === 'transfer' ? 'เงินโอน' : 'เงินสด';
+    }
+
     function renderCart() {
       const tbody = document.getElementById('cartBody');
       const itemsTotal = getItemsTotal();
       const laborCost = getLaborCost();
       const grandTotal = itemsTotal + laborCost;
-      const paid = getPaid();
-      const change = paid - grandTotal;
+      const paidInput = document.getElementById('paid');
+      let paid = getPaid();
+      if (paymentMethod === 'transfer') {
+        paid = grandTotal;
+        if (paidInput) paidInput.value = grandTotal;
+      }
+      const change = paymentMethod === 'transfer' ? 0 : (paid - grandTotal);
 
       if (!cart.length) {
         tbody.innerHTML = `
@@ -879,6 +982,7 @@
     }
 
     function addMoney(amount) {
+      if (paymentMethod === 'transfer') return;
       const paidInput = document.getElementById('paid');
       const current = asNumber(paidInput.value, 0);
       paidInput.value = current + asNumber(amount, 0);
@@ -886,6 +990,7 @@
     }
 
     function clearPaid() {
+      if (paymentMethod === 'transfer') return renderCart();
       document.getElementById('paid').value = 0;
       renderCart();
     }
@@ -902,6 +1007,7 @@
       document.getElementById('customerName').value = '';
       document.getElementById('laborCost').value = 0;
       document.getElementById('paid').value = 0;
+      setPaymentMethod('cash');
 
       updateDraftStatus();
       renderCart();
@@ -916,6 +1022,7 @@
         const customerName = document.getElementById('customerName')?.value?.trim() || '';
         const laborCost = asNumber(document.getElementById('laborCost')?.value, 0);
         const paid = asNumber(document.getElementById('paid')?.value, 0);
+        const selectedPaymentMethod = paymentMethod;
 
         if (customerName) {
           try {
@@ -926,6 +1033,7 @@
         const payload = {
           customerName,
           laborCost,
+          paymentMethod: selectedPaymentMethod,
           paid,
           createdAt: editingCreatedAt,
           items: cart.map(item => ({
@@ -981,6 +1089,7 @@
         document.getElementById('customerName').value = '';
         document.getElementById('laborCost').value = 0;
         document.getElementById('paid').value = 0;
+        setPaymentMethod('cash');
 
         renderCart();
         await loadItems();
@@ -1017,6 +1126,7 @@
         document.getElementById('customerName').value = draft.customerName || '';
         document.getElementById('laborCost').value = asNumber(draft.laborCost, 0);
         document.getElementById('paid').value = asNumber(draft.paid, 0);
+        setPaymentMethod(draft.paymentMethod || 'cash');
 
         cart = draft.items.map(item => ({
           id: Number(item.id),
@@ -1056,6 +1166,8 @@
     }
 
     async function initPage() {
+      applyTheme(currentTheme);
+      setPaymentMethod('cash');
       updateDraftStatus();
       renderCart();
       await loadItems();

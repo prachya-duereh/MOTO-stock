@@ -24,6 +24,18 @@
         --red: #e63232;
         --gray: #7a8393;
       }
+      body.dark {
+        --bg: #0f172a;
+        --card: #111c2f;
+        --line: rgba(148,163,184,.24);
+        --text: #e5edf8;
+        --muted: #93a4bb;
+        --primary: #4f8cff;
+        --green: #22c55e;
+        --orange: #f59e0b;
+        --red: #f87171;
+        --gray: #64748b;
+      }
       body {
         margin: 0;
         font-family: "Google Sans", sans-serif;
@@ -44,7 +56,10 @@
         margin-bottom: 14px;
       }
       .topbar-main { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-      .topbar-logo { width: 68px; height: 68px; object-fit: contain; border-radius: 18px; background:#fff; padding:6px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
+      .topbar-logo { width: 68px; height: 68px; object-fit: contain; border-radius: 18px; background:var(--card); padding:6px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
+      .nav-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+      .theme-toggle{border:0;border-radius:12px;padding:10px 16px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:#e9eef6;color:var(--text);}
+      body.dark .theme-toggle{background:#1e293b;color:#e5edf8;}
       .topbar h1 { margin: 0; }
       .topbar a {
         text-decoration: none;
@@ -85,7 +100,7 @@
       input, textarea, select {
         width: 100%;
         border: 1px solid var(--line);
-        background: #fff;
+        background: var(--card);
         border-radius: 12px;
         padding: 12px 14px;
         font-family: "Google Sans", sans-serif;
@@ -117,6 +132,8 @@
       .btn-red { background: var(--red); color: #fff; }
       .btn-gray { background: var(--gray); color: #fff; }
       .btn-light { background: #e9eef6; color: var(--text); }
+      body.dark input, body.dark textarea, body.dark select { background:#162338; color:var(--text); }
+      body.dark .summary .box { background:var(--card); }
       .search-row {
         display: grid;
         grid-template-columns: 1fr 180px;
@@ -381,6 +398,29 @@
     </div>
 
     <script>
+
+    const THEME_KEY = 'motoTheme';
+    let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
+
+    function updateThemeToggleText() {
+      const toggle = document.getElementById('themeToggle');
+      if (!toggle) return;
+      toggle.textContent = currentTheme === 'dark' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme === 'dark' ? 'dark' : 'light';
+      document.body.classList.toggle('dark', currentTheme === 'dark');
+      localStorage.setItem(THEME_KEY, currentTheme);
+      updateThemeToggleText();
+    }
+
+    function toggleTheme() {
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+      document.addEventListener('DOMContentLoaded', () => { applyTheme(currentTheme); document.getElementById('themeToggle')?.addEventListener('click', toggleTheme); });
+
       let items = [];
       let customers = [];
 

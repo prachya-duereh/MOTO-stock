@@ -7,11 +7,14 @@
   <style>
     :root{
       --paper-width: 58mm;
+      --preview-bg: #eef1f4;
+      --preview-card: #ffffff;
+      --preview-text: #111;
       --print-width: 50mm;
       --text: #111;
       --line: #444;
-      --bg: #eef1f4;
-      --card: #ffffff;
+      --bg: var(--preview-bg);
+      --card: var(--preview-card);
       --green: #1f8f3a;
     }
 
@@ -172,6 +175,8 @@
       margin-top: 4px;
     }
 
+    .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:180px;min-height:44px;border:0;border-radius:14px;background:#1e293b;color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin:14px auto 0;}
+    body.dark{--preview-bg:#0f172a;--preview-card:#111c2f;--preview-text:#e5edf8;}
     .print-btn {
       display: inline-flex;
       align-items: center;
@@ -220,7 +225,9 @@
         width: 50mm;
       }
 
-      .print-btn {
+      .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:180px;min-height:44px;border:0;border-radius:14px;background:#1e293b;color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin:14px auto 0;}
+    body.dark{--preview-bg:#0f172a;--preview-card:#111c2f;--preview-text:#e5edf8;}
+    .print-btn {
         display: none !important;
       }
     }
@@ -231,6 +238,9 @@
     <div class="wrap">
       <div class="receipt">
         <div class="print-area" id="receiptRoot"></div>
+      </div>
+      <div class="center">
+        <button class="theme-toggle" id="themeToggle" type="button">🌙 โหมดมืด</button>
       </div>
       <div class="center">
         <button class="print-btn" onclick="window.print()">พิมพ์เอกสาร</button>
@@ -328,11 +338,13 @@
       const receiptId = data.id || data.saleId || data.receiptId || data.code || "-";
       const date = data.created_at || data.createdAt || data.date || data.repairDate || "-";
       const customerName = data.customerName || data.customer || data.name || "-";
+      const paymentMethod = data.paymentMethod || data.payment_method || "cash";
 
       return {
         receiptId,
         date,
         customerName,
+        paymentMethod,
         items,
         itemsTotal,
         laborCost,
@@ -376,6 +388,7 @@
           <div class="meta-row"><div><strong>เลขที่:</strong></div><div>${esc(r.receiptId)}</div></div>
           <div class="meta-row"><div><strong>วันที่:</strong></div><div>${esc(r.date)}</div></div>
           <div class="meta-row"><div><strong>ลูกค้า:</strong></div><div>${esc(r.customerName || "-")}</div></div>
+          <div class="meta-row"><div><strong>ชำระ:</strong></div><div>${esc(r.paymentMethod === "transfer" ? "เงินโอน" : "เงินสด")}</div></div>
         </div>
 
         <hr class="dash">
@@ -411,7 +424,7 @@
 
         <div class="summary">
           <div class="sum-row">
-            <div><strong>รับเงิน</strong></div>
+            <div><strong>${r.paymentMethod === "transfer" ? "ยอดโอน" : "รับเงิน"}</strong></div>
             <div><strong>${fmtMoney(r.paid)}</strong></div>
           </div>
           <div class="sum-row">
@@ -425,6 +438,30 @@
         <div class="thanks">ขอบคุณที่ใช้บริการ</div>
       `;
     }
+
+
+    const THEME_KEY = 'motoTheme';
+    let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
+
+    function updateThemeToggleText() {
+      const toggle = document.getElementById('themeToggle');
+      if (!toggle) return;
+      toggle.textContent = currentTheme === 'dark' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme === 'dark' ? 'dark' : 'light';
+      document.body.classList.toggle('dark', currentTheme === 'dark');
+      localStorage.setItem(THEME_KEY, currentTheme);
+      updateThemeToggleText();
+    }
+
+    function toggleTheme() {
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+    applyTheme(currentTheme);
+    document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
 
     const data = getReceiptData();
     renderReceipt(data || {

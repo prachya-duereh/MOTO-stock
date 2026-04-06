@@ -192,6 +192,7 @@ execute function public.set_updated_at();
 create table if not exists public.sales (
   id bigint primary key,
   customer_name text not null default '',
+  payment_method text not null default 'cash',
   items jsonb not null default '[]'::jsonb,
   price_type text not null default 'retail',
   items_total numeric(12,2) not null default 0,
@@ -206,6 +207,7 @@ create table if not exists public.sales (
 
 alter table public.sales
   add column if not exists customer_name text not null default '',
+  add column if not exists payment_method text not null default 'cash',
   add column if not exists items jsonb not null default '[]'::jsonb,
   add column if not exists price_type text not null default 'retail',
   add column if not exists items_total numeric(12,2) not null default 0,
@@ -310,6 +312,7 @@ set
 update public.sales
 set
   customer_name = coalesce(customer_name, ''),
+  payment_method = coalesce(payment_method, 'cash'),
   items = coalesce(items, '[]'::jsonb),
   price_type = coalesce(price_type, 'retail'),
   items_total = coalesce(items_total, 0),

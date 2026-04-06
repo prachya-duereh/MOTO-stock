@@ -12,21 +12,25 @@
     />
     <style>
       * { box-sizing: border-box; }
+      :root{--bg:#eef2f7;--card:#fff;--line:#d8dee8;--text:#111827;--muted:#5c687a;--input:#fff;}
+      body.dark{--bg:#0f172a;--card:#111c2f;--line:rgba(148,163,184,.24);--text:#e5edf8;--muted:#93a4bb;--input:#162338;}
       body {
         margin: 0;
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #eef2f7;
+        background: var(--bg);
+        color: var(--text);
         font-family: "Google Sans", sans-serif;
       }
-      .page-logo { position: fixed; top: 18px; right: 18px; width: 68px; height: 68px; object-fit: contain; border-radius: 18px; background:#fff; padding:6px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
+      .page-logo { position: fixed; top: 18px; right: 18px; width: 68px; height: 68px; object-fit: contain; border-radius: 18px; background:var(--card); padding:6px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
+      .theme-toggle{position:fixed;top:18px;right:98px;border:0;border-radius:14px;padding:12px 16px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;background:#e9eef6;color:var(--text);} body.dark .theme-toggle{background:#1e293b;color:#e5edf8;}
       .card {
         width: 100%;
         max-width: 560px;
-        background: #fff;
-        border: 1px solid #d8dee8;
+        background: var(--card);
+        border: 1px solid var(--line);
         border-radius: 28px;
         padding: 28px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.05);
@@ -38,7 +42,7 @@
         display: block;
         margin: 0 auto 16px;
         border-radius: 20px;
-        background: #fff;
+        background: var(--card);
         box-shadow: 0 4px 16px rgba(0,0,0,0.06);
         padding: 10px;
       }
@@ -49,7 +53,7 @@
       }
       .sub {
         text-align: center;
-        color: #5c687a;
+        color: var(--muted);
         margin-bottom: 22px;
       }
       label {
@@ -60,7 +64,7 @@
       }
       input {
         width: 100%;
-        border: 1px solid #cfd7e3;
+        border: 1px solid var(--line);
         border-radius: 16px;
         padding: 16px 18px;
         font-size: 18px;
@@ -96,6 +100,7 @@
     </style>
   </head>
   <body>
+    <button type="button" class="theme-toggle" id="themeToggle">🌙 โหมดมืด</button>
     <img src="/logo.jpg" class="page-logo" alt="โลโก้ร้าน" onerror="this.style.display='none'" />
     <div class="card">
       <img src="/logo.jpg" class="logo" alt="logo" onerror="this.style.display='none'" />
@@ -117,6 +122,30 @@
     </div>
 
     <script>
+
+    const THEME_KEY = 'motoTheme';
+    let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
+
+    function updateThemeToggleText() {
+      const toggle = document.getElementById('themeToggle');
+      if (!toggle) return;
+      toggle.textContent = currentTheme === 'dark' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme === 'dark' ? 'dark' : 'light';
+      document.body.classList.toggle('dark', currentTheme === 'dark');
+      localStorage.setItem(THEME_KEY, currentTheme);
+      updateThemeToggleText();
+    }
+
+    function toggleTheme() {
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+      applyTheme(currentTheme);
+      document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+
       async function checkMe() {
         try {
           const res = await fetch("/api/auth/me");
