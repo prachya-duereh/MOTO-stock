@@ -7,24 +7,25 @@
   <style>
     :root{
       --paper-width: 58mm;
-      --preview-bg: #eef1f4;
-      --preview-card: #ffffff;
-      --preview-text: #111;
       --print-width: 50mm;
       --text: #111;
       --line: #444;
-      --bg: var(--preview-bg);
-      --card: var(--preview-card);
+      --bg: #eef1f4;
+      --card: #ffffff;
       --green: #1f8f3a;
     }
 
     * { box-sizing: border-box; }
 
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+    }
+
+    body {
       background: var(--bg);
       color: var(--text);
-      font-family: "Tahoma", "Noto Sans Thai", sans-serif;
+      font-family: "Courier New", "Noto Sans Thai", monospace;
     }
 
     .page {
@@ -39,7 +40,7 @@
       max-width: 320px;
     }
 
-    .receipt {
+    .receipt-shell {
       width: 100%;
       background: var(--card);
       border-radius: 18px;
@@ -98,7 +99,7 @@
 
     .meta-row {
       display: grid;
-      grid-template-columns: 42px 1fr;
+      grid-template-columns: 44px 1fr;
       gap: 4px;
       align-items: start;
     }
@@ -175,7 +176,34 @@
       margin-top: 4px;
     }
 
-  
+    .print-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 180px;
+      min-height: 46px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--green);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      margin: 14px auto 0;
+      box-shadow: 0 6px 18px rgba(31,143,58,.25);
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+    }
+
+    .print-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(31,143,58,.32);
+      filter: brightness(1.02);
+    }
+
+    .print-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(31,143,58,.22);
+    }
 
     @page {
       size: 58mm auto;
@@ -183,9 +211,10 @@
     }
 
     @media print {
-
-  
-}
+      html, body {
+        background: #fff !important;
+        color: #000 !important;
+      }
 
       .page {
         padding: 0;
@@ -197,29 +226,34 @@
         width: var(--paper-width);
       }
 
-      .receipt {
+      .receipt-shell {
         width: var(--paper-width);
         border-radius: 0;
         box-shadow: none;
         padding: 4mm 3.5mm 5mm;
+        background: #fff !important;
       }
 
       .print-area {
         width: 50mm;
       }
 
-    
-    
+      .print-btn,
+      button {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="page">
     <div class="wrap">
-      <div class="receipt">
+      <div class="receipt-shell">
         <div class="print-area" id="receiptRoot"></div>
+      </div>
 
       <div class="center">
-        <button class="print-btn" onclick="window.print()">พิมพ์เอกสาร</button>
+        <button class="print-btn" type="button" onclick="window.print()">พิมพ์เอกสาร</button>
       </div>
     </div>
   </div>
@@ -234,7 +268,10 @@
       const n = num(v);
       return Number.isInteger(n)
         ? n.toLocaleString("th-TH")
-        : n.toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        : n.toLocaleString("th-TH", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+          });
     }
 
     function esc(text) {
@@ -244,6 +281,41 @@
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+    }
+
+    function formatDateForReceipt(value) {
+      if (!value) return "-";
+
+      const raw = String(value).trim();
+
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
+        return raw;
+      }
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        const [y, m, d] = raw.split("-");
+        return `${d}/${m}/${y}`;
+      }
+
+      const parsed = new Date(raw);
+      if (!Number.isNaN(parsed.getTime())) {
+        const day = String(parsed.getDate()).padStart(2, "0");
+        const month = String(parsed.getMonth() + 1).padStart(2, "0");
+        const year = parsed.getFullYear();
+        const hours = String(parsed.getHours()).padStart(2, "0");
+        const mins = String(parsed.getMinutes()).padStart(2, "0");
+        return `${day}/${month}/${year} ${hours}:${mins}`;
+      }
+
+      return raw;
+    }
+
+    function paymentMethodLabel(method) {
+      const value = String(method || "").toLowerCase().trim();
+      if (value === "transfer" || value === "bank" || value === "qr" || value === "promptpay") {
+        return "เงินโอน";
+      }
+      return "เงินสด";
     }
 
     function getReceiptData() {
@@ -297,24 +369,24 @@
     }
 
     function normalizeReceipt(data) {
-      const items = normalizeItems(data);
-      const laborCost = num(data.laborCost ?? data.serviceCharge ?? data.service_cost ?? 0);
+      const items = normalizeItems(data || {});
+      const laborCost = num(data?.laborCost ?? data?.serviceCharge ?? data?.service_cost ?? 0);
       const itemsTotal = num(
-        data.itemsTotal ??
-        data.subtotal ??
+        data?.itemsTotal ??
+        data?.subtotal ??
         items.reduce((sum, i) => sum + i.total, 0)
       );
       const grandTotal = num(
-        data.grandTotal ??
-        data.total ??
+        data?.grandTotal ??
+        data?.total ??
         (itemsTotal + laborCost)
       );
-      const paid = num(data.paid ?? data.cash ?? data.received ?? 0);
-      const change = num(data.change ?? data.changeAmount ?? Math.max(0, paid - grandTotal));
-      const receiptId = data.id || data.saleId || data.receiptId || data.code || "-";
-      const date = data.created_at || data.createdAt || data.date || data.repairDate || "-";
-      const customerName = data.customerName || data.customer || data.name || "-";
-      const paymentMethod = data.paymentMethod || data.payment_method || "cash";
+      const paid = num(data?.paid ?? data?.cash ?? data?.received ?? grandTotal);
+      const change = num(data?.change ?? data?.changeAmount ?? Math.max(0, paid - grandTotal));
+      const receiptId = data?.id || data?.saleId || data?.receiptId || data?.code || "-";
+      const date = data?.created_at || data?.createdAt || data?.date || data?.repairDate || "-";
+      const customerName = data?.customerName || data?.customer || data?.name || "-";
+      const paymentMethod = data?.paymentMethod || data?.payment_method || "cash";
 
       return {
         receiptId,
@@ -331,8 +403,8 @@
     }
 
     function renderReceipt(data) {
-      const logoUrl = data.logo || "/D.jpg";
-      const r = normalizeReceipt(data);
+      const logoUrl = data?.logo || "/D.jpg";
+      const r = normalizeReceipt(data || {});
       const root = document.getElementById("receiptRoot");
 
       const itemRows = r.items.map(item => `
@@ -348,6 +420,11 @@
         </div>
       `).join("");
 
+      const paidLabel = paymentMethodLabel(r.paymentMethod) === "เงินโอน" ? "ยอดโอน" : "รับเงิน";
+      const paidAmount = paymentMethodLabel(r.paymentMethod) === "เงินโอน"
+        ? (r.paid > 0 ? r.paid : r.grandTotal)
+        : r.paid;
+
       root.innerHTML = `
         <div class="center">
           <img class="logo" src="${logoUrl}" alt="logo" onerror="this.style.display='none'">
@@ -362,9 +439,9 @@
 
         <div class="meta">
           <div class="meta-row"><div><strong>เลขที่:</strong></div><div>${esc(r.receiptId)}</div></div>
-          <div class="meta-row"><div><strong>วันที่:</strong></div><div>${esc(r.date)}</div></div>
+          <div class="meta-row"><div><strong>วันที่:</strong></div><div>${esc(formatDateForReceipt(r.date))}</div></div>
           <div class="meta-row"><div><strong>ลูกค้า:</strong></div><div>${esc(r.customerName || "-")}</div></div>
-          <div class="meta-row"><div><strong>ชำระ:</strong></div><div>${esc(r.paymentMethod === "transfer" ? "เงินโอน" : "เงินสด")}</div></div>
+          <div class="meta-row"><div><strong>ชำระ:</strong></div><div>${esc(paymentMethodLabel(r.paymentMethod))}</div></div>
         </div>
 
         <hr class="dash">
@@ -400,8 +477,8 @@
 
         <div class="summary">
           <div class="sum-row">
-            <div><strong>${r.paymentMethod === "transfer" ? "ยอดโอน" : "รับเงิน"}</strong></div>
-            <div><strong>${fmtMoney(r.paid)}</strong></div>
+            <div><strong>${paidLabel}</strong></div>
+            <div><strong>${fmtMoney(paidAmount)}</strong></div>
           </div>
           <div class="sum-row">
             <div><strong>เงินทอน</strong></div>
@@ -415,17 +492,12 @@
       `;
     }
 
-
-    const THEME_KEY = 'motoTheme';
-    let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
-
-  
-
     const data = getReceiptData();
     renderReceipt(data || {
       id: "-",
       date: "-",
       customerName: "-",
+      paymentMethod: "cash",
       items: [],
       laborCost: 0,
       total: 0,
