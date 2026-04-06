@@ -6,12 +6,12 @@
   <title>หน้าร้าน POS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: "Kanit", sans-serif;
+      font-family: "Google Sans", sans-serif;
       background: #f3f5f7;
       color: #0f172a;
     }
@@ -24,10 +24,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
       flex-wrap: wrap;
       margin-bottom: 16px;
     }
+    .topbar-main { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .topbar-logo { width: 68px; height: 68px; object-fit: contain; border-radius: 18px; background:#fff; padding:6px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
     .brand {
       font-size: 28px;
       font-weight: 800;
@@ -310,12 +312,15 @@
 <body>
   <div class="container">
     <div class="topbar">
-      <div class="brand">หน้าร้าน POS</div>
-      <div class="nav">
-        <a href="/admin.html">⚙️ หลังบ้าน</a>
-        <a href="/report.html">📊 รายงานยอดขาย</a>
-        <a href="/repair-history.html">🛠️ ประวัติซ่อม</a>
+      <div class="topbar-main">
+        <div class="brand">หน้าร้าน POS</div>
+        <div class="nav">
+          <a href="/admin.html">⚙️ หลังบ้าน</a>
+          <a href="/report.html">📊 รายงานยอดขาย</a>
+          <a href="/repair-history.html">🛠️ ประวัติซ่อม</a>
+        </div>
       </div>
+      <img src="/logo.jpg" class="topbar-logo" alt="โลโก้ร้าน" onerror="this.style.display='none'" />
     </div>
 
     <div id="draftStatus" class="status-bar"></div>
@@ -439,7 +444,7 @@
 
     function getPriceLabel(priceType) {
       if (priceType === 'wholesale') return 'ราคาส่ง';
-      if (priceType === 'mechanic') return 'ราคาช่าง';
+      if (priceType === 'mechanic') return 'ราคาซ่อม';
       return 'ราคาปลีก';
     }
 
