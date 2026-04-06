@@ -48,9 +48,24 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 1.25fr 1fr;
+      grid-template-columns: minmax(0, 1.25fr) minmax(360px, 1fr);
       gap: 16px;
       align-items: start;
+    }
+
+    .products-panel {
+      height: calc(100vh - 110px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .checkout-panel {
+      position: sticky;
+      top: 12px;
+      max-height: calc(100vh - 24px);
+      overflow: auto;
     }
 
     .panel {
@@ -88,6 +103,11 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(240px, 1fr));
       gap: 14px;
+      overflow: auto;
+      flex: 1;
+      min-height: 0;
+      align-content: start;
+      padding-right: 4px;
     }
 
     .product-card {
@@ -291,6 +311,8 @@
 
     @media (max-width: 1200px) {
       .layout { grid-template-columns: 1fr; }
+      .products-panel, .checkout-panel { height: auto; max-height: none; position: static; overflow: visible; }
+      .products { overflow: visible; }
     }
 
     @media (max-width: 900px) {
@@ -321,7 +343,7 @@
     <div id="draftStatus" class="status-bar"></div>
 
     <div class="layout">
-      <div class="panel">
+      <div class="panel products-panel">
         <div class="search-row">
           <input
             type="text"
@@ -341,7 +363,7 @@
         <div id="productList" class="products"></div>
       </div>
 
-      <div class="panel">
+      <div class="panel checkout-panel">
         <div class="section-title">เลือกราคาขาย</div>
         <div class="price-type-tabs">
           <button id="tab-retail" class="price-tab active" onclick="setPriceType('retail')">ลูกค้าทั่วไป</button>
