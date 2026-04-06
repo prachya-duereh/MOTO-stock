@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": 1775499439146565,
+    "username": "deekpn",
+    "loginAt": "2026-04-06T18:17:19.146Z",
+    "logoutAt": "2026-04-06T18:17:44.905Z",
+    "ip": "::1",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+  }
+]
