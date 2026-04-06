@@ -183,9 +183,12 @@
     }
 
     @media print {
-      body {
-        background: #fff;
-      }
+
+  .print-btn,
+  button {
+    display: none !important;
+  }
+}
 
       .page {
         padding: 0;
@@ -209,18 +212,15 @@
       }
 
     
-    }
+    
   </style>
 </head>
 <body>
   <div class="page">
     <div class="wrap">
-      <div class="receipt">
+      < class="receipt">
         <div class="print-area" id="receiptRoot"></div>
-      </div>
-      <div class="center">
-        <button class="theme-toggle" id="themeToggle" type="button">🌙 โหมดมืด</button>
-      </div>
+
       <div class="center">
         <button class="print-btn" onclick="window.print()">พิมพ์เอกสาร</button>
       </div>
