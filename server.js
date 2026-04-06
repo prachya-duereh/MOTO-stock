@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -12,6 +13,9 @@ const USE_SUPABASE = String(process.env.USE_SUPABASE || 'false').toLowerCase() =
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '1234';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '';
+const ADMIN_USERNAME_2 = process.env.ADMIN_USERNAME_2 || '';
+const ADMIN_PASSWORD_2 = process.env.ADMIN_PASSWORD_2 || '';
+const ADMIN_PASSWORD_HASH_2 = process.env.ADMIN_PASSWORD_HASH_2 || '';
 const SESSION_SECRET = process.env.SESSION_SECRET || '';
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -44,15 +48,64 @@ function makeScryptHash(password, salt) {
   return crypto.scryptSync(String(password), String(salt), 64).toString('hex');
 }
 
-function verifyAdminPassword(password) {
-  if (ADMIN_PASSWORD_HASH) {
-    const [scheme, salt, savedHash] = String(ADMIN_PASSWORD_HASH).split('$');
-    if (scheme === 'scrypt' && salt && savedHash) {
-      const testHash = makeScryptHash(password, salt);
-      return crypto.timingSafeEqual(Buffer.from(testHash, 'hex'), Buffer.from(savedHash, 'hex'));
-    }
+function isBcryptHash(value) {
+  return /^\$2[aby]\$\d{2}\$/.test(String(value || ''));
+}
+
+function safeTimingEqualHex(leftHex, rightHex) {
+  if (!leftHex || !rightHex) return false;
+  try {
+    const left = Buffer.from(String(leftHex), 'hex');
+    const right = Buffer.from(String(rightHex), 'hex');
+    return left.length === right.length && crypto.timingSafeEqual(left, right);
+  } catch (_) {
+    return false;
   }
-  return String(password) === String(ADMIN_PASSWORD);
+}
+
+function verifyPassword(password, plainPassword, passwordHash) {
+  const raw = String(password || '');
+  const hash = String(passwordHash || '').trim();
+
+  if (hash) {
+    if (isBcryptHash(hash)) {
+      try {
+        return bcrypt.compareSync(raw, hash);
+      } catch (_) {
+        return false;
+      }
+    }
+
+    const [scheme, salt, savedHash] = hash.split('$');
+    if (scheme === 'scrypt' && salt && savedHash) {
+      const testHash = makeScryptHash(raw, salt);
+      return safeTimingEqualHex(testHash, savedHash);
+    }
+
+    return false;
+  }
+
+  return raw === String(plainPassword || '');
+}
+
+function getAdminAccounts() {
+  const admins = [
+    { username: cleanText(ADMIN_USERNAME), plainPassword: ADMIN_PASSWORD, passwordHash: ADMIN_PASSWORD_HASH },
+    { username: cleanText(ADMIN_USERNAME_2), plainPassword: ADMIN_PASSWORD_2, passwordHash: ADMIN_PASSWORD_HASH_2 },
+  ].filter((row) => row.username);
+
+  const seen = new Set();
+  return admins.filter((row) => {
+    const key = row.username.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function findAuthenticatedAdmin(username, password) {
+  const wanted = cleanText(username).toLowerCase();
+  return getAdminAccounts().find((admin) => admin.username.toLowerCase() === wanted && verifyPassword(password, admin.plainPassword, admin.passwordHash)) || null;
 }
 
 function parseCookies(req) {
@@ -661,8 +714,9 @@ app.post('/api/auth/login', (req, res) => {
     return res.status(400).json({ success: false, message: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน' });
   }
 
-  if (username === ADMIN_USERNAME && verifyAdminPassword(password)) {
-    const user = { username: ADMIN_USERNAME, role: 'admin' };
+  const admin = findAuthenticatedAdmin(username, password);
+  if (admin) {
+    const user = { username: admin.username, role: 'admin' };
     const sid = createSession(req, res, user);
     const session = sessions.get(sid);
     if (session) {
