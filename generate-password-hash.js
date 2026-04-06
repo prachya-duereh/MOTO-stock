@@ -1,11 +1,11 @@
-const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 const password = process.argv[2];
 if (!password) {
-  console.log('Usage: node generate-password-hash.js your_password');
+  console.log('ใส่รหัสด้วย');
   process.exit(1);
 }
 
-const salt = crypto.randomBytes(16).toString('hex');
-const hash = crypto.scryptSync(String(password), salt, 64).toString('hex');
-console.log(`scrypt$${salt}$${hash}`);
+bcrypt.hash(password, 10).then(hash => {
+  console.log(hash);
+});
