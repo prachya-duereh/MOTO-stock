@@ -7,7 +7,7 @@
   <style>
     :root{
       --paper-width: 58mm;
-      --print-width: 50mm;
+      --print-width: 52mm;
       --text: #111;
       --line: #444;
       --bg: #eef1f4;
@@ -15,7 +15,9 @@
       --green: #1f8f3a;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     html, body {
       margin: 0;
@@ -26,6 +28,10 @@
       background: var(--bg);
       color: var(--text);
       font-family: "Courier New", monospace;
+      font-weight: 400;
+      text-rendering: geometricPrecision;
+      -webkit-font-smoothing: none;
+      font-smooth: never;
     }
 
     .page {
@@ -45,7 +51,7 @@
       background: var(--card);
       border-radius: 18px;
       padding: 14px 10px 18px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
       margin: 0 auto;
     }
 
@@ -58,7 +64,7 @@
     .right { text-align: right; }
 
     .logo {
-      width: 46px;
+      width: 42px;
       height: auto;
       display: block;
       margin: 0 auto 4px;
@@ -66,17 +72,18 @@
     }
 
     .shop-name {
-      font-size: 16px;
-      font-weight: 800;
-      line-height: 1.15;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
       margin: 0 0 2px;
     }
 
     .shop-sub,
     .shop-tel {
-      font-size: 11px;
-      line-height: 1.2;
+      font-size: 12px;
+      line-height: 1.25;
       margin: 0;
+      font-weight: 400;
     }
 
     .dash {
@@ -88,18 +95,19 @@
     .title {
       text-align: center;
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 700;
       margin: 4px 0 6px;
     }
 
     .meta {
-      font-size: 11px;
-      line-height: 1.35;
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 400;
     }
 
     .meta-row {
       display: grid;
-      grid-template-columns: 44px 1fr;
+      grid-template-columns: 46px 1fr;
       gap: 4px;
       align-items: start;
     }
@@ -107,20 +115,20 @@
     .thead,
     .item-line-1 {
       display: grid;
-      grid-template-columns: 12px 1fr 22px 30px 30px;
+      grid-template-columns: 12px 1fr 24px 32px 32px;
       gap: 3px;
       align-items: start;
     }
 
     .thead {
-      font-size: 10px;
-      font-weight: 800;
-      margin-bottom: 2px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 3px;
     }
 
     .item {
-      font-size: 10px;
-      margin-bottom: 2px;
+      font-size: 12px;
+      margin-bottom: 3px;
     }
 
     .item-line-1 {
@@ -133,27 +141,29 @@
     .total {
       text-align: right;
       white-space: nowrap;
+      font-weight: 400;
     }
 
     .item-code {
-      font-size: 10px;
-      color: #333;
-      line-height: 1.15;
+      font-size: 11px;
+      color: #111;
+      line-height: 1.2;
       word-break: break-all;
+      font-weight: 400;
     }
 
     .item-name {
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 700;
-      line-height: 1.18;
+      line-height: 1.2;
       word-break: break-word;
       margin-top: 1px;
       padding-left: 15px;
     }
 
     .summary {
-      font-size: 11px;
-      line-height: 1.35;
+      font-size: 12px;
+      line-height: 1.4;
     }
 
     .sum-row {
@@ -166,12 +176,12 @@
 
     .sum-row .big {
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 700;
     }
 
     .thanks {
       text-align: center;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
       margin-top: 4px;
     }
@@ -190,19 +200,19 @@
       font-weight: 800;
       cursor: pointer;
       margin: 14px auto 0;
-      box-shadow: 0 6px 18px rgba(31,143,58,.25);
+      box-shadow: 0 6px 18px rgba(31, 143, 58, .25);
       transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
     }
 
     .print-btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(31,143,58,.32);
+      box-shadow: 0 8px 20px rgba(31, 143, 58, .32);
       filter: brightness(1.02);
     }
 
     .print-btn:active {
       transform: translateY(0);
-      box-shadow: 0 4px 12px rgba(31,143,58,.22);
+      box-shadow: 0 4px 12px rgba(31, 143, 58, .22);
     }
 
     @page {
@@ -212,30 +222,46 @@
 
     @media print {
       html, body {
+        width: 58mm !important;
         background: #fff !important;
         color: #000 !important;
+        font-family: "Courier New", monospace !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      * {
+        transform: none !important;
+        zoom: 1 !important;
+        text-shadow: none !important;
+        box-shadow: none !important;
+        filter: none !important;
       }
 
       .page {
         padding: 0;
         min-height: auto;
+        display: block;
       }
 
       .wrap {
         max-width: none;
-        width: var(--paper-width);
+        width: 58mm;
       }
 
       .receipt-shell {
-        width: var(--paper-width);
+        width: 58mm;
         border-radius: 0;
         box-shadow: none;
-        padding: 4mm 3.5mm 5mm;
+        padding: 2.5mm 3mm 4mm;
         background: #fff !important;
       }
 
       .print-area {
-        width: 50mm;
+        width: 52mm;
+        margin: 0 auto;
       }
 
       .print-btn,
@@ -440,14 +466,22 @@
         <div class="title">ใบเสร็จรับเงิน</div>
 
         <div class="meta">
-          <div class="meta-row"><div><strong>เลขที่:</strong>
-            </div><div>${esc(r.receiptId)}</div></div>
-          <div class="meta-row"><div><strong>วันที่:</strong>
-            </div><div>${esc(formatDateForReceipt(r.date))}</div></div>
-          <div class="meta-row"><div><strong>ลูกค้า:</strong>
-            </div><div>${esc(r.customerName || "-")}</div></div>
-          <div class="meta-row"><div><strong>ชำระ:</strong>
-           </div><div>${esc(paymentMethodLabel(r.paymentMethod))}</div></div>
+          <div class="meta-row">
+            <div><strong>เลขที่:</strong></div>
+            <div>${esc(r.receiptId)}</div>
+          </div>
+          <div class="meta-row">
+            <div><strong>วันที่:</strong></div>
+            <div>${esc(formatDateForReceipt(r.date))}</div>
+          </div>
+          <div class="meta-row">
+            <div><strong>ลูกค้า:</strong></div>
+            <div>${esc(r.customerName || "-")}</div>
+          </div>
+          <div class="meta-row">
+            <div><strong>ชำระ:</strong></div>
+            <div>${esc(paymentMethodLabel(r.paymentMethod))}</div>
+          </div>
         </div>
 
         <hr class="dash">
