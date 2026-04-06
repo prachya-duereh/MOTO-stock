@@ -1,16 +1,10 @@
--- =========================================
--- MOTO STOCK - COMPLETE SUPABASE SCHEMA
--- วางทับทั้งไฟล์เดิมได้เลย
--- =========================================
 
--- =========================
--- EXTENSIONS
--- =========================
+
+
 create extension if not exists pgcrypto;
 
--- =========================
--- updated_at trigger function
--- =========================
+
+
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql

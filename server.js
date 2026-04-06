@@ -169,7 +169,7 @@ function itemToDb(item) {
 function repairPriceLabel(type) {
   if (type === 'retail') return 'ราคาปลีก';
   if (type === 'wholesale') return 'ราคาส่ง';
-  return 'ราคาช่าง';
+  return 'ราคาซ่อม';
 }
 
 function getItemPrice(item, priceType = 'retail') {

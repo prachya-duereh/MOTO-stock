@@ -6,7 +6,7 @@
   <title>Dashboard รายงาน</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
     :root {
@@ -37,7 +37,7 @@
     }
     body {
       margin: 0;
-      font-family: "Kanit", sans-serif;
+      font-family: "Google Sans", sans-serif;
       background:
         radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 32%),
         radial-gradient(circle at top right, rgba(15,118,110,.10), transparent 28%),
@@ -56,6 +56,8 @@
       display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
       padding: 14px 18px; border-radius: 22px; margin-bottom: 18px;
     }
+    .topbar-main { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .topbar-logo { width: 68px; height: 68px; object-fit: contain; border-radius: 18px; background:#fff; padding:6px; box-shadow:0 8px 24px rgba(15,23,42,.10); }
     .brand h1 { margin:0; font-size: 30px; }
     .brand p { margin:4px 0 0; color:var(--muted); }
     .nav { display:flex; gap:10px; flex-wrap:wrap; }
@@ -154,16 +156,19 @@
 <body>
   <div class="container">
     <div class="topbar">
-      <div class="brand">
-        <h1>Dashboard รายงานยอดขาย</h1>
-        <p>ดูภาพรวมยอดขาย งานซ่อม กำไร และบิลล่าสุดในช่วงวันที่ที่เลือก</p>
+      <div class="topbar-main">
+        <div class="brand">
+          <h1>Dashboard รายงานยอดขาย</h1>
+          <p>ดูภาพรวมยอดขาย งานซ่อม กำไร และบิลล่าสุดในช่วงวันที่ที่เลือก</p>
+        </div>
+        <div class="nav">
+          <a href="/admin.html">⚙️ หลังบ้าน</a>
+          <a href="/pos.html">🛒 หน้าร้าน</a>
+          <a href="/repair-history.html">🔧 ประวัติซ่อม</a>
+          <button class="btn btn-light" id="themeToggle" type="button">🌙 Dark mode</button>
+        </div>
       </div>
-      <div class="nav">
-        <a href="/admin.html">⚙️ หลังบ้าน</a>
-        <a href="/pos.html">🛒 หน้าร้าน</a>
-        <a href="/repair-history.html">🔧 ประวัติซ่อม</a>
-        <button class="btn btn-light" id="themeToggle" type="button">🌙 Dark mode</button>
-      </div>
+      <img src="/D.jpg" class="topbar-logo" alt="โลโก้ร้าน" onerror="this.style.display='none'" />
     </div>
 
     <div class="filters panel">
