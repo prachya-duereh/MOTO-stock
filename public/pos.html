@@ -220,13 +220,23 @@
       border: 1px solid var(--line);
       border-radius: 18px;
       padding: 14px;
-      margin-bottom: 12px;
+      margin: 14px 0 14px;
       background: var(--soft);
     }
     .cart-total-big {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       font-size: 28px;
       font-weight: 800;
-      margin-bottom: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--line);
+    }
+    .cart-total-big strong {
+      font-size: 30px;
+      font-weight: 800;
     }
     .sum-row {
       display: flex;
@@ -480,12 +490,6 @@
           <button id="tab-mechanic" class="price-tab" onclick="setPriceType('mechanic')">ราคาซ่อม</button>
         </div>
 
-        <div class="cart-summary-box">
-          <div class="cart-total-big">รวม <span id="grandTotalText">0</span> บาท</div>
-          <div class="sum-row"><span>ค่าสินค้า</span><strong id="itemsTotalText">0</strong></div>
-          <div class="sum-row"><span>ค่าแรง</span><strong id="laborCostText">0</strong></div>
-        </div>
-
         <div class="cart-table-wrap">
           <table>
             <thead>
@@ -500,6 +504,12 @@
             </thead>
             <tbody id="cartBody"></tbody>
           </table>
+        </div>
+
+        <div class="cart-summary-box">
+          <div class="sum-row"><span>ค่าสินค้า</span><strong id="itemsTotalText">0</strong></div>
+          <div class="sum-row"><span>ค่าแรง</span><strong id="laborCostText">0</strong></div>
+          <div class="cart-total-big"><span>ยอดรวม</span><strong><span id="grandTotalText">0</span> บาท</strong></div>
         </div>
 
         <div class="payment-box">

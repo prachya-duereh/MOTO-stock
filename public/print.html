@@ -438,10 +438,14 @@
         <div class="title">ใบเสร็จรับเงิน</div>
 
         <div class="meta">
-          <div class="meta-row"><div><strong>เลขที่:</strong></div><div>${esc(r.receiptId)}</div></div>
-          <div class="meta-row"><div><strong>วันที่:</strong></div><div>${esc(formatDateForReceipt(r.date))}</div></div>
-          <div class="meta-row"><div><strong>ลูกค้า:</strong></div><div>${esc(r.customerName || "-")}</div></div>
-          <div class="meta-row"><div><strong>ชำระ:</strong></div><div>${esc(paymentMethodLabel(r.paymentMethod))}</div></div>
+          <div class="meta-row"><div><strong>เลขที่:</strong>
+            </div><div>${esc(r.receiptId)}</div></div>
+          <div class="meta-row"><div><strong>วันที่:</strong>
+            </div><div>${esc(formatDateForReceipt(r.date))}</div></div>
+          <div class="meta-row"><div><strong>ลูกค้า:</strong>
+            </div><div>${esc(r.customerName || "-")}</div></div>
+          <div class="meta-row"><div><strong>ชำระ:</strong>
+           </div><div>${esc(paymentMethodLabel(r.paymentMethod))}</div></div>
         </div>
 
         <hr class="dash">
