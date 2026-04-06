@@ -6,12 +6,12 @@
   <title>หน้าร้าน POS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: "Kanit", sans-serif;
+      font-family: "Google Sans", sans-serif;
       background: #f3f5f7;
       color: #0f172a;
     }
@@ -24,10 +24,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
       flex-wrap: wrap;
       margin-bottom: 16px;
     }
+    .topbar-main { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .topbar-logo { width: 68px; height: 68px; object-fit: contain; border-radius: 18px; background:#fff; padding:6px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
     .brand {
       font-size: 28px;
       font-weight: 800;
@@ -269,6 +271,35 @@
       gap: 12px;
     }
 
+    .scan-status {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .scan-status.show { display: block; }
+    .scan-status.success { background: #dcfce7; color: #166534; }
+    .scan-status.error { background: #fee2e2; color: #991b1b; }
+    .cart-row-highlight {
+      animation: cartRowFlash 1.6s ease;
+      box-shadow: inset 0 0 0 9999px rgba(37, 99, 235, 0.14);
+    }
+    @keyframes cartRowFlash {
+      0% {
+        box-shadow: inset 0 0 0 9999px rgba(37, 99, 235, 0.24);
+        transform: scale(1);
+      }
+      25% {
+        box-shadow: inset 0 0 0 9999px rgba(37, 99, 235, 0.18);
+      }
+      100% {
+        box-shadow: inset 0 0 0 9999px rgba(37, 99, 235, 0);
+        transform: scale(1);
+      }
+    }
+
     .status-bar {
       margin-bottom: 14px;
       padding: 12px 14px;
@@ -310,12 +341,15 @@
 <body>
   <div class="container">
     <div class="topbar">
-      <div class="brand">หน้าร้าน POS</div>
-      <div class="nav">
-        <a href="/admin.html">⚙️ หลังบ้าน</a>
-        <a href="/report.html">📊 รายงานยอดขาย</a>
-        <a href="/repair-history.html">🛠️ ประวัติซ่อม</a>
+      <div class="topbar-main">
+        <div class="brand">หน้าร้าน POS</div>
+        <div class="nav">
+          <a href="/admin.html">⚙️ หลังบ้าน</a>
+          <a href="/report.html">📊 รายงานยอดขาย</a>
+          <a href="/repair-history.html">🛠️ ประวัติซ่อม</a>
+        </div>
       </div>
+      <img src="/logo.jpg" class="topbar-logo" alt="โลโก้ร้าน" onerror="this.style.display='none'" />
     </div>
 
     <div id="draftStatus" class="status-bar"></div>
@@ -334,8 +368,11 @@
             id="barcodeInput"
             placeholder="ยิงบาร์โค้ดแล้วกด Enter"
             onkeydown="handleBarcodeEnter(event)"
+            autocomplete="off"
+            inputmode="none"
           />
         </div>
+        <div id="scanStatus" class="scan-status"></div>
 
         <div class="section-title">รายการสินค้า</div>
         <div id="productList" class="products"></div>
@@ -418,6 +455,11 @@
     let editingSaleId = null;
     let editingCreatedAt = null;
     let draftMode = null;
+    let scanStatusTimer = null;
+    let barcodeInputRefocusTimer = null;
+    let cartHighlightTimer = null;
+    let lastHighlightedCartKey = '';
+    let beepAudioContext = null;
 
     function formatNumber(value) {
       return Number(value || 0).toLocaleString('th-TH');
@@ -453,6 +495,55 @@
       return asNumber(item.quantity, 0);
     }
 
+    function getCartRowKey(itemId, priceType) {
+      return `${Number(itemId)}__${String(priceType || 'retail')}`;
+    }
+
+    function highlightCartRow(itemId, priceType) {
+      lastHighlightedCartKey = getCartRowKey(itemId, priceType);
+      renderCart();
+
+      clearTimeout(cartHighlightTimer);
+      cartHighlightTimer = setTimeout(() => {
+        lastHighlightedCartKey = '';
+        renderCart();
+      }, 1600);
+    }
+
+    function playScanBeep() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+
+        if (!beepAudioContext) {
+          beepAudioContext = new AudioCtx();
+        }
+
+        if (beepAudioContext.state === 'suspended') {
+          beepAudioContext.resume().catch(() => {});
+        }
+
+        const oscillator = beepAudioContext.createOscillator();
+        const gainNode = beepAudioContext.createGain();
+        const now = beepAudioContext.currentTime;
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(1180, now);
+
+        gainNode.gain.setValueAtTime(0.0001, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(beepAudioContext.destination);
+
+        oscillator.start(now);
+        oscillator.stop(now + 0.12);
+      } catch (error) {
+        console.warn('playScanBeep error:', error);
+      }
+    }
+
     function updateDraftStatus() {
       const box = document.getElementById('draftStatus');
 
@@ -469,6 +560,56 @@
         box.className = 'status-bar show status-duplicate';
         box.textContent = 'กำลังทำซ้ำบิลเดิม เมื่อบันทึกจะสร้างบิลใหม่อีกใบ';
       }
+    }
+
+    function focusBarcodeInput(selectText = false) {
+      const input = document.getElementById('barcodeInput');
+      if (!input) return;
+
+      clearTimeout(barcodeInputRefocusTimer);
+      barcodeInputRefocusTimer = setTimeout(() => {
+        input.focus();
+        if (selectText) input.select();
+      }, 0);
+    }
+
+    function showScanStatus(message, type = 'success') {
+      const box = document.getElementById('scanStatus');
+      if (!box) return;
+
+      box.textContent = message || '';
+      box.className = `scan-status show ${type}`;
+
+      clearTimeout(scanStatusTimer);
+      scanStatusTimer = setTimeout(() => {
+        box.className = 'scan-status';
+        box.textContent = '';
+      }, type === 'error' ? 2200 : 1200);
+    }
+
+    function addToCartByBarcode(barcode) {
+      const cleanBarcode = String(barcode || '').trim();
+      if (!cleanBarcode) return false;
+
+      const item = allItems.find(i => String(i.barcode || '').trim() === cleanBarcode);
+      if (!item) {
+        showScanStatus('ไม่พบบาร์โค้ดนี้ในระบบ', 'error');
+        focusBarcodeInput(true);
+        return false;
+      }
+
+      const result = addToCart(item.id, { silentError: true, source: 'barcode' });
+      if (!result?.success) {
+        showScanStatus(result?.message || 'เพิ่มสินค้าไม่สำเร็จ', 'error');
+        focusBarcodeInput(true);
+        return false;
+      }
+
+      playScanBeep();
+      highlightCartRow(item.id, currentPriceType);
+      showScanStatus(`เพิ่ม ${item.name} แล้ว`, 'success');
+      focusBarcodeInput(true);
+      return true;
     }
 
     async function loadItems() {
@@ -551,9 +692,13 @@
       }).join('');
     }
 
-    function addToCart(itemId) {
+    function addToCart(itemId, options = {}) {
       const item = allItems.find(i => Number(i.id) === Number(itemId));
-      if (!item) return alert('ไม่พบสินค้า');
+      if (!item) {
+        const message = 'ไม่พบสินค้า';
+        if (!options.silentError) alert(message);
+        return { success: false, message };
+      }
 
       const stock = getItemStock(item);
       const price = getItemPrice(item, currentPriceType);
@@ -569,7 +714,9 @@
         .reduce((sum, row) => sum + asNumber(row.qty, 0), 0);
 
       if (usedQtySameItem + 1 > stock) {
-        return alert(`สินค้า ${item.name} มีไม่พอในสต๊อก`);
+        const message = `สินค้า ${item.name} มีไม่พอในสต๊อก`;
+        if (!options.silentError) alert(message);
+        return { success: false, message };
       }
 
       if (existing) {
@@ -589,6 +736,8 @@
       }
 
       renderCart();
+      if (options.source === 'barcode') focusBarcodeInput(true);
+      return { success: true, item };
     }
 
     function updateQty(itemId, priceType, delta) {
@@ -660,7 +809,7 @@
         `;
       } else {
         tbody.innerHTML = cart.map((item, index) => `
-          <tr>
+          <tr class="${getCartRowKey(item.id, item.priceType) === lastHighlightedCartKey ? 'cart-row-highlight' : ''}">
             <td>${index + 1}</td>
             <td>${escapeHtml(item.barcode || item.id || '-')}</td>
             <td>
@@ -803,17 +952,12 @@
       if (event.key !== 'Enter') return;
       event.preventDefault();
 
-      const barcode = document.getElementById('barcodeInput').value.trim();
+      const input = document.getElementById('barcodeInput');
+      const barcode = input.value.trim();
       if (!barcode) return;
 
-      const item = allItems.find(i => String(i.barcode || '').trim() === barcode);
-      if (!item) {
-        alert('ไม่พบบาร์โค้ดนี้ในระบบ');
-        return;
-      }
-
-      addToCart(item.id);
-      document.getElementById('barcodeInput').value = '';
+      input.value = '';
+      addToCartByBarcode(barcode);
     }
 
     function loadDraftSaleFromStorage() {
