@@ -17,6 +17,8 @@
 
     * {
       box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
 
     html, body {
@@ -27,11 +29,9 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: "Courier New", monospace;
+      font-family: Tahoma, Arial, sans-serif;
       font-weight: 400;
       text-rendering: geometricPrecision;
-      -webkit-font-smoothing: none;
-      font-smooth: never;
     }
 
     .page {
@@ -64,7 +64,7 @@
     .right { text-align: right; }
 
     .logo {
-      width: 42px;
+      width: 46px;
       height: auto;
       display: block;
       margin: 0 auto 4px;
@@ -94,7 +94,7 @@
 
     .title {
       text-align: center;
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
       margin: 4px 0 6px;
     }
@@ -107,9 +107,13 @@
 
     .meta-row {
       display: grid;
-      grid-template-columns: 46px 1fr;
+      grid-template-columns: 48px 1fr;
       gap: 4px;
       align-items: start;
+    }
+
+    .meta-row .label {
+      font-weight: 700;
     }
 
     .thead,
@@ -146,10 +150,10 @@
 
     .item-code {
       font-size: 11px;
-      color: #111;
       line-height: 1.2;
       word-break: break-all;
       font-weight: 400;
+      color: #111;
     }
 
     .item-name {
@@ -163,7 +167,7 @@
 
     .summary {
       font-size: 12px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .sum-row {
@@ -172,6 +176,10 @@
       gap: 8px;
       align-items: end;
       margin: 1px 0;
+    }
+
+    .sum-row strong {
+      font-weight: 700;
     }
 
     .sum-row .big {
@@ -225,11 +233,9 @@
         width: 58mm !important;
         background: #fff !important;
         color: #000 !important;
-        font-family: "Courier New", monospace !important;
+        font-family: Tahoma, Arial, sans-serif !important;
         font-size: 12px !important;
         font-weight: 400 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
       }
 
       * {
@@ -314,6 +320,10 @@
 
       const raw = String(value).trim();
 
+      if (/^\d{2}\/\d{2}\/\d{4}\s\d{2}:\d{2}$/.test(raw)) {
+        return raw;
+      }
+
       if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
         return raw;
       }
@@ -338,7 +348,13 @@
 
     function paymentMethodLabel(method) {
       const value = String(method || "").toLowerCase().trim();
-      if (value === "transfer" || value === "bank" || value === "qr" || value === "promptpay") {
+      if (
+        value === "transfer" ||
+        value === "bank" ||
+        value === "qr" ||
+        value === "promptpay" ||
+        value.includes("โอน")
+      ) {
         return "เงินโอน";
       }
       return "เงินสด";
@@ -400,6 +416,7 @@
       const itemsTotal = num(
         data?.itemsTotal ??
         data?.subtotal ??
+        data?.partsTotal ??
         items.reduce((sum, i) => sum + i.total, 0)
       );
       const discount = num(data?.discount ?? data?.discountAmount ?? data?.discount_amount ?? 0);
@@ -448,8 +465,9 @@
         </div>
       `).join("");
 
-      const paidLabel = paymentMethodLabel(r.paymentMethod) === "เงินโอน" ? "ยอดโอน" : "รับเงิน";
-      const paidAmount = paymentMethodLabel(r.paymentMethod) === "เงินโอน"
+      const paymentLabel = paymentMethodLabel(r.paymentMethod);
+      const paidLabel = paymentLabel === "เงินโอน" ? "ยอดโอน" : "รับเงิน";
+      const paidAmount = paymentLabel === "เงินโอน"
         ? (r.paid > 0 ? r.paid : r.grandTotal)
         : r.paid;
 
@@ -467,20 +485,20 @@
 
         <div class="meta">
           <div class="meta-row">
-            <div><strong>เลขที่:</strong></div>
+            <div class="label">เลขที่:</div>
             <div>${esc(r.receiptId)}</div>
           </div>
           <div class="meta-row">
-            <div><strong>วันที่:</strong></div>
+            <div class="label">วันที่:</div>
             <div>${esc(formatDateForReceipt(r.date))}</div>
           </div>
           <div class="meta-row">
-            <div><strong>ลูกค้า:</strong></div>
+            <div class="label">ลูกค้า:</div>
             <div>${esc(r.customerName || "-")}</div>
           </div>
           <div class="meta-row">
-            <div><strong>ชำระ:</strong></div>
-            <div>${esc(paymentMethodLabel(r.paymentMethod))}</div>
+            <div class="label">ชำระ:</div>
+            <div>${esc(paymentLabel)}</div>
           </div>
         </div>
 
