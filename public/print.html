@@ -147,6 +147,11 @@
       padding-left: 1px;
     }
 
+    /* ขยับหัวคำว่า "จำนวน" ไปทางซ้ายนิดนึง */
+    .thead div:nth-child(3) {
+      padding-right: 4px;
+    }
+
     .item {
       margin: 0 0 3px;
       font-size: 12px;
@@ -172,6 +177,11 @@
     .item-no {
       text-align: left;
       font-family: Tahoma, Arial, sans-serif;
+    }
+
+    /* ขยับเลขจำนวนไปทางซ้ายนิดนึง */
+    .qty {
+      padding-right: 4px;
     }
 
     .item-code {
@@ -212,8 +222,8 @@
     }
 
     .sum-row .big {
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
       line-height: 1.05;
     }
 
@@ -377,6 +387,11 @@
         text-align: left !important;
       }
 
+      /* ขยับหัวคำว่า "จำนวน" ไปทางซ้ายนิดนึง ตอนพิมพ์ */
+      .thead div:nth-child(3) {
+        padding-right: 4px !important;
+      }
+
       .item {
         margin: 0 0 2px !important;
         line-height: 1.1 !important;
@@ -413,6 +428,11 @@
         text-align: right !important;
       }
 
+      /* ขยับเลขจำนวนไปทางซ้ายนิดนึง ตอนพิมพ์ */
+      .qty {
+        padding-right: 4px !important;
+      }
+
       .summary {
         line-height: 1.2 !important;
         font-family: Tahoma, Arial, sans-serif !important;
@@ -423,7 +443,7 @@
       }
 
       .sum-row .big {
-        font-size: 16px !important;
+        font-size: 14px !important;
         line-height: 1 !important;
       }
 
