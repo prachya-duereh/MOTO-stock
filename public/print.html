@@ -121,16 +121,26 @@
     .thead,
     .item-top {
       display: grid;
-      grid-template-columns: 14px minmax(0,1fr) 22px 30px 32px;
-      column-gap: 2px;
+      grid-template-columns: 12px minmax(0, 1fr) 26px 34px 36px;
+      column-gap: 4px;
       align-items: start;
     }
 
     .thead {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       line-height: 1.15;
       margin-bottom: 3px;
+    }
+
+    .thead div {
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .thead div:nth-child(1),
+    .thead div:nth-child(2) {
+      text-align: left;
     }
 
     .thead .col-item {
@@ -156,6 +166,12 @@
       text-align: right;
       white-space: nowrap;
       font-weight: 400;
+      font-family: "Courier New", "Lucida Console", monospace;
+    }
+
+    .item-no {
+      text-align: left;
+      font-family: Tahoma, Arial, sans-serif;
     }
 
     .item-code {
@@ -165,6 +181,7 @@
       word-break: break-all;
       overflow-wrap: anywhere;
       padding-left: 1px;
+      font-family: "Courier New", "Lucida Console", monospace;
     }
 
     .item-name {
@@ -303,6 +320,14 @@
       .shop-name {
         font-size: 15px !important;
         line-height: 1.1 !important;
+        font-family: Tahoma, Arial, sans-serif !important;
+      }
+
+      .title,
+      .thanks,
+      .item-name,
+      .meta-row .label {
+        font-family: Tahoma, Arial, sans-serif !important;
       }
 
       .shop-sub,
@@ -322,6 +347,7 @@
 
       .meta {
         line-height: 1.28 !important;
+        font-family: Tahoma, Arial, sans-serif !important;
       }
 
       .meta-row {
@@ -331,13 +357,24 @@
 
       .thead,
       .item-top {
-        grid-template-columns: 14px minmax(0,1fr) 22px 30px 32px !important;
-        column-gap: 2px !important;
+        grid-template-columns: 12px minmax(0, 1fr) 26px 34px 36px !important;
+        column-gap: 4px !important;
       }
 
       .thead {
+        font-size: 11px !important;
         margin-bottom: 2px !important;
         line-height: 1.1 !important;
+      }
+
+      .thead div {
+        white-space: nowrap !important;
+        text-align: right !important;
+      }
+
+      .thead div:nth-child(1),
+      .thead div:nth-child(2) {
+        text-align: left !important;
       }
 
       .item {
@@ -358,16 +395,27 @@
         padding-left: 15px !important;
       }
 
+      .item-no,
       .qty,
       .price,
       .total {
         font-family: "Courier New", "Lucida Console", monospace !important;
-        text-align: right !important;
         white-space: nowrap !important;
+      }
+
+      .item-no {
+        text-align: left !important;
+      }
+
+      .qty,
+      .price,
+      .total {
+        text-align: right !important;
       }
 
       .summary {
         line-height: 1.2 !important;
+        font-family: Tahoma, Arial, sans-serif !important;
       }
 
       .sum-row {
@@ -615,9 +663,9 @@
         <div class="thead">
           <div>#</div>
           <div class="col-item">รายการ</div>
-          <div class="right">จำนวน</div>
-          <div class="right">ราคา</div>
-          <div class="right">รวม</div>
+          <div>จำนวน</div>
+          <div>ราคา</div>
+          <div>รวม</div>
         </div>
 
         ${itemRows || `<div class="item"><div class="item-name">ไม่มีรายการ</div></div>`}
