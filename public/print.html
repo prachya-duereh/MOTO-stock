@@ -32,8 +32,6 @@
       font-family: Tahoma, Arial, sans-serif;
       font-weight: 400;
       text-rendering: geometricPrecision;
-      -webkit-font-smoothing: none;
-      -moz-osx-font-smoothing: auto;
     }
 
     .page {
@@ -76,14 +74,14 @@
     .shop-name {
       font-size: 15px;
       font-weight: 700;
-      line-height: 1.2;
+      line-height: 1.15;
       margin: 0 0 2px;
     }
 
     .shop-sub,
     .shop-tel {
       font-size: 12px;
-      line-height: 1.25;
+      line-height: 1.2;
       margin: 0;
       font-weight: 400;
     }
@@ -98,21 +96,22 @@
       text-align: center;
       font-size: 16px;
       font-weight: 700;
+      line-height: 1.15;
       margin: 4px 0 6px;
-      line-height: 1.2;
     }
 
     .meta {
       font-size: 12px;
-      line-height: 1.38;
+      line-height: 1.3;
       font-weight: 400;
     }
 
     .meta-row {
       display: grid;
-      grid-template-columns: 48px 1fr;
+      grid-template-columns: 46px 1fr;
       gap: 4px;
       align-items: start;
+      margin: 0;
     }
 
     .meta-row .label {
@@ -120,9 +119,9 @@
     }
 
     .thead,
-    .item-line-1 {
+    .item-top {
       display: grid;
-      grid-template-columns: 14px minmax(0, 1fr) 24px 34px 36px;
+      grid-template-columns: 14px minmax(0,1fr) 22px 30px 32px;
       column-gap: 2px;
       align-items: start;
     }
@@ -130,22 +129,24 @@
     .thead {
       font-size: 12px;
       font-weight: 700;
-      margin-bottom: 4px;
-      line-height: 1.2;
+      line-height: 1.15;
+      margin-bottom: 3px;
     }
 
-    .thead > div:nth-child(2) {
-      padding-left: 2px;
+    .thead .col-item {
+      padding-left: 1px;
     }
 
     .item {
+      margin: 0 0 3px;
       font-size: 12px;
-      margin-bottom: 4px;
+      line-height: 1.15;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
-    .item-line-1 {
-      margin-top: 1px;
-      line-height: 1.2;
+    .item-top {
+      margin: 0;
     }
 
     .item-no,
@@ -157,35 +158,28 @@
       font-weight: 400;
     }
 
-    .item-no {
-      padding-top: 0;
-    }
-
     .item-code {
-      font-size: 11px;
-      line-height: 1.22;
-      word-break: break-word;
-      overflow-wrap: anywhere;
-      white-space: normal;
-      font-weight: 400;
-      color: #111;
-      padding-left: 2px;
       min-width: 0;
+      font-size: 11px;
+      line-height: 1.1;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+      padding-left: 1px;
     }
 
     .item-name {
       font-size: 12px;
       font-weight: 700;
-      line-height: 1.22;
+      line-height: 1.1;
+      margin: 1px 0 0;
+      padding-left: 15px;
       word-break: break-word;
       overflow-wrap: anywhere;
-      margin-top: 1px;
-      padding-left: 16px;
     }
 
     .summary {
       font-size: 12px;
-      line-height: 1.4;
+      line-height: 1.25;
     }
 
     .sum-row {
@@ -193,7 +187,7 @@
       grid-template-columns: 1fr auto;
       gap: 8px;
       align-items: end;
-      margin: 1px 0;
+      margin: 0;
     }
 
     .sum-row strong {
@@ -203,15 +197,15 @@
     .sum-row .big {
       font-size: 16px;
       font-weight: 700;
-      line-height: 1.1;
+      line-height: 1.05;
     }
 
     .thanks {
       text-align: center;
       font-size: 12px;
       font-weight: 700;
+      line-height: 1.15;
       margin-top: 4px;
-      line-height: 1.2;
     }
 
     .print-btn {
@@ -253,9 +247,10 @@
         width: 58mm !important;
         background: #fff !important;
         color: #000 !important;
-        font-family: Tahoma, Arial, sans-serif !important;
+        font-family: "Courier New", "Lucida Console", monospace !important;
         font-size: 12px !important;
         font-weight: 400 !important;
+        letter-spacing: 0 !important;
       }
 
       * {
@@ -264,11 +259,6 @@
         text-shadow: none !important;
         box-shadow: none !important;
         filter: none !important;
-      }
-
-      body {
-        -webkit-font-smoothing: none !important;
-        image-rendering: pixelated;
       }
 
       .page {
@@ -295,14 +285,24 @@
         margin: 0 auto;
       }
 
-      .logo {
-        width: 44px;
-        margin-bottom: 3px;
+      .print-btn,
+      button {
+        display: none !important;
+      }
+
+      .shop-name,
+      .title,
+      .item-name,
+      .thanks,
+      .meta-row .label,
+      .thead,
+      .sum-row strong {
+        font-weight: 700 !important;
       }
 
       .shop-name {
-        font-size: 15px;
-        line-height: 1.15;
+        font-size: 15px !important;
+        line-height: 1.1 !important;
       }
 
       .shop-sub,
@@ -316,39 +316,71 @@
       }
 
       .dash {
-        border-top: 1px dashed #000;
+        border-top: 1px dashed #000 !important;
+        margin: 5px 0 !important;
+      }
+
+      .meta {
+        line-height: 1.28 !important;
+      }
+
+      .meta-row {
+        grid-template-columns: 46px 1fr !important;
+        gap: 4px !important;
       }
 
       .thead,
-      .item-line-1 {
-        grid-template-columns: 14px minmax(0, 1fr) 24px 34px 36px;
-        column-gap: 2px;
+      .item-top {
+        grid-template-columns: 14px minmax(0,1fr) 22px 30px 32px !important;
+        column-gap: 2px !important;
+      }
+
+      .thead {
+        margin-bottom: 2px !important;
+        line-height: 1.1 !important;
       }
 
       .item {
-        margin-bottom: 5px;
-        page-break-inside: avoid;
-        break-inside: avoid;
+        margin: 0 0 2px !important;
+        line-height: 1.1 !important;
       }
 
       .item-code {
-        font-size: 11px;
-        line-height: 1.23;
+        font-size: 11px !important;
+        line-height: 1.05 !important;
+        white-space: normal !important;
       }
 
       .item-name {
-        font-size: 12px;
-        line-height: 1.2;
-        margin-top: 1px;
+        font-size: 12px !important;
+        line-height: 1.08 !important;
+        margin-top: 0 !important;
+        padding-left: 15px !important;
+      }
+
+      .qty,
+      .price,
+      .total {
+        font-family: "Courier New", "Lucida Console", monospace !important;
+        text-align: right !important;
+        white-space: nowrap !important;
+      }
+
+      .summary {
+        line-height: 1.2 !important;
+      }
+
+      .sum-row {
+        margin: 0 !important;
       }
 
       .sum-row .big {
-        font-size: 16px;
+        font-size: 16px !important;
+        line-height: 1 !important;
       }
 
-      .print-btn,
-      button {
-        display: none !important;
+      img {
+        image-rendering: crisp-edges;
       }
     }
   </style>
@@ -530,7 +562,7 @@
 
       const itemRows = r.items.map(item => `
         <div class="item">
-          <div class="item-line-1">
+          <div class="item-top">
             <div class="item-no">${item.no}</div>
             <div class="item-code">${esc(item.code ? "[" + item.code + "]" : "-")}</div>
             <div class="qty">${fmtMoney(item.qty)}</div>
@@ -582,7 +614,7 @@
 
         <div class="thead">
           <div>#</div>
-          <div>รายการ</div>
+          <div class="col-item">รายการ</div>
           <div class="right">จำนวน</div>
           <div class="right">ราคา</div>
           <div class="right">รวม</div>
