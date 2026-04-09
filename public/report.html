@@ -117,8 +117,8 @@
     .legend span::before { content:""; display:inline-block; width:12px; height:12px; border-radius:999px; margin-right:6px; vertical-align:middle; }
     .legend .sales::before { background:#2563eb; }
     .legend .repair::before { background:#0f766e; }
-    .rank-list, .quick-grid, .bill-list, .stock-list { display:flex; flex-direction:column; gap:12px; }
-    .rank-item, .quick-card, .bill-item, .stock-item {
+    .rank-list, .quick-grid, .bill-list, .stock-list, .payment-list { display:flex; flex-direction:column; gap:12px; }
+    .rank-item, .quick-card, .bill-item, .stock-item, .payment-item {
       border:1px solid var(--line); border-radius:18px; padding:14px; background: rgba(255,255,255,.46);
     }
     body.dark .rank-item, body.dark .quick-card, body.dark .bill-item, body.dark .stock-item { background: rgba(15,23,42,.35); }
@@ -137,12 +137,29 @@
     .bill-table th, .bill-table td { border-bottom:1px solid var(--line); padding:8px 6px; text-align:left; font-size:14px; }
     .bill-table th { color:var(--muted); }
     .action-btn { background: var(--green); color:#fff; border:none; border-radius:12px; padding:10px 14px; font:inherit; font-weight:700; cursor:pointer; }
+
+    .payment-list { margin-top: 14px; }
+    .payment-item {
+      display:grid; grid-template-columns: minmax(120px, 1.1fr) repeat(4, minmax(110px, .8fr)); gap:12px; align-items:center;
+    }
+    .payment-item .date { font-size:18px; font-weight:800; }
+    .payment-item .meta { color:var(--muted); font-size:13px; margin-top:4px; }
+    .payment-pill {
+      border-radius:14px; padding:12px 14px; font-weight:800; text-align:right; border:1px solid var(--line);
+      background: rgba(255,255,255,.42);
+    }
+    body.dark .payment-pill { background: rgba(15,23,42,.35); }
+    .payment-pill .label { display:block; color:var(--muted); font-size:13px; font-weight:600; margin-bottom:4px; text-align:left; }
+    .payment-pill.cash { box-shadow: inset 0 0 0 1px rgba(34,197,94,.10); }
+    .payment-pill.transfer { box-shadow: inset 0 0 0 1px rgba(37,99,235,.10); }
+
     .empty { color:var(--muted); font-size:18px; padding:16px 0; }
     @media (max-width: 1200px) {
       .filters { grid-template-columns: 1fr 1fr; }
       .cards { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
       .grid-2, .bill-grid { grid-template-columns: 1fr; }
       .quick-grid { grid-template-columns: 1fr; }
+      .payment-item { grid-template-columns: 1fr; }
     }
     @media (max-width: 720px) {
       .filters { grid-template-columns: 1fr; }
@@ -212,6 +229,16 @@
         <div class="value" id="laborTotal">0</div>
         <div class="sub">รวมค่าแรงทุกบิลขาย</div>
       </div>
+      <div class="card green">
+        <div class="title">เงินสดในช่วงที่เลือก</div>
+        <div class="value" id="rangeCashIncome">0</div>
+        <div class="sub">รวมเฉพาะบิลที่ชำระด้วยเงินสด</div>
+      </div>
+      <div class="card teal">
+        <div class="title">เงินโอนในช่วงที่เลือก</div>
+        <div class="value" id="rangeTransferIncome">0</div>
+        <div class="sub">รวมเฉพาะบิลที่ชำระด้วยเงินโอน</div>
+      </div>
       <div class="card">
         <div class="title">จำนวนบิล</div>
         <div class="value" id="billCount">0</div>
@@ -261,6 +288,34 @@
         </div>
         <div id="itemProfitList" class="rank-list"></div>
       </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="section-head">
+        <div>
+          <h2>รายได้รายวันแยกตามช่องทางชำระ</h2>
+          <p>ดูยอดเงินสดและเงินโอนของแต่ละวันในช่วงวันที่ที่เลือก</p>
+        </div>
+        <div class="mini-stat">
+          <div class="label">เฉลี่ยเงินโอนต่อวัน</div>
+          <div class="value" id="avgTransferPerDay">0</div>
+        </div>
+      </div>
+      <div class="quick-grid" style="margin-bottom:14px;">
+        <div class="quick-card">
+          <div class="label">เงินสดวันนี้</div>
+          <div class="value" id="todayCashIncome">0</div>
+        </div>
+        <div class="quick-card">
+          <div class="label">เงินโอนวันนี้</div>
+          <div class="value" id="todayTransferIncome">0</div>
+        </div>
+        <div class="quick-card">
+          <div class="label">เงินโอนเดือนนี้</div>
+          <div class="value" id="monthTransferIncome">0</div>
+        </div>
+      </div>
+      <div id="dailyPaymentList" class="payment-list"></div>
     </div>
 
     <div class="panel" style="margin-bottom:18px;">
@@ -482,10 +537,47 @@
       `).join('');
     }
 
+    function renderDailyPayments(rows, summary = {}) {
+      const box = document.getElementById('dailyPaymentList');
+      const avgTransfer = rows.length ? rows.reduce((sum, row) => sum + Number(row.transfer || 0), 0) / rows.length : 0;
+      document.getElementById('avgTransferPerDay').textContent = formatNumber(avgTransfer);
+
+      if (!rows.length) {
+        box.innerHTML = '<div class="empty">ยังไม่มีข้อมูลเงินสด/เงินโอนในช่วงนี้</div>';
+        return;
+      }
+
+      box.innerHTML = rows.map(row => `
+        <div class="payment-item">
+          <div>
+            <div class="date">${escapeHtml(formatThaiDate(row.date))}</div>
+            <div class="meta">จำนวนบิล ${formatNumber(row.billCount || 0)} ใบ</div>
+          </div>
+          <div class="payment-pill cash">
+            <span class="label">เงินสด</span>
+            ${formatNumber(row.cash || 0)}
+          </div>
+          <div class="payment-pill transfer">
+            <span class="label">เงินโอน</span>
+            ${formatNumber(row.transfer || 0)}
+          </div>
+          <div class="payment-pill">
+            <span class="label">รวมต่อวัน</span>
+            ${formatNumber(row.total || 0)}
+          </div>
+          <div class="payment-pill">
+            <span class="label">สัดส่วนเงินโอน</span>
+            ${formatNumber(row.total ? ((Number(row.transfer || 0) / Number(row.total || 0)) * 100) : 0)}%
+          </div>
+        </div>
+      `).join('');
+    }
+
     function renderQuickCards(summary, itemProfits) {
       const avgBill = Number(summary.billCount || 0) ? Number(summary.salesIncome || 0) / Number(summary.billCount || 0) : 0;
       const laborRatio = Number(summary.salesIncome || 0) ? (Number(summary.laborTotal || 0) / Number(summary.salesIncome || 0)) * 100 : 0;
       const topItem = itemProfits[0] || null;
+      const transferRatio = Number(summary.salesIncome || 0) ? (Number(summary.rangeTransferIncome || 0) / Number(summary.salesIncome || 0)) * 100 : 0;
       document.getElementById('quickGrid').innerHTML = `
         <div class="quick-card">
           <div class="label">ยอดเฉลี่ยต่อบิล</div>
@@ -494,6 +586,10 @@
         <div class="quick-card">
           <div class="label">สัดส่วนค่าแรงต่อรายได้ขาย</div>
           <div class="value">${formatNumber(laborRatio)}%</div>
+        </div>
+        <div class="quick-card">
+          <div class="label">สัดส่วนเงินโอนต่อยอดขาย</div>
+          <div class="value">${formatNumber(transferRatio)}%</div>
         </div>
         <div class="quick-card">
           <div class="label">สินค้ากำไรสูงสุด</div>
@@ -583,10 +679,16 @@
         document.getElementById('repairIncome').textContent = formatNumber(summary.repairIncome || 0);
         document.getElementById('rangeSales').textContent = formatNumber(combinedIncome);
         document.getElementById('laborTotal').textContent = formatNumber(summary.laborTotal || 0);
+        document.getElementById('rangeCashIncome').textContent = formatNumber(summary.rangeCashIncome || 0);
+        document.getElementById('rangeTransferIncome').textContent = formatNumber(summary.rangeTransferIncome || 0);
+        document.getElementById('todayCashIncome').textContent = formatNumber(summary.todayCashIncome || 0);
+        document.getElementById('todayTransferIncome').textContent = formatNumber(summary.todayTransferIncome || 0);
+        document.getElementById('monthTransferIncome').textContent = formatNumber(summary.monthTransferIncome || 0);
         document.getElementById('billCount').textContent = formatNumber(summary.billCount || 0);
         document.getElementById('profitTotal').textContent = formatNumber(summary.profitTotal || 0);
 
         renderChart(data.bills || [], data.repairs || []);
+        renderDailyPayments(data.dailyPaymentRows || [], summary);
         renderItemProfits(data.itemProfits || []);
         renderQuickCards(summary, data.itemProfits || []);
         renderLowStock(data.lowStock || []);

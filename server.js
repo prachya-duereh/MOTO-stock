@@ -1490,11 +1490,42 @@ app.get('/api/report', async (req, res) => {
     const billsInRange = bills.filter((bill) => inRange(bill.createdAt));
     const repairsInRange = repairs.filter((repair) => inRange(repair.created_at || repair.repairDate));
 
-    const todaySales = aggregateBills(salesRows.filter((row) => dayKey(row.created_at) === today)).reduce((sum, bill) => sum + asNumber(bill.grandTotal, 0), 0);
-    const monthSales = aggregateBills(salesRows.filter((row) => monthKey(row.created_at) === month)).reduce((sum, bill) => sum + asNumber(bill.grandTotal, 0), 0);
+    const todayBills = aggregateBills(salesRows.filter((row) => dayKey(row.created_at) === today));
+    const monthBills = aggregateBills(salesRows.filter((row) => monthKey(row.created_at) === month));
+
+    const summarizePaymentTotals = (billList = []) => billList.reduce((acc, bill) => {
+      const method = cleanText(bill.paymentMethod) === 'transfer' ? 'transfer' : 'cash';
+      const amount = asNumber(bill.grandTotal, 0);
+      if (method === 'transfer') acc.transfer += amount;
+      else acc.cash += amount;
+      return acc;
+    }, { cash: 0, transfer: 0 });
+
+    const buildDailyPaymentRows = (billList = []) => {
+      const map = new Map();
+      for (const bill of billList) {
+        const day = dayKey(bill.createdAt);
+        if (!day) continue;
+        if (!map.has(day)) map.set(day, { date: day, cash: 0, transfer: 0, total: 0, billCount: 0 });
+        const row = map.get(day);
+        const amount = asNumber(bill.grandTotal, 0);
+        const method = cleanText(bill.paymentMethod) === 'transfer' ? 'transfer' : 'cash';
+        row[method] += amount;
+        row.total += amount;
+        row.billCount += 1;
+      }
+      return Array.from(map.values()).sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    };
+
+    const todaySales = todayBills.reduce((sum, bill) => sum + asNumber(bill.grandTotal, 0), 0);
+    const monthSales = monthBills.reduce((sum, bill) => sum + asNumber(bill.grandTotal, 0), 0);
     const rangeSales = billsInRange.reduce((sum, bill) => sum + asNumber(bill.grandTotal, 0), 0);
     const laborTotal = billsInRange.reduce((sum, bill) => sum + asNumber(bill.laborCost, 0), 0);
     const profitTotal = rowsInRange.reduce((sum, row) => sum + asNumber(row.profit, 0), 0);
+    const todayPaymentTotals = summarizePaymentTotals(todayBills);
+    const monthPaymentTotals = summarizePaymentTotals(monthBills);
+    const rangePaymentTotals = summarizePaymentTotals(billsInRange);
+    const dailyPaymentRows = buildDailyPaymentRows(billsInRange);
 
     const itemProfitMap = new Map();
     for (const row of rowsInRange) {
@@ -1532,11 +1563,18 @@ app.get('/api/report', async (req, res) => {
         profitTotal,
         salesIncome: rangeSales,
         repairIncome: repairsInRange.reduce((sum, repair) => sum + asNumber(repair.totalCost, 0), 0),
+        todayCashIncome: todayPaymentTotals.cash,
+        todayTransferIncome: todayPaymentTotals.transfer,
+        monthCashIncome: monthPaymentTotals.cash,
+        monthTransferIncome: monthPaymentTotals.transfer,
+        rangeCashIncome: rangePaymentTotals.cash,
+        rangeTransferIncome: rangePaymentTotals.transfer,
       },
       itemProfits: Array.from(itemProfitMap.values()).sort((a, b) => b.profit - a.profit),
       lowStock,
       bills: billsInRange,
       repairs: repairsInRange,
+      dailyPaymentRows,
     });
   } catch (error) {
     console.error('GET /api/report', error);
