@@ -10,13 +10,13 @@
     <title>ประวัติการซ่อม</title>
     <style>
       *{box-sizing:border-box;font-family:"Google Sans",sans-serif}
-      :root{--bg:#eef2f7;--card:#fff;--line:#d5dbe4;--text:#1f2937;--muted:#6b7280;--input:#fff;--soft:#fbfdff;} body.dark{--bg:#0f172a;--card:#111c2f;--line:rgba(148,163,184,.24);--text:#e5edf8;--muted:#93a4bb;--input:#162338;--soft:#122033;} body{margin:0;background:var(--bg);color:var(--text)}
-      .page{padding:16px}.topbar,.panel{background:var(--card);border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+      :root{--bg:#eef2f7;--card:#fff;--line:#d5dbe4;--text:#1f2937;--muted:#6b7280;--input:#fff;--soft:#fbfdff;} body.dark{--bg:#0f172a;--card:#111c2f;--line:rgba(148,163,184,.24);--text:#e5edf8;--muted:#93a4bb;--input:#162338;--soft:#122033;} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);overflow:hidden}
+      .page{padding:16px;height:100vh;display:grid;grid-template-rows:auto minmax(0,1fr);gap:16px;overflow:hidden}.topbar,.panel{background:var(--card);border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
       .topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;margin-bottom:16px}
       .topbar-main{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
       .topbar-logo{width:68px;height:68px;object-fit:contain;border-radius:18px;background:var(--card);padding:6px;box-shadow:0 8px 24px rgba(15,23,42,.08)} .nav-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap} .theme-toggle{border:none;border-radius:12px;padding:11px 14px;cursor:pointer;font-weight:700;background:#e9eef6;color:var(--text)} body.dark .theme-toggle{background:#1e293b;color:#e5edf8}
       .nav{display:flex;gap:10px;flex-wrap:wrap}.nav button,button{border:none;border-radius:12px;cursor:pointer}.nav button{background:#2563eb;color:#fff;padding:11px 14px}
-      .grid{display:grid;grid-template-columns:40% 60%;gap:16px}.panel{padding:16px}
+      .grid{display:grid;grid-template-columns:40% minmax(0,60%);gap:16px;min-height:0;overflow:hidden}.panel{padding:16px}.left-panel,.right-panel{min-height:0;min-width:0}.left-panel{overflow:hidden}.right-panel{display:flex;flex-direction:column;min-height:0;overflow:hidden}.repair-search-sticky{position:sticky;top:0;z-index:20;flex:0 0 auto}.repair-list-wrap{position:relative;flex:1;min-height:0;overflow:hidden;border-radius:18px}.repair-list-wrap::before,.repair-list-wrap::after{content:"";position:absolute;left:0;right:10px;height:24px;pointer-events:none;z-index:10}.repair-list-wrap::before{top:0;background:linear-gradient(to bottom,var(--card),rgba(255,255,255,0))}body.dark .repair-list-wrap::before{background:linear-gradient(to bottom,var(--card),rgba(17,28,47,0))}.repair-list-wrap::after{bottom:0;background:linear-gradient(to top,var(--card),rgba(255,255,255,0))}body.dark .repair-list-wrap::after{background:linear-gradient(to top,var(--card),rgba(17,28,47,0))}.repair-list-scroll{margin-top:10px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;flex:1;min-height:0;padding-right:10px}.repair-list-scroll::-webkit-scrollbar{width:10px}.repair-list-scroll::-webkit-scrollbar-thumb{background:rgba(107,114,128,.45);border-radius:999px}
       input,textarea,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font-size:15px;background:var(--input);color:var(--text)} textarea{min-height:110px;resize:vertical}
       .date-field{display:grid;grid-template-columns:1fr 54px;gap:8px;align-items:center}
       .date-picker-btn{height:48px;border:1px solid var(--line);border-radius:12px;background:var(--input);color:#2563eb;font-size:22px;font-weight:700;cursor:pointer}
@@ -27,7 +27,7 @@
       .tool-row,.record-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.record-actions{grid-template-columns:repeat(4,1fr)}
       .save{background:#2563eb;color:#fff;padding:13px;font-weight:700;width:100%;margin-top:10px}.print{background:#16a34a;color:#fff;padding:12px;font-weight:700}.print2{background:#0f766e;color:#fff;padding:12px;font-weight:700}.edit{background:#f59e0b;color:#fff;padding:12px;font-weight:700}.danger{background:#dc2626;color:#fff;padding:12px;font-weight:700}.small{background:#16a34a;color:#fff;padding:12px;font-weight:700;width:100%}
       .muted{color:var(--muted)}.tag{display:inline-block;padding:2px 8px;border-radius:999px;background:#e5e7eb;font-size:11px}.total-box{font-weight:700;font-size:18px;margin-top:10px}
-      @media (max-width:1100px){.grid,.split,.tool-row,.record-actions,.price-mode{grid-template-columns:1fr}}
+      @media (max-width:1100px), (max-height:820px){body{overflow:auto}.page{height:auto;min-height:100vh;display:block;overflow:visible}.grid,.split,.tool-row,.record-actions,.price-mode{grid-template-columns:1fr}.left-panel,.right-panel,.repair-list-wrap,.repair-list-scroll{position:static;max-height:none;height:auto;overflow:visible}.repair-search-sticky{position:static}.repair-list-wrap::before,.repair-list-wrap::after{display:none}}
     </style>
   </head>
   <body>
@@ -45,7 +45,7 @@
         <div class="nav-actions"><button type="button" class="theme-toggle" id="themeToggle">🌙 โหมดมืด</button><img src="/D.jpg" class="topbar-logo" alt="โลโก้ร้าน" onerror="this.style.display='none'" /></div>
       </div>
       <div class="grid">
-        <div class="panel">
+        <div class="left-panel panel">
           <div class="title" id="formTitle">บันทึกประวัติใหม่</div>
           <input id="customerName" placeholder="ชื่อลูกค้า" />
           <div class="split">
@@ -101,10 +101,14 @@
           </div>
         </div>
 
-        <div class="panel">
-          <div class="title">ค้นหาประวัติ</div>
-          <input id="searchRepair" placeholder="ค้นหาชื่อลูกค้า เบอร์ รุ่นรถ ทะเบียน อาการ อะไหล่" oninput="loadRepairs()" />
-          <div id="repairList" style="margin-top:10px"></div>
+        <div class="right-panel panel">
+          <div class="repair-search-sticky">
+            <div class="title">ค้นหาประวัติ</div>
+            <input id="searchRepair" placeholder="ค้นหาชื่อลูกค้า เบอร์ รุ่นรถ ทะเบียน อาการ อะไหล่" oninput="loadRepairs()" />
+          </div>
+          <div class="repair-list-wrap">
+            <div id="repairList" class="repair-list-scroll"></div>
+          </div>
         </div>
       </div>
     </div>

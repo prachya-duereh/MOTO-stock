@@ -36,16 +36,25 @@
         --red: #f87171;
         --gray: #64748b;
       }
+      html, body {
+        height: 100%;
+      }
       body {
         margin: 0;
         font-family: "Google Sans", sans-serif;
         background: var(--bg);
         color: var(--text);
+        overflow: hidden;
       }
       .wrap {
         max-width: 1400px;
+        height: 100vh;
         margin: 0 auto;
         padding: 18px;
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr);
+        gap: 14px;
+        overflow: hidden;
       }
       .topbar {
         display: flex;
@@ -53,7 +62,6 @@
         align-items: center;
         gap: 14px;
         flex-wrap: wrap;
-        margin-bottom: 14px;
       }
       .topbar-main { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
       .topbar-logo { width: 68px; height: 68px; object-fit: contain; border-radius: 18px; background:var(--card); padding:6px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
@@ -79,9 +87,106 @@
       h1, h2, h3 { margin: 0 0 12px; }
       .grid-2 {
         display: grid;
-        grid-template-columns: 420px 1fr;
+        grid-template-columns: 420px minmax(0, 1fr);
         gap: 16px;
-        align-items: start;
+        align-items: stretch;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .left-column,
+      .right-column {
+        min-height: 0;
+        min-width: 0;
+      }
+      .left-column {
+        overflow: hidden;
+      }
+      .left-column > .card {
+        height: 100%;
+        overflow: hidden;
+      }
+      .left-stack {
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .left-stack > .card:first-child {
+        flex: 0 0 auto;
+      }
+      .left-stack > .card:not(:first-child) {
+        flex: 1 1 0;
+        min-height: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .customer-list {
+        flex: 1;
+        min-height: 0;
+        padding-right: 4px;
+      }
+      .right-column {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .search-sticky {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        flex: 0 0 auto;
+      }
+      .item-list-wrap {
+        position: relative;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+        border-radius: 18px;
+      }
+      .item-list-wrap::before,
+      .item-list-wrap::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 10px;
+        height: 26px;
+        pointer-events: none;
+        z-index: 15;
+      }
+      .item-list-wrap::before {
+        top: 0;
+        background: linear-gradient(to bottom, var(--bg), rgba(244,247,251,0));
+      }
+      body.dark .item-list-wrap::before {
+        background: linear-gradient(to bottom, var(--bg), rgba(15,23,42,0));
+      }
+      .item-list-wrap::after {
+        bottom: 0;
+        background: linear-gradient(to top, var(--bg), rgba(244,247,251,0));
+      }
+      body.dark .item-list-wrap::after {
+        background: linear-gradient(to top, var(--bg), rgba(15,23,42,0));
+      }
+      .item-list-scroll {
+        height: 100%;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        padding-right: 10px;
+      }
+      .item-list-scroll::-webkit-scrollbar,
+      .customer-list::-webkit-scrollbar {
+        width: 10px;
+      }
+      .item-list-scroll::-webkit-scrollbar-thumb,
+      .customer-list::-webkit-scrollbar-thumb {
+        background: rgba(95,111,134,.45);
+        border-radius: 999px;
       }
       .form-grid {
         display: grid;
@@ -144,7 +249,6 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 12px;
-        margin-bottom: 14px;
       }
       .summary .box {
         background: var(--card);
@@ -162,9 +266,14 @@
         margin-top: 4px;
       }
       .item-list {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
+        position: relative;
+      }
+      .item-virtual-inner {
+        position: relative;
+      }
+      .item-card {
+        content-visibility: auto;
+        contain-intrinsic-size: 250px;
       }
       .item-card {
         display: grid;
@@ -212,12 +321,32 @@
         color: var(--muted);
         padding: 30px 10px;
       }
-      .customer-list { display:flex; flex-direction:column; gap:10px; margin-top:12px; max-height:320px; overflow:auto; }
+      .customer-list { display:flex; flex-direction:column; gap:10px; margin-top:12px; overflow:auto; }
       .customer-item { border:1px solid var(--line); border-radius:14px; padding:12px; background:#fbfdff; display:flex; justify-content:space-between; gap:12px; align-items:start; }
       .customer-item-name { font-weight:800; font-size:18px; }
       .customer-item-meta { color: var(--muted); font-size:14px; margin-top:4px; }
-      @media (max-width: 1000px) {
-        .grid-2 { grid-template-columns: 1fr; }
+      @media (max-width: 1000px), (max-height: 820px) {
+        body { overflow: auto; }
+        .wrap {
+          height: auto;
+          min-height: 100vh;
+          display: block;
+          overflow: visible;
+        }
+        .grid-2 { grid-template-columns: 1fr; min-height: auto; overflow: visible; }
+        .left-column, .right-column, .item-list-wrap, .item-list-scroll, .left-column > .card, .left-stack, .customer-list {
+          position: static;
+          max-height: none;
+          height: auto;
+          overflow: visible;
+        }
+        .search-sticky {
+          position: static;
+        }
+        .item-list-wrap::before,
+        .item-list-wrap::after {
+          display: none;
+        }
         .summary { grid-template-columns: repeat(2, 1fr); }
         .item-card { grid-template-columns: 1fr; }
       }
@@ -259,8 +388,10 @@
       </div>
 
       <div class="grid-2">
-        <div class="card">
-          <h2>เพิ่ม / แก้ไขสินค้า</h2>
+        <div class="left-column">
+          <div class="left-stack">
+            <div class="card">
+              <h2>เพิ่ม / แก้ไขสินค้า</h2>
 
           <form id="itemForm">
             <input type="hidden" id="itemId" />
@@ -333,8 +464,8 @@
             </div>
           </form>
 
-        <div class="card" style="margin-top:14px;">
-          <h2>เติมสต๊อกด้วยบาร์โค้ด</h2>
+            <div class="card">
+              <h2>เติมสต๊อกด้วยบาร์โค้ด</h2>
           <div class="form-grid">
             <div class="full">
               <label>ยิงบาร์โค้ดสินค้าเดิมในระบบ</label>
@@ -355,8 +486,8 @@
           </div>
         </div>
 
-        <div class="card" style="margin-top:14px;">
-          <h2>รายชื่อลูกค้าหน้าร้าน</h2>
+            <div class="card">
+              <h2>รายชื่อลูกค้าหน้าร้าน</h2>
           <div class="form-grid">
             <div>
               <label>ชื่อลูกค้า</label>
@@ -378,21 +509,27 @@
           <div id="customerList" class="customer-list"></div>
         </div>
 
+            </div>
+          </div>
         </div>
 
-        <div>
-          <div class="card" style="margin-bottom:14px;">
-            <h2>รายการสินค้า / แจ้งเตือนของใกล้หมด</h2>
-            <div class="search-row">
-              <input id="searchInput" placeholder="ค้นหาสินค้า รหัส ประเภท รุ่น ปี หมายเหตุ" />
-              <select id="filterMode">
-                <option value="all">ทั้งหมด</option>
-                <option value="low">เฉพาะใกล้หมด</option>
-              </select>
+        <div class="right-column">
+          <div class="search-sticky">
+            <div class="card" style="margin-bottom:14px;">
+              <h2>รายการสินค้า / แจ้งเตือนของใกล้หมด</h2>
+              <div class="search-row">
+                <input id="searchInput" placeholder="ค้นหาสินค้า รหัส ประเภท รุ่น ปี หมายเหตุ" />
+                <select id="filterMode">
+                  <option value="all">ทั้งหมด</option>
+                  <option value="low">เฉพาะใกล้หมด</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div id="itemList" class="item-list"></div>
+          <div class="item-list-wrap">
+            <div id="itemList" class="item-list item-list-scroll"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -423,6 +560,11 @@
 
       let items = [];
       let customers = [];
+      let itemListVirtualState = {
+        source: [],
+        rowHeight: 252,
+        overscan: 6
+      };
 
       function money(n) {
         const num = Number(n || 0);
@@ -565,64 +707,103 @@
         });
       }
 
-      function renderItems() {
-        const list = getFilteredItems();
-        updateSummary(items);
+      function getItemCardHtml(item) {
+        const low = isLowStock(item);
+        return `
+          <div class="item-card">
+            <div>
+              <div class="item-name">${escapeHtml(item.name || "-")}</div>
+              <div class="meta">
+                <div><b>รหัสสินค้า:</b> ${escapeHtml(item.barcode || "-")}</div>
+                <div>ประเภท: ${escapeHtml(item.category || "-")} | รุ่น: ${escapeHtml(item.model || "-")} | ปี: ${escapeHtml(item.year || "-")}</div>
+                <div class="${low ? "warn" : ""}">
+                  คงเหลือ: ${money(item.quantity || 0)} | เตือนต่ำกว่า: ${money(item.minStock || 0)}
+                </div>
+                <div>
+                  ปลีก ${money(item.retailPrice || 0)} |
+                  ส่ง ${money(item.wholesalePrice || 0)} |
+                  ซ่อม ${money(item.mechanicPrice || 0)} |
+                  ต้นทุน ${money(item.costPrice || 0)}
+                </div>
+                <div>หมายเหตุ: ${escapeHtml(item.note || "-")}</div>
+              </div>
+            </div>
 
+            <div class="stock-panel">
+              <div class="stock-input">
+                <input id="stock-${item.id}" type="number" min="1" step="1" placeholder="จำนวนเพิ่ม / ลด" />
+              </div>
+
+              <div class="stock-btns-2">
+                <button class="btn-green" onclick="adjustStock('${item.id}', 'add')">เติมเข้า</button>
+                <button class="btn-orange" onclick="adjustStock('${item.id}', 'remove')">ตัดออก</button>
+              </div>
+
+              <div class="stock-btns-3">
+                <button class="btn-green" onclick="quickStock('${item.id}', 1)">+1</button>
+                <button class="btn-orange" onclick="quickStock('${item.id}', -1)">-1</button>
+                <button class="btn-red" onclick="deleteItem('${item.id}')">ลบ</button>
+              </div>
+
+              <div class="stock-btns-2">
+                <button class="btn-light" onclick="editItem('${item.id}')">แก้ไข</button>
+                <button class="btn-gray" onclick="copyBarcode('${escapeHtml(item.barcode || "")}')">คัดลอกรหัส</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function syncVirtualItemList() {
         const box = document.getElementById("itemList");
+        const list = itemListVirtualState.source || [];
+        const rowHeight = itemListVirtualState.rowHeight;
+        const overscan = itemListVirtualState.overscan;
 
+        if (!box) return;
         if (!list.length) {
           box.innerHTML = `<div class="card empty">ไม่พบสินค้า</div>`;
           return;
         }
 
-        box.innerHTML = list.map(item => {
-          const low = isLowStock(item);
+        const viewportHeight = box.clientHeight || 800;
+        const scrollTop = box.scrollTop || 0;
+        const start = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan);
+        const visibleCount = Math.ceil(viewportHeight / rowHeight) + (overscan * 2);
+        const end = Math.min(list.length, start + visibleCount);
+        const offsetTop = start * rowHeight;
+        const totalHeight = list.length * rowHeight;
 
-          return `
-            <div class="item-card">
-              <div>
-                <div class="item-name">${escapeHtml(item.name || "-")}</div>
-                <div class="meta">
-                  <div><b>รหัสสินค้า:</b> ${escapeHtml(item.barcode || "-")}</div>
-                  <div>ประเภท: ${escapeHtml(item.category || "-")} | รุ่น: ${escapeHtml(item.model || "-")} | ปี: ${escapeHtml(item.year || "-")}</div>
-                  <div class="${low ? "warn" : ""}">
-                    คงเหลือ: ${money(item.quantity || 0)} | เตือนต่ำกว่า: ${money(item.minStock || 0)}
-                  </div>
-                  <div>
-                    ปลีก ${money(item.retailPrice || 0)} |
-                    ส่ง ${money(item.wholesalePrice || 0)} |
-                    ซ่อม ${money(item.mechanicPrice || 0)} |
-                    ต้นทุน ${money(item.costPrice || 0)}
-                  </div>
-                  <div>หมายเหตุ: ${escapeHtml(item.note || "-")}</div>
-                </div>
-              </div>
+        const inner = document.createElement("div");
+        inner.className = "item-virtual-inner";
+        inner.style.height = totalHeight + "px";
 
-              <div class="stock-panel">
-                <div class="stock-input">
-                  <input id="stock-${item.id}" type="number" min="1" step="1" placeholder="จำนวนเพิ่ม / ลด" />
-                </div>
-
-                <div class="stock-btns-2">
-                  <button class="btn-green" onclick="adjustStock('${item.id}', 'add')">เติมเข้า</button>
-                  <button class="btn-orange" onclick="adjustStock('${item.id}', 'remove')">ตัดออก</button>
-                </div>
-
-                <div class="stock-btns-3">
-                  <button class="btn-green" onclick="quickStock('${item.id}', 1)">+1</button>
-                  <button class="btn-orange" onclick="quickStock('${item.id}', -1)">-1</button>
-                  <button class="btn-red" onclick="deleteItem('${item.id}')">ลบ</button>
-                </div>
-
-                <div class="stock-btns-2">
-                  <button class="btn-light" onclick="editItem('${item.id}')">แก้ไข</button>
-                  <button class="btn-gray" onclick="copyBarcode('${escapeHtml(item.barcode || "")}')">คัดลอกรหัส</button>
-                </div>
-              </div>
-            </div>
-          `;
+        const slice = list.slice(start, end).map((item, index) => {
+          const y = offsetTop + (index * rowHeight);
+          return `<div style="position:absolute;left:0;right:0;top:${y}px;">${getItemCardHtml(item)}</div>`;
         }).join("");
+
+        inner.innerHTML = slice;
+        box.replaceChildren(inner);
+
+        requestAnimationFrame(() => {
+          const firstCard = box.querySelector(".item-card");
+          if (!firstCard) return;
+          const measured = Math.ceil(firstCard.getBoundingClientRect().height) + 14;
+          if (measured > 180 && Math.abs(measured - itemListVirtualState.rowHeight) > 8) {
+            itemListVirtualState.rowHeight = measured;
+            syncVirtualItemList();
+          }
+        });
+      }
+
+      function renderItems(resetScroll = false) {
+        const list = getFilteredItems();
+        updateSummary(items);
+        const box = document.getElementById("itemList");
+        if (resetScroll && box) box.scrollTop = 0;
+        itemListVirtualState.source = list;
+        syncVirtualItemList();
       }
 
       async function adjustStock(id, mode) {
@@ -713,7 +894,7 @@
         document.getElementById("minStock").value = Number(item.minStock || 0);
         document.getElementById("note").value = item.note ?? "";
 
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        document.getElementById("name")?.focus({ preventScroll: false });
       }
 
       function resetForm() {
