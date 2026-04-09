@@ -1134,6 +1134,7 @@ app.post('/api/checkout', async (req, res) => {
         itemsTotal: 0,
         grandTotal: 0,
         customerName,
+        paymentMethod,
         paid,
         change: 0,
         created_at: createdAt,
