@@ -83,8 +83,11 @@
       font-size: 12px;
       line-height: 1.2;
       margin: 0;
-      font-weight: 400;
+      font-weight: 600;
     }
+    .shop-tel {
+  font-weight: 600;
+}
 
     .dash {
       border: 0;
@@ -95,7 +98,7 @@
     .title {
       text-align: center;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 800;
       line-height: 1.15;
       margin: 4px 0 6px;
     }
@@ -173,6 +176,9 @@
       font-weight: 400;
       font-family: "Courier New", "Lucida Console", monospace;
     }
+    .price {
+  padding-right: 3px;
+}
 
     .item-no {
       text-align: left;
@@ -222,10 +228,36 @@
     }
 
     .sum-row .big {
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 17px;
+      font-weight: 700;
       line-height: 1.05;
     }
+    .sum-row.total {
+  grid-template-columns: auto 1fr;
+}
+
+.sum-row.total div:first-child {
+  text-align: left;
+}
+
+.sum-row.total div:last-child {
+  text-align: right;
+}
+.sum-row.total strong:first-child {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sum-row.total .big {
+  font-size: 16px;
+  font-weight: 700;
+}
+    .sum-row.total {
+  margin-top: 4px;
+  padding-top: 3px;
+  border-top: 1px dashed #000;
+}
+    
 
     .thanks {
       text-align: center;
@@ -347,8 +379,11 @@
       .item,
       .summary,
       .thanks {
-        color: #000 !important;
+        color: #000000 !important;
       }
+      .shop-tel {
+      font-weight: 600 !important;
+     }
 
       .dash {
         border-top: 1px dashed #000 !important;
@@ -417,6 +452,9 @@
         font-family: "Courier New", "Lucida Console", monospace !important;
         white-space: nowrap !important;
       }
+      .price {
+  padding-right: 3px !important;
+}
 
       .item-no {
         text-align: left !important;
@@ -443,10 +481,35 @@
       }
 
       .sum-row .big {
-        font-size: 14px !important;
+        font-size: 17px !important;
         line-height: 1 !important;
       }
+      .sum-row.total {
+  grid-template-columns: auto 1fr !important;
+}
 
+.sum-row.total div:first-child {
+  text-align: left !important;
+}
+
+.sum-row.total div:last-child {
+  text-align: right !important;
+}
+.sum-row.total strong:first-child {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.sum-row.total .big {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+      .sum-row.total {
+         margin-top: 4px !important;
+         padding-top: 3px !important;
+         border-top: 1px dashed #000 !important;
+}
+    
       img {
         image-rendering: crisp-edges;
       }
@@ -705,12 +768,11 @@
             <div><strong>ส่วนลด</strong></div>
             <div><strong>${fmtMoney(r.discount)}</strong></div>
           </div>
-          <div class="sum-row">
-            <div><strong>ยอดรวม</strong></div>
-            <div><strong class="big">${fmtMoney(r.grandTotal)}</strong></div>
-          </div>
-        </div>
-
+          <div class="sum-row total">
+         <div><strong>ยอดรวม</strong></div>
+         <div><strong class="big">${fmtMoney(r.grandTotal)}</strong></div>
+         </div>
+          
         <hr class="dash">
 
         <div class="summary">
