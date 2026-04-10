@@ -1,0 +1,447 @@
+:root {
+  --radius-xs: 12px;
+  --radius-sm: 16px;
+  --radius-md: 20px;
+  --radius-lg: 24px;
+  --panel-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  --panel-shadow-hover: 0 22px 48px rgba(15, 23, 42, 0.12);
+  --ring: 0 0 0 4px rgba(37, 99, 235, 0.14);
+}
+body.dark {
+  --panel-shadow: 0 22px 48px rgba(2, 6, 23, 0.34);
+  --panel-shadow-hover: 0 26px 54px rgba(2, 6, 23, 0.42);
+  --ring: 0 0 0 4px rgba(79, 140, 255, 0.2);
+}
+html { scroll-behavior: smooth; }
+body {
+  background-image:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 30%),
+    radial-gradient(circle at top right, rgba(20, 184, 166, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0));
+}
+body.dark {
+  background-image:
+    radial-gradient(circle at top left, rgba(79, 140, 255, 0.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(20, 184, 166, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+}
+.topbar,
+.panel,
+.card,
+.left-panel,
+.right-panel,
+.bill-item,
+.rank-item,
+.quick-card,
+.stock-item,
+.payment-item,
+.item-card,
+.product-card,
+.record,
+.customer-item,
+.summary .box,
+.login-card,
+.card {
+  box-shadow: var(--panel-shadow);
+}
+.topbar,
+.panel,
+.card,
+.summary .box,
+.item-card,
+.product-card,
+.record,
+.bill-item,
+.rank-item,
+.quick-card,
+.stock-item,
+.payment-item,
+.customer-item {
+  backdrop-filter: blur(12px);
+}
+.topbar {
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 16px 20px !important;
+  position: relative;
+  overflow: hidden;
+}
+.topbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0));
+  pointer-events: none;
+}
+body.dark .topbar::before {
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+}
+.topbar > * { position: relative; z-index: 1; }
+.topbar-logo,
+.page-logo,
+.logo {
+  border: 1px solid var(--line);
+}
+.brand,
+.topbar h1,
+.title {
+  letter-spacing: -0.02em;
+}
+.nav, .nav-actions {
+  align-items: center;
+}
+.nav a,
+.nav button,
+.theme-toggle,
+.btn,
+button,
+.action-btn,
+.small,
+.print,
+.print2,
+.edit,
+.danger,
+.date-picker-btn,
+.qty-btn,
+.remove-btn,
+.price-tab,
+.pay-method-btn,
+.quick-money button {
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, background-color .18s ease, border-color .18s ease;
+}
+.nav a,
+.nav button,
+.theme-toggle {
+  min-height: 48px !important;
+  padding: 12px 18px !important;
+  border-radius: 14px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.16);
+}
+.nav a:hover,
+.nav button:hover,
+.theme-toggle:hover,
+.btn:hover,
+button:hover,
+.action-btn:hover,
+.small:hover,
+.print:hover,
+.print2:hover,
+.edit:hover,
+.danger:hover,
+.date-picker-btn:hover,
+.qty-btn:hover,
+.remove-btn:hover,
+.price-tab:hover,
+.pay-method-btn:hover,
+.quick-money button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.02);
+}
+.nav a.active,
+.nav button.active-nav {
+  background: linear-gradient(180deg, #1d4ed8, #2563eb) !important;
+  box-shadow: 0 10px 24px rgba(37,99,235,0.28);
+}
+.theme-toggle {
+  background: linear-gradient(180deg, #f8fafc, #e2e8f0) !important;
+  color: var(--text) !important;
+  box-shadow: 0 8px 18px rgba(100,116,139,0.16) !important;
+}
+body.dark .theme-toggle {
+  background: linear-gradient(180deg, #243246, #172132) !important;
+  color: #e5edf8 !important;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+input,
+select,
+textarea {
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: rgba(37,99,235,.32) !important;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(37,99,235,.5) !important;
+  box-shadow: var(--ring);
+}
+.card,
+.panel,
+.summary .box,
+.product-card,
+.item-card,
+.record,
+.customer-item,
+.rank-item,
+.quick-card,
+.bill-item,
+.stock-item,
+.payment-item {
+  border-radius: var(--radius-md) !important;
+}
+.summary .box,
+.card,
+.quick-card,
+.rank-item,
+.bill-item,
+.stock-item,
+.payment-item,
+.product-card,
+.item-card,
+.record,
+.customer-item {
+  position: relative;
+  overflow: hidden;
+}
+.summary .box::after,
+.card::after,
+.quick-card::after {
+  content: "";
+  position: absolute;
+  right: -20px;
+  top: -20px;
+  width: 92px;
+  height: 92px;
+  border-radius: 999px;
+  background: rgba(59,130,246,.08);
+  pointer-events: none;
+}
+body.dark .summary .box::after,
+body.dark .card::after,
+body.dark .quick-card::after {
+  background: rgba(148,163,184,.08);
+}
+.section-title,
+.section-head h2,
+.card h2,
+.card h3 {
+  letter-spacing: -0.02em;
+}
+.section-title,
+.section-head h2,
+.card h2 {
+  font-size: clamp(20px, 2vw, 24px) !important;
+}
+.status-bar,
+.scan-status,
+#stockBarcodeResult,
+#partBarcodeResult {
+  border-radius: 14px;
+}
+.bill-table th {
+  font-weight: 700;
+}
+.bill-table tr:hover td {
+  background: rgba(37,99,235,.03);
+}
+body.dark .bill-table tr:hover td {
+  background: rgba(79,140,255,.04);
+}
+.item-list-scroll,
+.left-column,
+.repair-list-scroll,
+.products,
+.checkout-panel,
+.customer-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100,116,139,.5) transparent;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(100,116,139,.42);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-track { background: transparent; }
+.tag {
+  border: 1px solid rgba(148,163,184,.28);
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  font-weight: 700;
+}
+body.dark .tag {
+  background: rgba(30,41,59,.72) !important;
+}
+.empty,
+.empty-box {
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,.32);
+}
+body.dark .empty,
+body.dark .empty-box {
+  background: rgba(15,23,42,.22);
+}
+/* Admin */
+body .wrap {
+  position: relative;
+}
+.summary .box {
+  min-height: 120px;
+}
+.summary .label,
+.card .title,
+.quick-card .label,
+.section-head p,
+.brand p {
+  color: var(--muted) !important;
+}
+.item-card {
+  gap: 18px !important;
+}
+.item-name,
+.product-name,
+.customer-item-name,
+.rank-item-top,
+.bill-title {
+  letter-spacing: -0.02em;
+}
+.stock-panel,
+.record-actions,
+.checkout-actions,
+.actions,
+.payment-methods,
+.quick-money,
+.stock-btns-2,
+.stock-btns-3 {
+  gap: 12px !important;
+}
+.customer-item {
+  background: rgba(255,255,255,.52) !important;
+}
+body.dark .customer-item {
+  background: rgba(15,23,42,.4) !important;
+}
+/* POS */
+.checkout-panel,
+.products-panel {
+  border-radius: var(--radius-lg) !important;
+}
+.search-row input,
+.field input,
+.field select,
+.field textarea {
+  border-radius: 16px !important;
+}
+.product-card {
+  background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(248,250,252,.96)) !important;
+}
+body.dark .product-card {
+  background: linear-gradient(180deg, rgba(17,28,47,.92), rgba(18,32,51,.98)) !important;
+}
+.product-card .btn,
+.product-card button,
+.select-btn {
+  min-height: 46px;
+}
+.cart-summary-box,
+.payment-box {
+  border-radius: var(--radius-md) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+}
+.cart-table-wrap table tr:hover td {
+  background: rgba(37,99,235,.03);
+}
+.pay-method-btn,
+.price-tab {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+}
+.pay-method-btn.active,
+.price-tab.active {
+  box-shadow: 0 14px 28px rgba(37,99,235,.16);
+}
+.sum-row {
+  padding: 6px 0;
+}
+/* Repair */
+.record {
+  background: linear-gradient(180deg, rgba(255,255,255,.86), rgba(248,250,252,.96));
+}
+body.dark .record {
+  background: linear-gradient(180deg, rgba(17,28,47,.92), rgba(18,32,51,.98));
+}
+.record-actions button,
+.small,
+.print,
+.print2,
+.edit,
+.danger {
+  min-height: 46px;
+  border-radius: 14px !important;
+}
+.date-field input,
+#partSelect,
+#paperSize,
+#customerName,
+#phone,
+#plate,
+#bikeModel,
+#partSearch,
+#partBarcode,
+#partQty,
+#partBarcodeResult,
+#repairDateDisplay,
+textarea,
+.split input,
+.left-panel > input,
+.left-panel > select {
+  border-radius: 16px !important;
+}
+.parts-box,
+.total-box {
+  border-radius: var(--radius-md);
+}
+/* Report */
+.filters.panel {
+  padding: 16px !important;
+}
+.mini-stat {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+}
+.payment-pill,
+.quick-card,
+.rank-item,
+.bill-item,
+.stock-item {
+  background: rgba(255,255,255,.5) !important;
+}
+body.dark .payment-pill,
+body.dark .quick-card,
+body.dark .rank-item,
+body.dark .bill-item,
+body.dark .stock-item {
+  background: rgba(15,23,42,.42) !important;
+}
+/* Login */
+body > .card {
+  box-shadow: var(--panel-shadow) !important;
+}
+body > .card h1 {
+  letter-spacing: -0.03em;
+}
+body > .card button[type="submit"] {
+  box-shadow: 0 14px 28px rgba(47,99,220,.22);
+}
+@media (max-width: 900px) {
+  .topbar {
+    padding: 16px !important;
+  }
+  .nav a,
+  .nav button,
+  .theme-toggle {
+    min-height: 46px !important;
+    padding: 11px 16px !important;
+  }
+}
