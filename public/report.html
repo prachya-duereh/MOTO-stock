@@ -62,8 +62,12 @@
     .brand p { margin:4px 0 0; color:var(--muted); }
     .nav { display:flex; gap:10px; flex-wrap:wrap; }
     .nav a, .btn {
-      text-decoration:none; border:none; cursor:pointer; border-radius:14px; font:inherit; font-weight:700;
-      padding: 12px 16px;
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      min-height: 50px;
+      text-decoration:none; border:none; cursor:pointer; border-radius:14px; font:inherit; font-size:15px; font-weight:700;
+      padding: 12px 18px;
+      line-height:1;
+      white-space:nowrap;
     }
     .nav a { background: var(--primary); color:#fff; }
     .filters {
@@ -182,7 +186,7 @@
           <a href="/admin.html">⚙️ หลังบ้าน</a>
           <a href="/pos.html">🛒 หน้าร้าน</a>
           <a href="/repair-history.html">🔧 ประวัติซ่อม</a>
-          <button class="btn btn-light" id="themeToggle" type="button">🌙 Dark mode</button>
+          <button class="btn btn-light" id="themeToggle" type="button">🌙 โหมดมืด</button>
         </div>
       </div>
       <img src="/D.jpg" class="topbar-logo" alt="โลโก้ร้าน" onerror="this.style.display='none'" />
@@ -450,6 +454,8 @@
         })) : [],
         itemsTotal: Number(bill.itemsTotal || 0),
         laborCost: Number(bill.laborCost || 0),
+        discount: Number(bill.discount || 0),
+        grandTotal: Number(bill.grandTotal || 0),
         total: Number(bill.grandTotal || 0),
         paymentMethod: bill.paymentMethod || 'cash',
         paid: Number(bill.paid || 0),

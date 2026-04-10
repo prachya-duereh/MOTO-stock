@@ -422,6 +422,22 @@ function repairToDb(repair) {
 }
 
 function sanitizeSaleRow(record = {}) {
+  const laborCost = asNumber(record.labor_cost ?? record.laborCost, 0);
+  const discount = asNumber(record.discount ?? record.discount_amount, 0);
+  const itemsTotal = asNumber(record.items_total ?? record.itemsTotal, 0);
+  const rawGrandTotal = asNumber(record.grand_total ?? record.grandTotal, 0);
+  const hasBillMathFields = [
+    record.items_total,
+    record.itemsTotal,
+    record.labor_cost,
+    record.laborCost,
+    record.discount,
+    record.discount_amount,
+  ].some((value) => value !== undefined && value !== null && String(value).trim() !== '');
+  const grandTotal = hasBillMathFields
+    ? Math.max(0, itemsTotal + laborCost - discount)
+    : rawGrandTotal;
+
   return {
     id: Number(record.id),
     saleId: cleanText(record.sale_id ?? record.saleId),
@@ -438,10 +454,10 @@ function sanitizeSaleRow(record = {}) {
     total: asNumber(record.total, 0),
     costPrice: asNumber(record.cost_price ?? record.costPrice, 0),
     profit: asNumber(record.profit, 0),
-    laborCost: asNumber(record.labor_cost ?? record.laborCost, 0),
-    discount: asNumber(record.discount ?? record.discount_amount, 0),
-    itemsTotal: asNumber(record.items_total ?? record.itemsTotal, 0),
-    grandTotal: asNumber(record.grand_total ?? record.grandTotal, 0),
+    laborCost,
+    discount,
+    itemsTotal,
+    grandTotal,
     customerName: cleanText(record.customer_name ?? record.customerName),
     paymentMethod: cleanText(record.payment_method ?? record.paymentMethod) || 'cash',
     paid: asNumber(record.paid, 0),
