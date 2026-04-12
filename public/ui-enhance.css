@@ -483,13 +483,28 @@ body.dark .empty-box {
 
 
 /* Admin card balance fix */
+<<<<<<< HEAD
 
 /* Admin squash fix */
 
+=======
+<<<<<<< HEAD
+=======
+
+/* Admin squash fix */
+>>>>>>> 7d9ab75dfb3366e8d261fcd013f7181eb8995b12
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
 body[data-page="admin"] .item-list {
   display: flex !important;
   flex-direction: column !important;
   align-items: stretch !important;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7d9ab75dfb3366e8d261fcd013f7181eb8995b12
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
   gap: 14px !important;
 }
 body[data-page="admin"] .item-card {
@@ -514,6 +529,12 @@ body[data-page="admin"] .item-name {
 }
 body[data-page="admin"] .meta {
   line-height: 1.8 !important;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
 }
 body[data-page="admin"] .item-card {
   display: grid !important;
@@ -533,6 +554,10 @@ body[data-page="admin"] .item-name {
 }
 body[data-page="admin"] .meta {
   line-height: 1.75 !important;
+<<<<<<< HEAD
+=======
+>>>>>>> 7d9ab75dfb3366e8d261fcd013f7181eb8995b12
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
 }
 body[data-page="admin"] .stock-panel {
   width: 100% !important;
@@ -547,23 +572,50 @@ body[data-page="admin"] .stock-panel {
 body[data-page="admin"] .stock-panel input,
 body[data-page="admin"] .stock-panel button {
   width: 100% !important;
+<<<<<<< HEAD
   box-sizing: border-box !important;
   box-sizing: border-box !important;
 
+=======
+<<<<<<< HEAD
+  box-sizing: border-box !important;
+=======
+
+  box-sizing: border-box !important;
+
+>>>>>>> 7d9ab75dfb3366e8d261fcd013f7181eb8995b12
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
 }
 body[data-page="admin"] .stock-btns-2,
 body[data-page="admin"] .stock-btns-3 {
   align-items: stretch !important;
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7d9ab75dfb3366e8d261fcd013f7181eb8995b12
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
   gap: 12px !important;
 }
 body[data-page="admin"] .stock-btns-2 button,
 body[data-page="admin"] .stock-btns-3 button {
   min-height: 44px !important;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
 }
 body[data-page="admin"] .stock-btns-2 button,
 body[data-page="admin"] .stock-btns-3 button {
   min-height: 46px !important;
+<<<<<<< HEAD
+=======
+>>>>>>> 7d9ab75dfb3366e8d261fcd013f7181eb8995b12
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
 }
 body[data-page="admin"] .customer-list {
   display: flex !important;
@@ -579,12 +631,22 @@ body[data-page="admin"] .customer-item {
   padding: 14px 14px !important;
   overflow: hidden !important;
   box-sizing: border-box !important;
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
   align-items: flex-start !important;
   gap: 14px !important;
   min-height: 92px !important;
   padding: 14px !important;
   overflow: visible !important;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7d9ab75dfb3366e8d261fcd013f7181eb8995b12
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
 }
 body[data-page="admin"] .customer-item > div:first-child {
   flex: 1 1 auto !important;
@@ -592,7 +654,14 @@ body[data-page="admin"] .customer-item > div:first-child {
 }
 body[data-page="admin"] .customer-item button {
   flex: 0 0 52px !important;
+<<<<<<< HEAD
   flex: 0 0 auto !important;
+=======
+<<<<<<< HEAD
+=======
+  flex: 0 0 auto !important;
+>>>>>>> 7d9ab75dfb3366e8d261fcd013f7181eb8995b12
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
   align-self: center !important;
   min-width: 52px !important;
 }
@@ -607,6 +676,12 @@ body[data-page="admin"] .customer-item button {
     min-height: 0 !important;
   }
 }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
 /* Admin product card overlap hotfix */
 body[data-page="admin"] .item-list-scroll {
   padding-bottom: 18px !important;
@@ -675,4 +750,10 @@ body[data-page="admin"] .stock-panel button {
     width: 100% !important;
     min-width: 0 !important;
   }
+<<<<<<< HEAD
 }
+=======
+}
+=======
+>>>>>>> 7d9ab75dfb3366e8d261fcd013f7181eb8995b12
+>>>>>>> f8363f97d19c770cda1bbb0a18eca907e7641af2
