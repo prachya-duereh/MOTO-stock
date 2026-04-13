@@ -36,9 +36,7 @@
         --red: #f87171;
         --gray: #64748b;
       }
-      html, body {
-        height: 100%;
-      }
+      html, body { height: 100%; }
       body {
         margin: 0;
         font-family: "Google Sans", sans-serif;
@@ -93,10 +91,7 @@
         flex: 1;
         min-height: 0;
       }
-      .left-column,
-      .right-column {
-        min-height: 0;
-      }
+      .left-column, .right-column { min-height: 0; }
       .left-column {
         overflow-y: auto;
         padding-right: 6px;
@@ -150,9 +145,7 @@
         -webkit-overflow-scrolling: touch;
       }
       .item-list-scroll::-webkit-scrollbar,
-      .left-column::-webkit-scrollbar {
-        width: 10px;
-      }
+      .left-column::-webkit-scrollbar { width: 10px; }
       .item-list-scroll::-webkit-scrollbar-thumb,
       .left-column::-webkit-scrollbar-thumb {
         background: rgba(107,114,128,.45);
@@ -163,9 +156,7 @@
         grid-template-columns: 1fr 1fr;
         gap: 10px;
       }
-      .form-grid .full {
-        grid-column: 1 / -1;
-      }
+      .form-grid .full { grid-column: 1 / -1; }
       label {
         display: block;
         font-size: 14px;
@@ -182,10 +173,7 @@
         font-size: 16px;
         outline: none;
       }
-      textarea {
-        min-height: 90px;
-        resize: vertical;
-      }
+      textarea { min-height: 90px; resize: vertical; }
       .actions {
         display: flex;
         gap: 10px;
@@ -226,15 +214,8 @@
         border-radius: 18px;
         padding: 14px;
       }
-      .summary .label {
-        color: var(--muted);
-        font-size: 14px;
-      }
-      .summary .value {
-        font-size: 28px;
-        font-weight: 800;
-        margin-top: 4px;
-      }
+      .summary .label { color: var(--muted); font-size: 14px; }
+      .summary .value { font-size: 28px; font-weight: 800; margin-top: 4px; }
       .item-list {
         display: flex;
         flex-direction: column;
@@ -249,20 +230,9 @@
         border-radius: 18px;
         padding: 16px;
       }
-      .item-name {
-        font-size: 20px;
-        font-weight: 800;
-        margin-bottom: 2px;
-      }
-      .meta {
-        color: var(--muted);
-        line-height: 1.7;
-        font-size: 15px;
-      }
-      .warn {
-        color: var(--red);
-        font-weight: 700;
-      }
+      .item-name { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+      .meta { color: var(--muted); line-height: 1.7; font-size: 15px; }
+      .warn { color: var(--red); font-weight: 700; }
       .stock-panel {
         display: flex;
         flex-direction: column;
@@ -274,11 +244,7 @@
         grid-template-columns: 1fr;
         gap: 10px;
       }
-      .stock-btns-2,
-      .stock-btns-3 {
-        display: grid;
-        gap: 10px;
-      }
+      .stock-btns-2, .stock-btns-3 { display: grid; gap: 10px; }
       .stock-btns-2 { grid-template-columns: 1fr 1fr; }
       .stock-btns-3 { grid-template-columns: 1fr 1fr 1fr; }
       .empty {
@@ -327,146 +293,65 @@
       </div>
 
       <div class="summary">
-        <div class="box">
-          <div class="label">จำนวนสินค้า</div>
-          <div class="value" id="sumItems">0</div>
-        </div>
-        <div class="box">
-          <div class="label">จำนวนคงเหลือรวม</div>
-          <div class="value" id="sumQty">0</div>
-        </div>
-        <div class="box">
-          <div class="label">ใกล้หมด</div>
-          <div class="value" id="sumLow">0</div>
-        </div>
-        <div class="box">
-          <div class="label">มูลค่าสต๊อกตามต้นทุน</div>
-          <div class="value" id="sumCost">0</div>
-        </div>
+        <div class="box"><div class="label">จำนวนสินค้า</div><div class="value" id="sumItems">0</div></div>
+        <div class="box"><div class="label">จำนวนคงเหลือรวม</div><div class="value" id="sumQty">0</div></div>
+        <div class="box"><div class="label">ใกล้หมด</div><div class="value" id="sumLow">0</div></div>
+        <div class="box"><div class="label">มูลค่าสต๊อกตามต้นทุน</div><div class="value" id="sumCost">0</div></div>
       </div>
 
       <div class="grid-2">
         <div class="left-column">
-        <div class="card">
-          <h2>เพิ่ม / แก้ไขสินค้า</h2>
-
-          <form id="itemForm">
-            <input type="hidden" id="itemId" />
-
-            <div class="form-grid">
-              <div class="full">
-                <label>ชื่อสินค้า</label>
-                <input id="name" required />
+          <div class="card">
+            <h2>เพิ่ม / แก้ไขสินค้า</h2>
+            <form id="itemForm">
+              <input type="hidden" id="itemId" />
+              <div class="form-grid">
+                <div class="full"><label>ชื่อสินค้า</label><input id="name" required /></div>
+                <div><label>รหัสสินค้า / บาร์โค้ด</label><input id="barcode" /></div>
+                <div><label>ประเภท</label><input id="category" /></div>
+                <div><label>รุ่น</label><input id="model" /></div>
+                <div><label>ปี</label><input id="year" /></div>
+                <div><label>จำนวนเริ่มต้น</label><input id="quantity" type="number" min="0" value="0" /></div>
+                <div><label>ราคาปลีก</label><input id="retailPrice" type="number" min="0" step="0.01" value="0" /></div>
+                <div><label>ราคาส่ง</label><input id="wholesalePrice" type="number" min="0" step="0.01" value="0" /></div>
+                <div><label>ราคาซ่อม</label><input id="mechanicPrice" type="number" min="0" step="0.01" value="0" /></div>
+                <div><label>ต้นทุน</label><input id="costPrice" type="number" min="0" step="0.01" value="0" /></div>
+                <div><label>แจ้งเตือนของใกล้หมด</label><input id="minStock" type="number" min="0" step="1" value="0" /></div>
+                <div class="full"><label>หมายเหตุ</label><textarea id="note"></textarea></div>
               </div>
-
-              <div>
-                <label>รหัสสินค้า / บาร์โค้ด</label>
-                <input id="barcode" />
+              <div class="actions">
+                <button type="submit" class="btn-primary">บันทึกสินค้า</button>
+                <button type="button" class="btn-light" onclick="resetForm()">ล้างฟอร์ม</button>
               </div>
+            </form>
 
-              <div>
-                <label>ประเภท</label>
-                <input id="category" />
+            <div class="card" style="margin-top:14px;">
+              <h2>เติมสต๊อกด้วยบาร์โค้ด</h2>
+              <div class="form-grid">
+                <div class="full"><label>ยิงบาร์โค้ดสินค้าเดิมในระบบ</label><input id="stockBarcode" placeholder="ยิงบาร์โค้ดแล้วกด Enter" /></div>
+                <div><label>จำนวนที่เติมเข้า</label><input id="stockBarcodeQty" type="number" min="1" step="1" value="1" /></div>
+                <div><label>สถานะ</label><input id="stockBarcodeResult" placeholder="รอการสแกน" readonly /></div>
               </div>
-
-              <div>
-                <label>รุ่น</label>
-                <input id="model" />
-              </div>
-
-              <div>
-                <label>ปี</label>
-                <input id="year" />
-              </div>
-
-              <div>
-                <label>จำนวนเริ่มต้น</label>
-                <input id="quantity" type="number" min="0" value="0" />
-              </div>
-
-              <div>
-                <label>ราคาปลีก</label>
-                <input id="retailPrice" type="number" min="0" step="0.01" value="0" />
-              </div>
-
-              <div>
-                <label>ราคาส่ง</label>
-                <input id="wholesalePrice" type="number" min="0" step="0.01" value="0" />
-              </div>
-
-              <div>
-                <label>ราคาซ่อม</label>
-                <input id="mechanicPrice" type="number" min="0" step="0.01" value="0" />
-              </div>
-
-              <div>
-                <label>ต้นทุน</label>
-                <input id="costPrice" type="number" min="0" step="0.01" value="0" />
-              </div>
-
-              <div>
-                <label>แจ้งเตือนของใกล้หมด</label>
-                <input id="minStock" type="number" min="0" step="1" value="0" />
-              </div>
-
-              <div class="full">
-                <label>หมายเหตุ</label>
-                <textarea id="note"></textarea>
+              <div class="actions">
+                <button type="button" class="btn-green" onclick="stockInByBarcode()">เติมสต๊อก</button>
+                <button type="button" class="btn-light" onclick="clearBarcodeStockForm()">ล้าง</button>
               </div>
             </div>
 
-            <div class="actions">
-              <button type="submit" class="btn-primary">บันทึกสินค้า</button>
-              <button type="button" class="btn-light" onclick="resetForm()">ล้างฟอร์ม</button>
-            </div>
-          </form>
-
-        <div class="card" style="margin-top:14px;">
-          <h2>เติมสต๊อกด้วยบาร์โค้ด</h2>
-          <div class="form-grid">
-            <div class="full">
-              <label>ยิงบาร์โค้ดสินค้าเดิมในระบบ</label>
-              <input id="stockBarcode" placeholder="ยิงบาร์โค้ดแล้วกด Enter" />
-            </div>
-            <div>
-              <label>จำนวนที่เติมเข้า</label>
-              <input id="stockBarcodeQty" type="number" min="1" step="1" value="1" />
-            </div>
-            <div>
-              <label>สถานะ</label>
-              <input id="stockBarcodeResult" placeholder="รอการสแกน" readonly />
+            <div class="card" style="margin-top:14px;">
+              <h2>รายชื่อลูกค้าหน้าร้าน</h2>
+              <div class="form-grid">
+                <div><label>ชื่อลูกค้า</label><input id="customerEntryName" placeholder="เช่น คุณปิด" /></div>
+                <div><label>เบอร์โทร (ถ้ามี)</label><input id="customerEntryPhone" placeholder="เช่น 0812345678" /></div>
+                <div class="full"><label>หมายเหตุ</label><input id="customerEntryNote" placeholder="เช่น ลูกค้าประจำ / บริษัท / ร้านซ่อม" /></div>
+              </div>
+              <div class="actions">
+                <button type="button" class="btn-primary" onclick="saveCustomerEntry()">บันทึกลูกค้า</button>
+                <button type="button" class="btn-light" onclick="clearCustomerEntry()">ล้าง</button>
+              </div>
+              <div id="customerList" class="customer-list"></div>
             </div>
           </div>
-          <div class="actions">
-            <button type="button" class="btn-green" onclick="stockInByBarcode()">เติมสต๊อก</button>
-            <button type="button" class="btn-light" onclick="clearBarcodeStockForm()">ล้าง</button>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <h2>รายชื่อลูกค้าหน้าร้าน</h2>
-          <div class="form-grid">
-            <div>
-              <label>ชื่อลูกค้า</label>
-              <input id="customerEntryName" placeholder="เช่น คุณปิด" />
-            </div>
-            <div>
-              <label>เบอร์โทร (ถ้ามี)</label>
-              <input id="customerEntryPhone" placeholder="เช่น 0812345678" />
-            </div>
-            <div class="full">
-              <label>หมายเหตุ</label>
-              <input id="customerEntryNote" placeholder="เช่น ลูกค้าประจำ / บริษัท / ร้านซ่อม" />
-            </div>
-          </div>
-          <div class="actions">
-            <button type="button" class="btn-primary" onclick="saveCustomerEntry()">บันทึกลูกค้า</button>
-            <button type="button" class="btn-light" onclick="clearCustomerEntry()">ล้าง</button>
-          </div>
-          <div id="customerList" class="customer-list"></div>
-        </div>
-
-        </div>
         </div>
 
         <div class="right-column">
@@ -489,28 +374,30 @@
     </div>
 
     <script>
+      const THEME_KEY = 'motoTheme';
+      let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
 
-    const THEME_KEY = 'motoTheme';
-    let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
+      function updateThemeToggleText() {
+        const toggle = document.getElementById('themeToggle');
+        if (!toggle) return;
+        toggle.textContent = currentTheme === 'dark' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
+      }
 
-    function updateThemeToggleText() {
-      const toggle = document.getElementById('themeToggle');
-      if (!toggle) return;
-      toggle.textContent = currentTheme === 'dark' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
-    }
+      function applyTheme(theme) {
+        currentTheme = theme === 'dark' ? 'dark' : 'light';
+        document.body.classList.toggle('dark', currentTheme === 'dark');
+        localStorage.setItem(THEME_KEY, currentTheme);
+        updateThemeToggleText();
+      }
 
-    function applyTheme(theme) {
-      currentTheme = theme === 'dark' ? 'dark' : 'light';
-      document.body.classList.toggle('dark', currentTheme === 'dark');
-      localStorage.setItem(THEME_KEY, currentTheme);
-      updateThemeToggleText();
-    }
+      function toggleTheme() {
+        applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+      }
 
-    function toggleTheme() {
-      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-    }
-
-      document.addEventListener('DOMContentLoaded', () => { applyTheme(currentTheme); document.getElementById('themeToggle')?.addEventListener('click', toggleTheme); });
+      document.addEventListener('DOMContentLoaded', () => {
+        applyTheme(currentTheme);
+        document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+      });
 
       let items = [];
       let customers = [];
@@ -546,7 +433,6 @@
         const cost = list.reduce((sum, i) => sum + Number(i.quantity || 0) * Number(i.costPrice || 0), 0);
         document.getElementById("sumCost").textContent = money(cost);
       }
-
 
       async function loadCustomers() {
         try {
@@ -637,20 +523,7 @@
         const mode = document.getElementById("filterMode").value;
 
         return items.filter(item => {
-          const hit =
-            !q ||
-            [
-              item.name,
-              item.barcode,
-              item.category,
-              item.model,
-              item.year,
-              item.note
-            ]
-              .join(" ")
-              .toLowerCase()
-              .includes(q);
-
+          const hit = !q || [item.name, item.barcode, item.category, item.model, item.year, item.note].join(" ").toLowerCase().includes(q);
           const stockHit = mode === "low" ? isLowStock(item) : true;
           return hit && stockHit;
         });
@@ -659,7 +532,6 @@
       function renderItems() {
         const list = getFilteredItems();
         updateSummary(items);
-
         const box = document.getElementById("itemList");
 
         if (!list.length) {
@@ -720,13 +592,9 @@
         try {
           const input = document.getElementById("stock-" + id);
           const value = Number(input.value);
-
-          if (!value || value <= 0) {
-            return alert("กรุณาใส่จำนวน");
-          }
+          if (!value || value <= 0) return alert("กรุณาใส่จำนวน");
 
           const change = mode === "add" ? value : -value;
-
           const res = await fetch(`/api/items/${id}/stock`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -734,11 +602,7 @@
           });
 
           const result = await res.json();
-
-          if (!res.ok || !result.success) {
-            throw new Error(result.message || "ปรับสต๊อกไม่สำเร็จ");
-          }
-
+          if (!res.ok || !result.success) throw new Error(result.message || "ปรับสต๊อกไม่สำเร็จ");
           input.value = "";
           await loadItems();
         } catch (err) {
@@ -755,11 +619,7 @@
           });
 
           const result = await res.json();
-
-          if (!res.ok || !result.success) {
-            throw new Error(result.message || "ปรับสต๊อกไม่สำเร็จ");
-          }
-
+          if (!res.ok || !result.success) throw new Error(result.message || "ปรับสต๊อกไม่สำเร็จ");
           await loadItems();
         } catch (err) {
           alert(err.message || "เกิดข้อผิดพลาด");
@@ -769,17 +629,9 @@
       async function deleteItem(id) {
         try {
           if (!confirm("ลบสินค้านี้ใช่หรือไม่")) return;
-
-          const res = await fetch(`/api/items/${id}`, {
-            method: "DELETE"
-          });
-
+          const res = await fetch(`/api/items/${id}`, { method: "DELETE" });
           const result = await res.json();
-
-          if (!res.ok || !result.success) {
-            throw new Error(result.message || "ลบสินค้าไม่สำเร็จ");
-          }
-
+          if (!res.ok || !result.success) throw new Error(result.message || "ลบสินค้าไม่สำเร็จ");
           await loadItems();
         } catch (err) {
           alert(err.message || "เกิดข้อผิดพลาด");
@@ -803,7 +655,6 @@
         document.getElementById("costPrice").value = Number(item.costPrice || 0);
         document.getElementById("minStock").value = Number(item.minStock || 0);
         document.getElementById("note").value = item.note ?? "";
-
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
@@ -820,10 +671,8 @@
 
       async function saveItem(event) {
         event.preventDefault();
-
         try {
           const id = document.getElementById("itemId").value.trim();
-
           const payload = {
             name: document.getElementById("name").value.trim(),
             barcode: document.getElementById("barcode").value.trim(),
@@ -839,9 +688,7 @@
             note: document.getElementById("note").value.trim()
           };
 
-          if (!payload.name) {
-            return alert("กรุณาใส่ชื่อสินค้า");
-          }
+          if (!payload.name) return alert("กรุณาใส่ชื่อสินค้า");
 
           const method = id ? "PUT" : "POST";
           const url = id ? `/api/items/${id}` : "/api/items";
@@ -853,11 +700,7 @@
           });
 
           const result = await res.json();
-
-          if (!res.ok || !result.success) {
-            throw new Error(result.message || "บันทึกสินค้าไม่สำเร็จ");
-          }
-
+          if (!res.ok || !result.success) throw new Error(result.message || "บันทึกสินค้าไม่สำเร็จ");
           resetForm();
           await loadItems();
           alert("บันทึกสินค้าเรียบร้อย");
@@ -865,8 +708,6 @@
           alert(err.message || "เกิดข้อผิดพลาด");
         }
       }
-
-
 
       function clearBarcodeStockForm() {
         document.getElementById("stockBarcode").value = "";
@@ -878,13 +719,8 @@
         try {
           const barcode = document.getElementById("stockBarcode").value.trim();
           const qty = Number(document.getElementById("stockBarcodeQty").value) || 0;
-
-          if (!barcode) {
-            return alert("กรุณายิงหรือกรอกบาร์โค้ด");
-          }
-          if (qty <= 0) {
-            return alert("กรุณาใส่จำนวนให้ถูกต้อง");
-          }
+          if (!barcode) return alert("กรุณายิงหรือกรอกบาร์โค้ด");
+          if (qty <= 0) return alert("กรุณาใส่จำนวนให้ถูกต้อง");
 
           const res = await fetch("/api/items/stock-by-barcode", {
             method: "POST",
@@ -893,9 +729,7 @@
           });
 
           const result = await res.json();
-          if (!res.ok || !result.success) {
-            throw new Error(result.message || "เติมสต๊อกไม่สำเร็จ");
-          }
+          if (!res.ok || !result.success) throw new Error(result.message || "เติมสต๊อกไม่สำเร็จ");
 
           document.getElementById("stockBarcodeResult").value = `${result.item.name} | คงเหลือ ${money(result.item.quantity)}`;
           document.getElementById("stockBarcode").value = "";
@@ -908,9 +742,7 @@
 
       async function copyBarcode(barcode) {
         try {
-          if (!barcode || barcode === "-") {
-            return alert("ไม่มีรหัสสินค้า");
-          }
+          if (!barcode || barcode === "-") return alert("ไม่มีรหัสสินค้า");
           await navigator.clipboard.writeText(barcode);
           alert("คัดลอกรหัสแล้ว");
         } catch (err) {
